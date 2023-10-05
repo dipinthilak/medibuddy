@@ -1,0 +1,173 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Medibuddy Dashboard</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assetsbackend/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link href="/assetsbackend/css/main.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <main>
+        <header class="main-header style-2 navbar">
+            <div class="col-brand">
+                <a href="index.html" class="brand-wrap">
+                    <img src="/assetsbackend/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard">
+                </a>
+            </div>
+            <div class="col-nav">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i> </a>
+                    </li>
+
+                </ul>
+            </div>
+        </header>
+        <section class="content-main mt-80 mb-80">
+            <div class="card mx-auto card-login">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Sign in</h4>
+                    <form method="post" id="adminLoginform" action="/admin/login">
+                        <div class="mb-3">
+                            <input class="form-control" placeholder="Username " required="true" aria-required="true" name="email" id="email" type="text">
+                        </div> <!-- form-group// -->
+                        <div class="mb-3">
+                            <input class="form-control" placeholder="Password" id="password" required="true" aria-required="true" name="password" type="password">
+                        </div> <!-- form-group// -->
+                        <div class="mb-3">
+                            <label class="form-check">
+                                <input type="checkbox" class="form-check-input" checked="">
+                            </label>
+                        </div> <!-- form-group form-check .// -->
+                        <div class="mb-4">
+                            <button type="submit" class="btn btn-primary w-100"> Login </button>
+                        </div> <!-- form-group// -->
+                    </form>
+                    <!-- <p id="validptag" style="color: crimson;"></p> -->
+                </div>
+            </div>
+        </section>
+        <footer class="main-footer text-center">
+            <p class="font-xs">
+                <script>
+                document.write(new Date().getFullYear())
+                </script>
+            </p>
+            <p class="font-xs mb-30">All rights reserved</p>
+        </footer>
+    </main>
+    <script src="/assetsbackend/js/vendors/jquery-3.6.0.min.js"></script>
+    <script src="/assetsbackend/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="/assetsbackend/js/vendors/jquery.fullscreen.min.js"></script>
+    <!-- Main Script -->
+    <script src="/assetsbackend/js/main.js" type="text/javascript"></script>
+    <!-- <script>
+    const form = document.getElementById('adminLoginform');
+    const validptag=document.getElementById('validptag')
+    form.addEventListener('submit', function (e) {
+    e.preventDefault(); // Prevent the default form submission
+
+  // Validation logic here
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+
+  if (!isValidEmail(email)) {
+    let emailInput=document.getElementById('email');
+    emailInput.style.border = '2px solid red';
+    emailInput.focus();
+    validptag.innerText='Invalid email';
+
+    return;
+  }
+
+  if (!isValidPassword(password)) {
+    alert('Invalid password');
+    return;
+  }
+
+  // If all validations pass, submit the form
+  form.submit();
+});
+
+// Validation functions
+function isValidUsername(username) {
+  // Implement username validation logic
+  return username.length >= 3;
+}
+
+function isValidEmail(email) {
+  // Implement email validation logic (e.g., regex)
+  const emailPattern = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
+  return emailPattern.test(email);
+}
+
+function isValidPassword(password) {
+  // Implement password validation logic
+  return password.length >= 8;
+} 
+
+
+// function isloginValidate()
+//     {
+//     console.log("VALIDATION STARTS HERE!!!!!");
+// 	const isValidEmail = (email) => 
+// 	{
+// 	//const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+// 	const re =/[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,3}/;
+// 	return re.test(String(email).toLowerCase());
+// 	}
+
+// let warning="";
+// 		const email = document.getElementById('email');
+// 		const password = document.getElementById('password');
+// 			const emailValue = email.value.trim();
+// 			const passwordValue = password.value.trim();
+// 			const passwordRegex  = /^[a-zA-Z0-9!@#$%^&*]{6,16}$/;
+
+// if(emailValue === '' || null) {
+// 	warning +='Please enter email';
+// 	console.log(warning);
+// 	document.getElementById('validptag').innerHTML("")
+// 		return false;
+// 	} else if (!isValidEmail(emailValue)) {
+// 		warning +='Please enter a correct email';
+// 	console.log(warning);
+// 		return false;
+// 	} 
+// 	else if(password.length<6){  
+// 		warning +="Password must be at least 6 characters long.";  
+// 	console.log(warning);
+// 	  return false;  
+// 	  } else if(passwordValue === '') {
+// 		warning +="Please enter password";
+// 	console.log(warning);
+// 		return false;
+// 	}
+// 	// else if(!passwordValue.match(passwordRegex)){
+// 	//   alert("Please enter password minimum size 6 char");
+// 	// 	return false;
+// 	// }
+// 	if(warning =='')
+// 	{
+// 	console.log(warning);
+// 		// alert("User data Succesfully submitted");
+// 		return  true; 
+// 	}
+  
+// }
+//   
+  </script>
+</body>
+
+</html>
