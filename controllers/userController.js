@@ -54,15 +54,13 @@ const newUser = async(req, res) => {
 const userSignin=async (req,res)=>{
     try{
         const email=req.body.email;
-        console.log(req.body.email, req.body.password);
         const udetails=await User.findOne({email:email});
-        console.log(udetails);
         const passwordMatch = await bcrypt.compare(req.body.password, udetails.password);
-        console.log(passwordMatch);
         if(passwordMatch)
         {
-            req.session.userlogin=true;
-            req.session.userId=udetails._id;
+            req.session.user_id=udetails._id;
+            req.session.user=udetails.name;
+            console.log(req.session.user_id, req.session.user);
             res.render('userDashboard')
         }
         else{
@@ -84,4 +82,12 @@ const userLogout = async(req,res)=>{
 } 
 
 
-module.exports = {userhome,loadSignup,loadSignin,newUser,userSignin,userLogout};
+module.exports = {
+                userhome,
+                loadSignup,
+                loadSignin,
+                newUser,
+                userSignin,
+                userLogout
+                
+            };

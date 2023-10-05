@@ -2,8 +2,12 @@
 const isLogin = async(req, res, next)=> {
     try {
 
-        if(req.session.user_id){  next();}
+        if(req.session.user_id){ 
+            console.log("isLogin>>> user active ,so next");
+            next();
+            }
         else{
+            console.log("isLogin>>> user not-active ,so / ");
             res.redirect('/')
         }
 
@@ -16,9 +20,15 @@ const isLogin = async(req, res, next)=> {
 const isLogout = async(req, res, next)=> {
     try {
 
-        if(req.session.user_id){
+        if(!req.session.user_id){
+            console.log("isLogout>>> user not-active ,so next")
+
+            next();            
+        }
+        else{ 
+            console.log("isLogout>>> user active ,so home")
+
             res.redirect('/userHome')
-        }else{ next()
         }
 
     } catch (error) {

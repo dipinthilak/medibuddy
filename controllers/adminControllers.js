@@ -12,14 +12,11 @@ const adminSignin = async (req, res) => {
   try {
     const email = req.body.email;
     if (req.body.email != null && req.body.password != null) {
-      console.log(req.body.email, req.body.password);
       const adetails = await Admin.findOne({ email: email });
-      console.log(adetails);
       const passwordMatch = await bcrypt.compare(
         req.body.password,
         adetails.password
       );
-      console.log(passwordMatch);
       if (passwordMatch) {
         req.session.admin = adetails._id;
         res.render("adminDashboard");
