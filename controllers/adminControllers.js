@@ -21,13 +21,13 @@ const adminSignin = async (req, res) => {
       );
       console.log(passwordMatch);
       if (passwordMatch) {
-        req.session.adminlogin = true;
+        req.session.admin = adetails._id;
         res.render("adminDashboard");
       } else {
-        res.redirect("/admin");
+        res.redirect("/admin/");
       }
     } else {
-      res.redirect("/admin");
+      res.redirect("/admin/");
     }
   } catch (er) {
     console.log(er);
@@ -83,8 +83,8 @@ const userUpdate = async (req, res) => {
   }
 };
 const adminSignout=async (req,res)=>{
-  req.session.destroy((err) => {
-    res.redirect('/') 
+ await req.session.destroy((err) => {
+    res.redirect('/admin/') 
   })
 
 }

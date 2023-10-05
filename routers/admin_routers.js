@@ -139,8 +139,8 @@ admin_routers.get("/productDelete",adminauth.isLogin,productControllers.editProd
 
 
 
-// admin_routers.use("/*", (req, res) => {
-//   res.redirect("/admin");
-// });
+admin_routers.use("/*", adminauth.isLogin,(req, res) => {
+  res.redirect("/admin");
+});
 
 module.exports = admin_routers;
