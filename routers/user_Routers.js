@@ -27,7 +27,7 @@ user_routers.use(session({
   user_routers.post("/userSignin",userController.userSignin);
 
 
-  user_routers.get("/userDashboard",userauth.isLogin,userController.loadSignup);
+  user_routers.get("/userDashboard",userauth.isLogin,userController.userDashboard);
 
   user_routers.get("/userlogout",userauth.isLogin,userController.userLogout);
 

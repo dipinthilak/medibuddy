@@ -9,13 +9,10 @@ const loadproductManagement = async (req, res) => {
 const addProduct=async (req,res)=>{
     try{
     const categorydata=await Category.find({},{name:1});
-    console.log(categorydata);
     for (var i = 0; i < categorydata.length; i++) { 
        console.log(categorydata[i].name);
   }
-
     res.render("adminProductadd",{categorydata:categorydata})
-
   }
   catch(er)
   {
@@ -25,9 +22,7 @@ const addProduct=async (req,res)=>{
 
 const addProductdata=async(req,res)=>{
       try {
-          console.log(req.body);
-          const fileNames = req.files.map(file => file.filename); 
-          console.log(fileNames);      
+          const fileNames = req.files.map(file => file.filename);    
           let product = new Product({
               productName : req.body.productname,
               brandName : req.body.productbrand,
@@ -56,7 +51,7 @@ const addProductdata=async(req,res)=>{
 
 const editProduct=async(req,res)=>
   { const productId =req.query.pid;
-    console.log(productId);
+    // console.log(productId);
     try{
       const categorydata=await Category.find({},{name:1});
       const productdata=await Product.find({_id:productId});

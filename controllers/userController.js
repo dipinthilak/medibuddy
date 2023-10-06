@@ -1,5 +1,6 @@
 const User = require('../models/userSchema');
-const Category=require('../models/categorySchema')
+const Category=require('../models/categorySchema');
+const Product=require("../models/productSchema")
 const bcrypt = require('bcrypt')
 
 const ecryptpassword = async(password)=> {
@@ -13,19 +14,31 @@ const ecryptpassword = async(password)=> {
 
 const userhome=async (req,res)=>{
     const category =await Category.find();
-    console.log(category);
-    res.render('userHome',{category:category})  
+    const product=await Product.find();
+    console.log(product[0].image);
+    if(req.session.user_id)
+    {
+        const user=await User.findById(req.session.user_id);
+        res.render('userHome',{category:category,
+            user:user})  
+    }
+    else{
+        res.render('userHome',{category:category,product:product,user:null})  
+        }
     };
 
 const loadSignup=async(req,res)=>{
     res.render('userSignup')
     };
 
+const userDashboard =async (req,res)=>{
+    const user = await User.findById(req.session.user_id)
+    res.render('userDashboard',{user:user})
+    };
 
 const loadSignin=async(req,res)=>{
     res.render('userSignin')
     };
-
 
 const newUser = async(req, res) => {
     try {
@@ -51,7 +64,8 @@ const newUser = async(req, res) => {
     {
         console.log(error.message);
     }
-}
+    };
+
 const userSignin=async (req,res)=>{
     try{
         const email=req.body.email;
@@ -62,7 +76,7 @@ const userSignin=async (req,res)=>{
             req.session.user_id=udetails._id;
             req.session.user=udetails.name;
             console.log(req.session.user_id, req.session.user);
-            res.render('userDashboard')
+            res.render('userDashboard',{user : udetails})
         }
         else{
             res.redirect('/userSignin');
@@ -71,7 +85,7 @@ const userSignin=async (req,res)=>{
     catch(er){
 
     }
-};
+    };
 
 const userLogout = async(req,res)=>{
     try {
@@ -89,6 +103,7 @@ module.exports = {
                 loadSignin,
                 newUser,
                 userSignin,
+                userDashboard,
                 userLogout
                 
             };

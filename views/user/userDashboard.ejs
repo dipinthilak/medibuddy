@@ -42,16 +42,27 @@
                         </div> -->
                     </div>
                     <div class="col-xl-3 col-lg-4">
+                        <%if(user){%>
                         <div class="header-info header-info-right">
                             <ul>
                                 <li>
                                     <a class="language-dropdown-active" href="#"> <i class="fi-rs-world"></i> English </a>
-                                    <li><i class="fi-rs-user"></i><a href="/userDashboard">User</a></li>
-                                    <li><i class="fi-rs-user"></i><a href="/userlogout">SignOUt </a></li>
-                                    <li><i class="fi-rs-user"></i><a href="/userSignin">Log In </a></li>
-                                    <li><i class="fi-rs-user"></i><a href="/userSignup"> Sign Up</a></li>
+                                    <li><i class="fi-rs-user"></i><a href="/userDashboard"><%=user.name%></a></li>
+                                    <li><i class="fi-rs-user"></i><a href="/userlogout">Signout </a></li>
+                              
                             </ul>
                         </div>
+                        <%}else{%>
+                            <div class="header-info header-info-right">
+                                <ul>
+                                    <li>
+                                        <a class="language-dropdown-active" href="#"> <i class="fi-rs-world"></i> English </a>
+                                  
+                                        <li><i class="fi-rs-user"></i><a href="/userSignin">Login </a></li>
+                                        <li><i class="fi-rs-user"></i><a href="/userSignup"> Signup</a></li>
+                                </ul>
+                            </div>
+                            <%}%>
                     </div>
                 </div>
             </div>
