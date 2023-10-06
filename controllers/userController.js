@@ -13,6 +13,7 @@ const ecryptpassword = async(password)=> {
 
 const userhome=async (req,res)=>{
     const category =await Category.find();
+    console.log(category);
     res.render('userHome',{category:category})  
     };
 

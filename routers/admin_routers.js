@@ -32,7 +32,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 //multer product
-
 const prostorage = multer.diskStorage({
   destination: (req, file, cb) => {
     return cb(null, path.join(__dirname, "../public/admin/product"));
@@ -42,7 +41,6 @@ const prostorage = multer.diskStorage({
   },
 });
 const proupload = multer({ storage: prostorage });
-
 
 
 // sharp cat
@@ -73,8 +71,6 @@ const sharpcrop = async (req, res, next) => {
     console.error(er);
   }
 };
-
-
 // sharp product
 // const productsharpcrop = async (req, res, next) => {
 //   const uncroppedimage = `C:/Users/dipin/Documents/VS Code/week11_14/medibuddy/public/admin/product/${req.file.filename}`;
@@ -111,6 +107,7 @@ const sharpcrop = async (req, res, next) => {
 admin_routers.get("/",adminauth.isLogout, adminControllers.loadLogin);
 admin_routers.post("/login", adminControllers.adminSignin);
 admin_routers.get("/logout",adminauth.isLogin, adminControllers.adminSignout);
+admin_routers.get("/adminDashboard",adminauth.isLogin,adminControllers.adminDashboard);
 
 
 //User management
@@ -135,7 +132,7 @@ admin_routers.get("/addnewProducts",adminauth.isLogin,productControllers.addProd
 admin_routers.post("/addnewProductsdata",proupload.array("image"),productControllers.addProductdata);
 admin_routers.get("/productEdit",adminauth.isLogin,productControllers.editProduct);
 admin_routers.post("/updateProductdata",proupload.array("image"),productControllers.updateProduct);
-admin_routers.get("/productDelete",adminauth.isLogin,productControllers.editProduct);
+admin_routers.get("/productDelete",adminauth.isLogin,productControllers.productDelete);
 
 
 

@@ -31,6 +31,10 @@ const adminSignin = async (req, res) => {
   }
 };
 
+const adminDashboard=async (req,res)=>{
+  res.render("adminDashboard");
+};
+
 const loadUsermanagement = async (req, res) => {
   const users = await User.find();
   // console.log(users);
@@ -79,12 +83,13 @@ const userUpdate = async (req, res) => {
     console.error(er);
   }
 };
+
 const adminSignout=async (req,res)=>{
  await req.session.destroy((err) => {
     res.redirect('/admin/') 
   })
 
-}
+};
 module.exports = {
   loadLogin,
   adminSignin,
@@ -92,5 +97,6 @@ module.exports = {
   userstatusChange,
   userdataUpdate,
   userUpdate,
-  adminSignout
+  adminSignout,
+  adminDashboard
 };

@@ -6,7 +6,6 @@ const loadproductManagement = async (req, res) => {
     res.render("adminProductmanagement", { products: productOut });
   };
 
-
 const addProduct=async (req,res)=>{
     try{
     const categorydata=await Category.find({},{name:1});
@@ -59,7 +58,6 @@ const editProduct=async(req,res)=>
   { const productId =req.query.pid;
     console.log(productId);
     try{
-
       const categorydata=await Category.find({},{name:1});
       const productdata=await Product.find({_id:productId});
       console.log(productdata);
@@ -72,13 +70,16 @@ const editProduct=async(req,res)=>
     }
 
   };
-  const productDelete=async(req,res)=>
+
+const productDelete=async(req,res)=>
   { const productId =req.query.pid;
     console.log(productId);
     try{
+      const productImg=await Product.findOne({_id:productId},{image:1});
       const productdata=await Product.deleteOne({_id:productId});
       console.log(productdata);
-      res.redirect('/productmanagement');
+      console.log(productImg);
+      res.redirect('/admin/productmanagement');
 
     }
     catch(er)
@@ -87,6 +88,7 @@ const editProduct=async(req,res)=>
     }
 
   };
+
 const updateProduct=async(req,res)=>{
   //   try {
   //     const productId =req.query.pid;
@@ -120,11 +122,12 @@ const updateProduct=async(req,res)=>{
   // }
             res.redirect('/admin/productmanagement');
     
-  }
+  };
   module.exports={
     loadproductManagement,
     addProduct,
     addProductdata,
     editProduct,
-    updateProduct
+    updateProduct,
+    productDelete
   }

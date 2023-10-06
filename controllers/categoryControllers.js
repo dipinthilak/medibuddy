@@ -85,7 +85,6 @@ const updateCategoryitem=async (req,res)=>{
       filename: "cpd" + req.file.filename,
       isListed: "true",
     });
-
           // Image deletion
           fs.unlink(
             `C:/Users/dipin/Documents/VS Code/week11_14/medibuddy/public/admin/category/${catImg}`,
