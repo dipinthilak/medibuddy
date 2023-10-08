@@ -20,6 +20,7 @@ user_routers.use(session({
 
   user_routers.get('/',userController.userhome);
   user_routers.get('/userHome',(req,res)=>{   res.redirect('/');    });
+  user_routers.get("/userShopproduct",userController.productShop)
     
   user_routers.get("/userSignin",userauth.isLogout,userController.loadSignin);
   user_routers.get("/userSignup",userauth.isLogout,userController.loadSignup);
@@ -28,7 +29,6 @@ user_routers.use(session({
 
 
   user_routers.get("/userDashboard",userauth.isLogin,userController.userDashboard);
-
   user_routers.get("/userlogout",userauth.isLogin,userController.userLogout);
 
   module.exports = user_routers;

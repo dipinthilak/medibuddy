@@ -1,37 +1,58 @@
 const Admin = require("../models/adminSchema");
 const User = require("../models/userSchema");
 const bcrypt = require("bcrypt");
-const path = require('path')
-
+const path = require("path");
 
 const loadLogin = (req, res) => {
-  res.render("adminLogin");
+  if (req.query.credential) {
+    const crerror = true;
+    res.render("adminLogin", { crerror });
+  }
+  const crerror = false;
+  res.render("adminLogin", { crerror });
 };
 
-const adminSignin = async (req, res) => {
-  try {
+const adminSignin = async (req, res) => 
+{
+  try 
+  {
     const email = req.body.email;
-    if (req.body.email != null && req.body.password != null) {
-      const adetails = await Admin.findOne({ email: email });
-      const passwordMatch = await bcrypt.compare(
-        req.body.password,
-        adetails.password
-      );
-      if (passwordMatch) {
-        req.session.admin = adetails._id;
-        res.render("adminDashboard");
-      } else {
-        res.redirect("/admin/");
-      }
-    } else {
-      res.redirect("/admin/");
+    if (req.body.email != null && req.body.password != null) 
+        {
+          const adetails = await Admin.findOne({ email: email });
+          if(adetails)
+          {
+            const passwordMatch = await bcrypt.compare(
+            req.body.password,
+            adetails.password
+          );
+          if (passwordMatch) 
+          {
+            req.session.admin = adetails._id;
+            res.render("adminDashboard");
+          } 
+          else
+          {
+            res.redirect("/admin/?credential=wrong");
+          }
+          }
+          else
+          {
+            res.redirect("/admin/?credential='wrong'");
+          }
+        } 
+    else 
+    {
+      res.redirect("/admin/?credential='wrong'");
     }
-  } catch (er) {
+  } 
+  catch (er) 
+  {
     console.log(er);
   }
 };
 
-const adminDashboard=async (req,res)=>{
+const adminDashboard = async (req, res) => {
   res.render("adminDashboard");
 };
 
@@ -67,7 +88,6 @@ const userdataUpdate = async (req, res) => {
 };
 
 const userUpdate = async (req, res) => {
-  
   try {
     const userid = req.query.userId;
     let userdetails = {
@@ -84,11 +104,10 @@ const userUpdate = async (req, res) => {
   }
 };
 
-const adminSignout=async (req,res)=>{
- await req.session.destroy((err) => {
-    res.redirect('/admin/') 
-  })
-
+const adminSignout = async (req, res) => {
+  await req.session.destroy((err) => {
+    res.redirect("/admin/");
+  });
 };
 module.exports = {
   loadLogin,
@@ -98,5 +117,5 @@ module.exports = {
   userdataUpdate,
   userUpdate,
   adminSignout,
-  adminDashboard
+  adminDashboard,
 };

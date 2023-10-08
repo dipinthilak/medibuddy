@@ -1,7 +1,8 @@
 const User = require('../models/userSchema');
 const Category=require('../models/categorySchema');
 const Product=require("../models/productSchema")
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
+const { findById } = require('../models/adminSchema');
 
 const ecryptpassword = async(password)=> {
         try {
@@ -10,7 +11,7 @@ const ecryptpassword = async(password)=> {
         } catch (error) {
             console.log(error.message);
         }
-}
+    };
 
 const userhome=async (req,res)=>{
     const category =await Category.find();
@@ -94,7 +95,19 @@ const userLogout = async(req,res)=>{
     } catch (error) {
         console.log(error.message);
     }
-} 
+    };
+    
+const productShop=async (req,res)=>{
+    const id=req.query.pid;
+    console.log(id);
+    const category =await Category.find();
+    console.log(category);
+    const user = await User.findById(req.session.user_id);
+    console.log(user);
+    const product=await Product.findById(id);
+    console.log(product);
+    res.render("userProduct",{product,user,category});
+    };
 
 
 module.exports = {
@@ -104,6 +117,7 @@ module.exports = {
                 newUser,
                 userSignin,
                 userDashboard,
-                userLogout
+                userLogout,
+                productShop
                 
             };

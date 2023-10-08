@@ -54,7 +54,11 @@
                             <button type="submit" class="btn btn-primary w-100"> Login </button>
                         </div> <!-- form-group// -->
                     </form>
-                    <!-- <p id="validptag" style="color: crimson;"></p> -->
+                    <%if(crerror){%>
+                    <p id="validptag" style="color: crimson;">Enter valid credentials</p>
+                    <%} else {%>
+                        <%}%>
+                    
                 </div>
             </div>
         </section>
