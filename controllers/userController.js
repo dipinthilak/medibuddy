@@ -2,7 +2,7 @@ const User = require('../models/userSchema');
 const Category=require('../models/categorySchema');
 const Product=require("../models/productSchema")
 const bcrypt = require('bcrypt');
-const { findById } = require('../models/adminSchema');
+// const { findById } = require('../models/adminSchema');
 
 const ecryptpassword = async(password)=> {
         try {
@@ -21,7 +21,7 @@ const userhome=async (req,res)=>{
     {
         const user=await User.findById(req.session.user_id);
         res.render('userHome',{category:category,
-            user:user})  
+            user:user,product:product})  
     }
     else{
         res.render('userHome',{category:category,product:product,user:null})  
@@ -99,14 +99,21 @@ const userLogout = async(req,res)=>{
     
 const productShop=async (req,res)=>{
     const id=req.query.pid;
-    console.log(id);
     const category =await Category.find();
-    console.log(category);
     const user = await User.findById(req.session.user_id);
-    console.log(user);
     const product=await Product.findById(id);
-    console.log(product);
     res.render("userProduct",{product,user,category});
+    };
+
+const userCart=async (req,res)=>{
+    const category =await Category.find();
+    const product=await Product.find();
+
+    if(req.session.user_id)
+    {
+        const user=await User.findById(req.session.user_id);
+        res.render('userCart',{category:category,user:user,product:product})  
+    }
     };
 
 
@@ -118,6 +125,6 @@ module.exports = {
                 userSignin,
                 userDashboard,
                 userLogout,
-                productShop
-                
+                productShop,
+                userCart                
             };
