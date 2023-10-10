@@ -28,6 +28,14 @@ const userhome=async (req,res)=>{
         }
     };
 
+const userContact=async(req,res)=>{
+    res.render("contact");
+    };
+
+const userAbout=async(req,res)=>{
+    res.render("about");
+    };
+
 const loadSignup=async(req,res)=>{
     res.render('userSignup')
     };
@@ -105,20 +113,39 @@ const productShop=async (req,res)=>{
     res.render("userProduct",{product,user,category});
     };
 
+const categoryShop=async (req,res)=>{
+    const cid=req.query.cid;
+    const category =await Category.find();
+    const categoryname =await Category.findOne({_id:cid},{name:1});
+    console.log(categoryname.name);
+    const user = await User.findById(req.session.user_id);
+    const product=await Product.find({category:categoryname.name});
+    console.log("--------------------------------------------------------------------");
+    console.log(product);
+    res.render("userCategoryproducts",{product,user,category});
+    };
+
 const userCart=async (req,res)=>{
     const category =await Category.find();
     const product=await Product.find();
-
+try {
     if(req.session.user_id)
     {
         const user=await User.findById(req.session.user_id);
         res.render('userCart',{category:category,user:user,product:product})  
     }
+    res.redirect("userSignin");
+} catch (error) {
+    console.error(error);
+}
+
     };
 
 
 module.exports = {
                 userhome,
+                userAbout,
+                userContact,
                 loadSignup,
                 loadSignin,
                 newUser,
@@ -126,5 +153,6 @@ module.exports = {
                 userDashboard,
                 userLogout,
                 productShop,
+                categoryShop,
                 userCart                
             };
