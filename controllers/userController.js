@@ -2,8 +2,8 @@ const User = require('../models/userSchema');
 const Category=require('../models/categorySchema');
 const Product=require("../models/productSchema")
 const bcrypt = require('bcrypt');
-//const nodemailer = require('nodemailer');
-//const dotenv = require('dotenv');
+const nodemailer = require('nodemailer');
+const dotenv = require('dotenv');
 
 
 
@@ -13,43 +13,43 @@ const generateOtp = () => {
 };
 
 //send mail
-// const sendMail = async (name, email) => {
-//     try {
-//         const otp = generateOtp();
-//         console.log(otp);
+const sendMail = async (name, email) => {
+    try {
+        const otp = generateOtp();
+        console.log(otp);
 
-//         const transporter = nodemailer.createTransport({
-//             host: 'smtp.gmail.com',
-//             port: 587,
-//             secure: false,
-//             requireTLS: true,
-//             auth: {
-//                 user: process.env.EMAIL,
-//                 pass: process.env.PASSWORD
-//             }
-//         });
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 587,
+            secure: false,
+            requireTLS: true,
+            auth: {
+                user: process.env.EMAIL,
+                pass: process.env.PASSWORD
+            }
+        });
 
-//         const mailOptions = {
-//             from: 'medibuddycc@gmail.com',
-//             to: email,
-//             subject: 'OTP || Medibuddy',
-//             text: `Thank you for choosing Medibuddy. Use this otp to finish your signup: ${otp}`,
-//         };
+        const mailOptions = {
+            from: 'medibuddycc@gmail.com',
+            to: email,
+            subject: 'OTP || Medibuddy',
+            text: `Thank you ,${name} for choosing Medibuddy. Use this otp to finish your signup: ${otp}`,
+        };
 
-//         transporter.sendMail(mailOptions, function (error, info) {
-//             if (error) {
-//                 console.log(error);
-//             } else {
-//                 console.log('Email has been sent', info.response);
-//             }
-//         });
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log('Email has been sent', info.response);
+            }
+        });
 
-//         return otp;
-//     } catch (error) {
-//         console.log(error.message);
-//         throw error;
-//     }
-// };
+        return otp;
+    } catch (error) {
+        console.log(error.message);
+        throw error;
+    }
+};
 
 const ecryptpassword = async(password)=> {
         try {
@@ -75,6 +75,12 @@ const userhome=async (req,res)=>{
         }
     };
 
+const usersignupOtp=async (req,res)=>{
+        // const hashedpassword =await ecryptpassword(req.body.password);
+
+    return res.render('userSignin')
+    };
+
 const userContact=async(req,res)=>{
     res.render("contact");
     };
@@ -98,23 +104,27 @@ const loadSignin=async(req,res)=>{
 
 const newUser = async(req, res) => {
     try {
-        const hashedpassword =await ecryptpassword(req.body.password);
-        const user = new User({
-           name : req.body.username,
-           email : req.body.email,
-           mobile : req.body.number,
-           password : hashedpassword,
-        });
+        // const hashedpassword =await ecryptpassword(req.body.password);
+        const user ={
+            name : req.body.username,
+            email : req.body.email,
+            mobile : req.body.number,
+            password : req.body.password,
+         };     
+         const otp=sendMail(user.name,user.email);
+         req.session.otp=otp;
+         console.log(otp);
 
-        const userData = await user.save();
-        console.log(userData);
+        //  const user = new User({
+        //     name : req.body.username,
+        //     email : req.body.email,
+        //     mobile : req.body.number,
+        //     password : req.body.password,
+        //  });
 
-        if(userData){
-            return res.render('userSignin');
-        }else {
-            return res.render('userSignup')
-        }
-        
+        // const userData = await user.save();
+        // console.log(userData);
+            return res.render('usersignupwithOtp',{user});
         }
     catch (error) 
     {
@@ -200,25 +210,19 @@ const addtoCart=async (req,res)=>{
     try {
         const productId = req.body.productid;
         console.log(productId);
-        if (!req.session.user_id) {
+        if (!req.session.user_id) 
+        {
             res.status(200).json({notlogin:true});
         }
-        const user_id = req.session.user_id;
-        const user = await User.findById(user_id);
-        console.log(user.cart);
+        const user = await User.findById(req.session.user_id);
         const quantity=1;
-        if(!user)
+        if(user)
         {
-            res.status(200).json({notlogin:true});
-        }
-        else
-        {
-            const cartItem=await User.findByIdAndUpdate({_id:user_id},{$push:{cart:{productId:productId,quantity:quantity}}});
+            const cartItem=await User.findByIdAndUpdate({_id:req.session.user_id    },{$push:{cart:{productId:productId,quantity:quantity}}});
             if (cartItem) {
-                res.status(200).json({message: 'product added to cart'});
+                res.status(200).json({toCart:true});
               } else {
-                res.status(404).json({message: 'product not added to cart'});
-
+                res.status(404).json({toCart:false});
               }
         }
 
@@ -241,5 +245,6 @@ module.exports = {
                 productShop,
                 categoryShop,
                 userCart,
-                addtoCart                
+                addtoCart,
+                usersignupOtp,                
             };

@@ -3843,6 +3843,16 @@ function addtoCart(productid){
 
                             });
                 }
+                else if(res.toCart){
+                  Swal.fire(
+                              'Item added to cart'
+                            );
+                }
+                else{
+                  Swal.fire(
+                              'Item not added to cart'
+                            );
+                }
             }
         });
       }
