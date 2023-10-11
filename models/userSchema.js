@@ -53,6 +53,10 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },   
+    cart : [{ productId: {type: mongoose.Schema.Types.ObjectId,ref: 'Product',},
+              quantity: Number,  
+  }],
+  
    address: [addressSchema]
 
 })

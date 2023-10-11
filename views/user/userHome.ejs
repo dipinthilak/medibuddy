@@ -251,7 +251,7 @@
                           <a href="shop-product-right.html"
                             ><img
                               alt="Evara"
-                              src="assets/imgs/shop/thumbnSail-4.jpg"
+                              src="assets/imgs/shop/thumbnail-4.jpg"
                           /></a>
                         </div>
                         <div class="shopping-cart-title">
@@ -419,6 +419,8 @@
         </div>
       </div>
     </div>
+
+
     <main class="main">
       <div class="container">
         <div class="row">
@@ -586,12 +588,8 @@
                         >
                       </div>
                       <div class="product-action-1 show">
-                        <a
-                          aria-label="Add To Cart"
-                          class="action-btn hover-up"
-                          href="shop-cart.html"
-                          ><i class="fi-rs-shopping-bag-add"></i
-                        ></a>
+                        <a onclick="addtoCart('<%=product[i]._id%>')" aria-label="Add To Cart" class="action-btn hover-up" id="addtocartButton" 
+                        ><i class="fi-rs-shopping-bag-add"></i></a>
                       </div>
                     </div>
                   </div>
@@ -3825,7 +3823,33 @@
     <script src="assets/js/plugins/jquery.vticker-min.js"></script>
     <script src="assets/js/plugins/jquery.theia.sticky.js"></script>
     <script src="assets/js/plugins/jquery.elevatezoom.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Template  JS -->
+    <script>
+
+function addtoCart(productid){
+        // Make an AJAX request to the server with the custom parameter
+        $.ajax({
+            method: 'POST',
+            url: '/addtocart',
+            data: { productid }, // Include the custom parameter in the request
+            success : function(res){
+                // Handle the response
+                if(res.notlogin){
+                  Swal.fire(
+                              'You should login first'
+                            ).then(function(){
+                              window.location.href="/userSignin";
+
+                            });
+                }
+            }
+        });
+      }
+
+
+
+    </script>
     <script src="./assets/js/main.js?v=3.4"></script>
     <script src="./assets/js/shop.js?v=3.4"></script>
   </body>

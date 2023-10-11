@@ -23,7 +23,8 @@ user_routers.use(session({
   user_routers.get('/userHome',(req,res)=>{   res.redirect('/');  });
   user_routers.get("/userShopproduct",userController.productShop);
   user_routers.get("/userCategoryproduct",userController.categoryShop);
-  user_routers.get("/userCart",userController.userCart);
+  user_routers.get("/userCart",userauth.isLogin,userController.userCart);
+  user_routers.post("/addtocart",userController.addtoCart)
 
   user_routers.get("/about",userController.userAbout);
   user_routers.get("/contact",userController.userContact);

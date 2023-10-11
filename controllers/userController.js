@@ -2,7 +2,54 @@ const User = require('../models/userSchema');
 const Category=require('../models/categorySchema');
 const Product=require("../models/productSchema")
 const bcrypt = require('bcrypt');
-// const { findById } = require('../models/adminSchema');
+//const nodemailer = require('nodemailer');
+//const dotenv = require('dotenv');
+
+
+
+//generate otp
+const generateOtp = () => {
+    return Math.floor(Math.random() * 90000 + 10000);
+};
+
+//send mail
+// const sendMail = async (name, email) => {
+//     try {
+//         const otp = generateOtp();
+//         console.log(otp);
+
+//         const transporter = nodemailer.createTransport({
+//             host: 'smtp.gmail.com',
+//             port: 587,
+//             secure: false,
+//             requireTLS: true,
+//             auth: {
+//                 user: process.env.EMAIL,
+//                 pass: process.env.PASSWORD
+//             }
+//         });
+
+//         const mailOptions = {
+//             from: 'medibuddycc@gmail.com',
+//             to: email,
+//             subject: 'OTP || Medibuddy',
+//             text: `Thank you for choosing Medibuddy. Use this otp to finish your signup: ${otp}`,
+//         };
+
+//         transporter.sendMail(mailOptions, function (error, info) {
+//             if (error) {
+//                 console.log(error);
+//             } else {
+//                 console.log('Email has been sent', info.response);
+//             }
+//         });
+
+//         return otp;
+//     } catch (error) {
+//         console.log(error.message);
+//         throw error;
+//     }
+// };
 
 const ecryptpassword = async(password)=> {
         try {
@@ -125,23 +172,62 @@ const categoryShop=async (req,res)=>{
     res.render("userCategoryproducts",{product,user,category});
     };
 
+
+
+
 const userCart=async (req,res)=>{
-    const category =await Category.find();
-    const product=await Product.find();
+
 try {
+    const category =await Category.find();
+    const product=await Product.find(); 
     if(req.session.user_id)
     {
         const user=await User.findById(req.session.user_id);
         res.render('userCart',{category:category,user:user,product:product})  
     }
+    else
+
+    {    
     res.redirect("userSignin");
+    }
 } catch (error) {
     console.error(error);
 }
 
     };
 
+const addtoCart=async (req,res)=>{
+    try {
+        const productId = req.body.productid;
+        console.log(productId);
+        if (!req.session.user_id) {
+            res.status(200).json({notlogin:true});
+        }
+        const user_id = req.session.user_id;
+        const user = await User.findById(user_id);
+        console.log(user.cart);
+        const quantity=1;
+        if(!user)
+        {
+            res.status(200).json({notlogin:true});
+        }
+        else
+        {
+            const cartItem=await User.findByIdAndUpdate({_id:user_id},{$push:{cart:{productId:productId,quantity:quantity}}});
+            if (cartItem) {
+                res.status(200).json({message: 'product added to cart'});
+              } else {
+                res.status(404).json({message: 'product not added to cart'});
 
+              }
+        }
+
+    } 
+    catch (error) {
+        
+    }
+    };
+    
 module.exports = {
                 userhome,
                 userAbout,
@@ -154,5 +240,6 @@ module.exports = {
                 userLogout,
                 productShop,
                 categoryShop,
-                userCart                
+                userCart,
+                addtoCart                
             };
