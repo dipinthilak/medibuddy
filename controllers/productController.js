@@ -33,17 +33,12 @@ const addProductdata=async(req,res)=>{
               quantity: req.body.productquantity,
               image: fileNames
               })
-  
-  
               console.log(product);
-  
               productres = await product.save();
               if(productres){
                 res.redirect('/admin/productmanagement')
-
               }
-              res.redirect('/admin/productmanagement',{})
-          
+              res.redirect('/admin/productmanagement',{}) 
       } catch (error) {
           console.log(error.message);
       }
