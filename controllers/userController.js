@@ -16,7 +16,7 @@ const generateOtp = () => {
 const sendMail = async (name, email) => {
     try {
         const otp = generateOtp();
-        console.log(otp);
+        console.log(otp +"hhjghghjg");
 
         const transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
@@ -77,8 +77,31 @@ const userhome=async (req,res)=>{
 
 const usersignupOtp=async (req,res)=>{
         // const hashedpassword =await ecryptpassword(req.body.password);
+        if(req.session.otp==req.body.otp)
+        {
+            console.log("SDHJASDGASHDGASDGHASGDHSAGDHG");
+         const user = new User({
+                name : req.body.username,
+                email : req.body.email,
+                mobile : req.body.number,
+                password : req.body.password,
+            });
+            console.log(user);
+        const userData = await user.save();
 
-    return res.render('userSignin')
+
+
+        console.log(">>>>>>"+userData);
+
+
+
+        if(userData)
+        {
+            res.render('userSignin')
+
+        }
+        }
+        res.redirect("/")
     };
 
 const userContact=async(req,res)=>{
@@ -111,7 +134,11 @@ const newUser = async(req, res) => {
             mobile : req.body.number,
             password : req.body.password,
          };     
-         const otp=sendMail(user.name,user.email);
+         console.log(user.email);
+        const otp = generateOtp();
+
+
+        //  const otp=sendMail(user.name,user.email);
          req.session.otp=otp;
          console.log(otp);
 

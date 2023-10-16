@@ -254,7 +254,7 @@
                                     <div class="categori-dropdown-wrap categori-dropdown-active-large">
                                         <ul>
                                             <% for (let i = 0; i < category.length; i++) { %>
-                                            <li><a href="shop-grid-right.html"><i class="evara-font-kite"></i><%= category[i].name %></a></li>
+                                            <li><a href="/userCategoryproduct?cid=<%=category[i]._id%>"><i class="evara-font-kite"></i><%= category[i].name %></a></li>
                                             <%}%>
                                         </ul>
                                     </div>
@@ -373,7 +373,7 @@
                         </a>
                         <div class="categori-dropdown-wrap categori-dropdown-active-small">
                             <ul>
-                                <li><a href="shop-grid-right.html"><i class="evara-font-dress"></i>Women's Clothing</a></li>
+                                <li><a href="dfjdf"><i class="evara-font-dress"></i>Women's Clothing</a></li>
                                 <li><a href="shop-grid-right.html"><i class="evara-font-tshirt"></i>Men's Clothing</a></li>
                                 <li> <a href="shop-grid-right.html"><i class="evara-font-smartphone"></i> Cellphones</a></li>
                                 <li><a href="shop-grid-right.html"><i class="evara-font-desktop"></i>Computer & Office</a></li>
@@ -1037,8 +1037,8 @@
                         <div class="widget-category mb-30">
                             <h5 class="section-title style-1 mb-30 wow fadeIn animated">Category</h5>
                             <ul class="categories">
-                                <% for (let i = 0; i < category.length; i++) { %>
-                                    <li><a href="shop-grid-right.html"><%= category[i].name %></a></li>
+                                <% for (let i = 0; i < category.length; i++) {                                                          %>
+                                    <li><a href="/userCategoryproduct?cid=<%=category[i]._id%>"><%= category[i].name %></a></li>
                                     <%}%>
                             </ul>
                         </div>
