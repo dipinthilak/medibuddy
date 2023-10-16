@@ -23,6 +23,9 @@ user_routers.use(session({
   user_routers.get('/userHome',(req,res)=>{   res.redirect('/');  });
   user_routers.get("/userShopproduct",userController.productShop);
   user_routers.get("/userCategoryproduct",userController.categoryShop);
+  user_routers.get("/searchproduct",userController.searchResult);
+
+
   user_routers.get("/userCart",userauth.isLogin,userController.userCart);
   user_routers.post("/addtocart",userController.addtoCart)
   
@@ -34,8 +37,8 @@ user_routers.use(session({
   user_routers.get("/userSignin",userauth.isLogout,userController.loadSignin);
   user_routers.get("/userSignup",userauth.isLogout,userController.loadSignup);
   user_routers.post("/userSignup",userController.newUser);
-  user_routers.post("/userSignin",userController.userSignin);
   user_routers.post("/usersignupOtp",userController.usersignupOtp);
+  user_routers.post("/userSignin",userController.userSignin);
 
 
 

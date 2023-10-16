@@ -75,35 +75,6 @@ const userhome=async (req,res)=>{
         }
     };
 
-const usersignupOtp=async (req,res)=>{
-        // const hashedpassword =await ecryptpassword(req.body.password);
-        if(req.session.otp==req.body.otp)
-        {
-            console.log("SDHJASDGASHDGASDGHASGDHSAGDHG");
-         const user = new User({
-                name : req.body.username,
-                email : req.body.email,
-                mobile : req.body.number,
-                password : req.body.password,
-            });
-            console.log(user);
-        const userData = await user.save();
-
-
-
-        console.log(">>>>>>"+userData);
-
-
-
-        if(userData)
-        {
-            res.render('userSignin')
-
-        }
-        }
-        res.redirect("/")
-    };
-
 const userContact=async(req,res)=>{
     res.render("contact");
     };
@@ -151,13 +122,56 @@ const newUser = async(req, res) => {
 
         // const userData = await user.save();
         // console.log(userData);
-            return res.render('usersignupwithOtp',{user});
+         res.render('usersignupwithOtp',{user,wrongotp:false});
         }
     catch (error) 
     {
         console.log(error.message);
     }
     };
+
+    const usersignupOtp=async (req,res)=>{
+        const hashedpassword =await ecryptpassword(req.body.password);
+        try {
+            if(req.session.otp==req.body.otp)
+            {
+                console.log("SDHJASDGASHDGASDGHASGDHSAGDHG");
+             const user = new User({
+                    name : req.body.username,
+                    email : req.body.email,
+                    mobile : req.body.number,
+                    password : hashedpassword,
+                });
+                console.log(user);
+            const userData = await user.save();
+
+            console.log(">>>>>>"+userData);
+        
+            if(userData)
+            {
+                res.render('userSignin')
+    
+            }
+            }
+            else
+            {
+                const user ={
+                    name : req.body.username,
+                    email : req.body.email,
+                    mobile : req.body.number,
+                    password : req.body.password,
+                 };  
+             res.render('usersignupwithOtp',{user,wrongotp:true});
+            }
+
+
+        } catch (error) 
+        {
+            console.error(error);
+        }
+    };
+
+
 
 const userSignin=async (req,res)=>{
     try{
@@ -210,6 +224,24 @@ const categoryShop=async (req,res)=>{
     };
 
 
+const searchResult=async (req,res)=>{
+    const searchq=req.query.searchquery;
+    console.log(searchq);
+    const category =await Category.find();
+    const product=await Product.find({productName: { $regex: new RegExp(searchq, 'i') }});
+    // console.log(product);
+    if(req.session.user_id)
+    {
+        const user=await User.findById(req.session.user_id);
+        res.render('userSearchitems',{category:category,
+            user:user,product:product})  
+    }
+    else{
+        res.render('userSearchitems',{category:category,product:product,user:null})  
+        }
+    };
+
+
 
 
 const userCart=async (req,res)=>{
@@ -220,7 +252,10 @@ try {
     if(req.session.user_id)
     {
         const user=await User.findById(req.session.user_id);
-        res.render('userCart',{category:category,user:user,product:product})  
+        const userCart = await User.findOne({_id: req.session.user_id}).populate('cart.productId');
+        console.log(userCart.cart);
+        console.log(userCart.cart.length);
+        res.render('userCart',{category:category,user:user,product:product,userCart:userCart})  
     }
     else
 
@@ -273,5 +308,6 @@ module.exports = {
                 categoryShop,
                 userCart,
                 addtoCart,
-                usersignupOtp,                
+                usersignupOtp,
+                searchResult,                
             };

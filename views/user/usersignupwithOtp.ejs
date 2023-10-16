@@ -623,6 +623,9 @@
                                             <div class="form-group ">
                                                 <button type="submit" class="btn btn-fill-out btn-block hover-up" name="login">Submit &amp; Register</button>
                                             </div>
+                                            <%if(wrongotp==true){%>
+                                                <div class="ml-5 align-items-center"><p style="color: red;">Enter correct otp</p></div>
+                                            <%}%>
                                         </form>
                                         <div class="divider-text-center mt-15 mb-15">
                                             <span> or</span>
