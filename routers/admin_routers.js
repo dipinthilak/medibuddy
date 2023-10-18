@@ -131,10 +131,11 @@ admin_routers.get("/productmanagement",adminauth.isLogin,productControllers.load
 admin_routers.get("/addnewProducts",adminauth.isLogin,productControllers.addProduct);
 admin_routers.post("/addnewProductsdata",proupload.array("image"),productControllers.addProductdata);
 admin_routers.get("/productEdit",adminauth.isLogin,productControllers.editProduct);
-admin_routers.post("/updateProductdata",proupload.array("image"),productControllers.updateProduct);
+admin_routers.post("/updateProductdata",productControllers.updateProduct);
 admin_routers.get("/productDelete",adminauth.isLogin,productControllers.productDelete);
 
-
+//Order amanagement
+admin_routers.get("/ordermanagement",adminauth.isLogin,adminControllers.ordermanagement);
 
 admin_routers.use("/*", adminauth.isLogin,(req, res) => {
   res.redirect("/admin");

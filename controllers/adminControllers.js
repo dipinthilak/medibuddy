@@ -1,7 +1,9 @@
 const Admin = require("../models/adminSchema");
 const User = require("../models/userSchema");
 const bcrypt = require("bcrypt");
+const Order=require("../models/orderSchema");
 const path = require("path");
+const { render } = require("../routers/user_Routers");
 
 const loadLogin = (req, res) => {
   if (req.query.credential) {
@@ -109,6 +111,16 @@ const adminSignout = async (req, res) => {
     res.redirect("/admin/");
   });
 };
+
+const ordermanagement=async (req,res)=>{
+  try {
+    const order= await Order.find().populate('customerId')
+    res.render("adminOrderview",{order:order});
+  } catch (error) {
+    console.log(error);
+  }
+
+};
 module.exports = {
   loadLogin,
   adminSignin,
@@ -118,4 +130,5 @@ module.exports = {
   userUpdate,
   adminSignout,
   adminDashboard,
+  ordermanagement
 };

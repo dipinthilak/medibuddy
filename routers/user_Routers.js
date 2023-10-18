@@ -30,9 +30,12 @@ user_routers.use(session({
   user_routers.post("/addtocart",userController.addtoCart);
   user_routers.post("/removecartitem",userController.removecartitem);
   user_routers.post("/changequantity",userController.updatequantity);
-  user_routers.get('/checkoutitems',userController.checkoutCart);
+  user_routers.get('/checkoutitems',userauth.isLogin,userController.checkoutCart);
   user_routers.post('/codcheckout',userController.codcheckout);
+  user_routers.get('/orderdetails',userauth.isLogin,userController.orderdetails);
 
+
+  
   user_routers.get("/addaddress",userController.addaddressload);
   user_routers.post("/addaddress",userController.addAddress);
   user_routers.get("/updateaddressload",userController.updateaddressload);

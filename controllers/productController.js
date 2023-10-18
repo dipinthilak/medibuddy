@@ -65,10 +65,7 @@ const productDelete=async(req,res)=>
   { const productId =req.query.pid;
     console.log(productId);
     try{
-      const productImg=await Product.findOne({_id:productId},{image:1});
-      const productdata=await Product.deleteOne({_id:productId});
-      console.log(productdata);
-      console.log(productImg);
+      const productdata=await Product.findByIdAndUpdate({_id:productId},{isListed:false});
       res.redirect('/admin/productmanagement');
 
     }
@@ -80,38 +77,34 @@ const productDelete=async(req,res)=>
   };
 
 const updateProduct=async(req,res)=>{
-  //   try {
-  //     const productId =req.query.pid;
-  //     console.log("...................."+productId);
-  //     console.log(req.body);
-  //     const fileNames = req.files.map(file => file.filename); 
-  //     console.log(fileNames);      
-  //     let newproductdata = {
-  //         productName : req.body.productname,
-  //         brandName : req.body.productbrand,
-  //         category: req.body.productcategory,
-  //         description: req.body.description,
-  //         regularPrice: req.body.productprice,
-  //         salePrice: req.body.saleprice,
-  //         quantity: req.body.productquantity,
-  //         image: fileNames
-  //         }
-  //         console.log(newproductdata);
+    try {
+      const productId =req.query.pid;
+      let newproductdata = {
+        productName : req.body.productname,
+        brandName : req.body.productbrand,
+        category: req.body.productcategory,
+        description: req.body.description,
+        regularPrice: req.body.productprice,
+        salePrice: req.body.saleprice,
+        quantity: req.body.productquantity
+          }
+          // console.log(pres);9
+          const productUpdateres=await Product.findOneAndUpdate({_id:productId},newproductdata);
 
-  //         console.log(Product.find({_id:productId}));
-  //         const productUpdateres=await Product.findOneAndUpdate({_id:productId},{newproductdata})
+          if(productUpdateres){
+            console.log("product updated");
+            res.redirect('/admin/productmanagement')
 
-  //         if(productUpdateres){
-  //           res.redirect('/admin/productmanagement')
+          }
+          else{
+            console.log("product not updated");
+            res.redirect('/admin/productmanagement',{})
+          }
 
-  //         }
-  //         res.redirect('/admin/productmanagement',{})
       
-  // } catch (error) {
-  //     console.log(error.message);
-  // }
-            res.redirect('/admin/productmanagement');
-    
+  } catch (error) {
+      console.log(error.message);
+  }    
   };
   module.exports={
     loadproductManagement,
@@ -119,5 +112,5 @@ const updateProduct=async(req,res)=>{
     addProductdata,
     editProduct,
     updateProduct,
-    productDelete
+    productDelete,
   }

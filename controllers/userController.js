@@ -63,8 +63,7 @@ const ecryptpassword = async(password)=> {
 
 const userhome=async (req,res)=>{
     const category =await Category.find();
-    const product=await Product.find();
-    console.log(product[0].image);
+    const product=await Product.find({isListed:true});
     if(req.session.user_id)
     {
         const user=await User.findById(req.session.user_id);
@@ -89,8 +88,10 @@ const loadSignup=async(req,res)=>{
     };
 
 const userDashboard =async (req,res)=>{
-    const user = await User.findById(req.session.user_id)
-    res.render('userDashboard',{user:user})
+    const user = await User.findById(req.session.user_id);
+    const order=await Order.find({customerId:req.session.user_id});
+    console.log(order.length);
+    res.render('userDashboard',{user:user,order:order})
     };
 
 const addaddressload=async(req,res)=>{
@@ -274,8 +275,9 @@ const userSignin=async (req,res)=>{
         {
             req.session.user_id=udetails._id;
             req.session.user=udetails.name;
-            console.log(req.session.user_id, req.session.user);
-            res.render('userDashboard',{user : udetails})
+            const order=await Order.find({customerId:req.session.user_id});
+            console.log(order);
+            res.render('userDashboard',{user : udetails,order:order})
         }
         else{
             res.redirect('/userSignin');
@@ -320,7 +322,7 @@ const searchResult=async (req,res)=>{
     const searchq=req.query.searchquery;
     console.log(searchq);
     const category =await Category.find();
-    const product=await Product.find({productName: { $regex: new RegExp(searchq, 'i') }});
+    const product=await Product.find({isListed:true,productName: { $regex: new RegExp(searchq, 'i') }});
     // console.log(product);
     if(req.session.user_id)
     {
@@ -495,6 +497,18 @@ const codcheckout=async (req,res)=> {
         }
     };
 
+const orderdetails=async (req,res)=>{
+    try {
+    const user_id=req.session.user_id;
+    const user=await User.findById(user_id);
+    const orderid=req.query.ordid;
+    const order = await Order.findOne({_id: orderid}).populate('products.productId');
+    res.render('userorderdetails',{order:order,user:user})
+    } catch (error) {
+        console.error(error);
+    }
+    };
+
 const updatequantity = async (req,res) => {
         try {
             console.log(req.body)
@@ -530,6 +544,7 @@ module.exports = {
                 addtoCart,
                 checkoutCart,
                 codcheckout,
+                orderdetails,
                 removecartitem,
                 updatequantity,
                 usersignupOtp,
