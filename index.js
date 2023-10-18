@@ -19,11 +19,6 @@ app.use('/', userRouters);
 app.use('/admin', admin_routers);
 
 
-
-
-
-
-
 app.listen(3000, () => {
     console.log('Server started...');
 })

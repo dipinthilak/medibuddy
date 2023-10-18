@@ -3,6 +3,7 @@ const Category=require('../models/categorySchema');
 const Product=require("../models/productSchema")
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
+const Order=require('../models/orderSchema');
 const dotenv = require('dotenv');
 
 
@@ -10,7 +11,7 @@ const dotenv = require('dotenv');
 //generate otp
 const generateOtp = () => {
     return Math.floor(Math.random() * 90000 + 10000);
-};
+    };
 
 //send mail
 const sendMail = async (name, email) => {
@@ -49,7 +50,7 @@ const sendMail = async (name, email) => {
         console.log(error.message);
         throw error;
     }
-};
+    };
 
 const ecryptpassword = async(password)=> {
         try {
@@ -92,6 +93,99 @@ const userDashboard =async (req,res)=>{
     res.render('userDashboard',{user:user})
     };
 
+const addaddressload=async(req,res)=>{
+    const user = await User.findById(req.session.user_id)
+    res.render("useraddaddress",{user:user});
+    };
+
+const addAddress =  async (req,res)=>{
+        try {
+            const address = {
+                name : req.body.name,
+                addressLine1 : req.body.addressLine1,
+                addressLine2 : req.body.addressLine2,
+                city : req.body.city,
+                state : req.body.state,
+                pinCode : req.body.pinCode,
+                phone : req.body.phone,
+                email : req.body.email,
+                addressType : req.body.addressType,
+                            }
+            console.log(address);
+            const user = await User.findById(req.session.user_id);
+            user.address.push(address);
+            await user.save();
+            res.redirect('/userDashboard');
+            }
+         catch (error) {
+            console.log(error.message);
+        }
+    }
+
+const updateaddressload=async(req,res)=>{
+    try {
+        const addressid = req.query.adid;
+        console.log(addressid);
+        const userData = await User.findById(req.session.user_id);
+        const categories = await Category.find();
+
+        const user = await User.findById(req.session.user_id);
+        const address = user.address[addressid];
+        console.log(address);
+        res.render('updateaddress',{
+            user:user,
+            address: address,
+            addressIndex: addressid,
+            userData: userData,
+            categories: categories
+        })
+    } catch (error) {
+        console.log(error.message);
+    }
+    };
+
+const updateaddress=async (req,res)=>{
+    try {
+        console.log(req.body);
+        const user = await User.findById(req.session.user_id);
+        const addressId = req.body.addressId;
+        console.log(addressId);
+        const updatedUser = await User.findOneAndUpdate(
+          {
+            _id: user._id,
+            'address._id': addressId
+          },
+          {
+            $set: {
+              'address.$.name': req.body.name,
+              'address.$.addressLine1': req.body.addressLine1,
+              'address.$.addressLine2': req.body.addressLine2,
+              'address.$.city': req.body.city,
+              'address.$.state': req.body.state,
+              'address.$.pinCode': req.body.pinCode,
+              'address.$.phone': req.body.phone,
+              'address.$.email': req.body.email,
+              'address.$.addressType': req.body.addressType
+            }
+          },
+          { new: true } // To return the updated user document
+        );
+      
+        if (updatedUser) {
+          console.log('User address updated:', updatedUser);
+          res.redirect('/userDashboard');
+        } else {
+          console.log('Address not updated');
+          
+        }
+
+      } catch (error) {
+        console.log(error.message);
+      }
+      
+
+    }
+
 const loadSignin=async(req,res)=>{
     res.render('userSignin')
     };
@@ -130,7 +224,7 @@ const newUser = async(req, res) => {
     }
     };
 
-    const usersignupOtp=async (req,res)=>{
+const usersignupOtp=async (req,res)=>{
         const hashedpassword =await ecryptpassword(req.body.password);
         try {
             if(req.session.otp==req.body.otp)
@@ -170,8 +264,6 @@ const newUser = async(req, res) => {
             console.error(error);
         }
     };
-
-
 
 const userSignin=async (req,res)=>{
     try{
@@ -241,21 +333,21 @@ const searchResult=async (req,res)=>{
         }
     };
 
-
-
-
 const userCart=async (req,res)=>{
-
 try {
     const category =await Category.find();
     const product=await Product.find(); 
+
     if(req.session.user_id)
     {
         const user=await User.findById(req.session.user_id);
         const userCart = await User.findOne({_id: req.session.user_id}).populate('cart.productId');
-        console.log(userCart.cart);
-        console.log(userCart.cart.length);
-        res.render('userCart',{category:category,user:user,product:product,userCart:userCart})  
+        let cartAmount=0;
+        for(let i =0;i<userCart.cart.length;i++){
+            cartAmount= cartAmount + parseInt(userCart.cart[i].productId.salePrice)* parseInt(userCart.cart[i].quantity)
+        }
+        console.log(cartAmount);
+        res.render('userCart',{category:category,user:user,product:product,userCart:userCart,cartAmount:cartAmount})  
     }
     else
 
@@ -270,29 +362,153 @@ try {
 
 const addtoCart=async (req,res)=>{
     try {
-        const productId = req.body.productid;
-        console.log(productId);
+        console.log("add cart router");
+        const productId =req.body.productid ;
+        console.log("productId   "+productId);
+        const prdct=await Product.findById(productId);
+        console.log(prdct);
         if (!req.session.user_id) 
         {
             res.status(200).json({notlogin:true});
         }
         const user = await User.findById(req.session.user_id);
+        console.log(user);
         const quantity=1;
         if(user)
         {
+        const existingitem = user.cart.find((item)=>
+                item.productId.equals(productId)
+            );
+
+        if(existingitem){
+            console.log("existingitem>>>>>>>>>");
+            console.log(existingitem);
+            existingitem.quantity++;
+            await user.save();
+            res.status(200).json({toCart:true});
+        }else{
             const cartItem=await User.findByIdAndUpdate({_id:req.session.user_id    },{$push:{cart:{productId:productId,quantity:quantity}}});
             if (cartItem) {
                 res.status(200).json({toCart:true});
               } else {
-                res.status(404).json({toCart:false});
+                res.status(200).json({toCart:false});
               }
         }
+    }
 
     } 
     catch (error) {
         
     }
     };
+
+const removecartitem=async (req,res)=>{
+        try {
+            console.log("remove item router");
+            const user_id=req.session.user_id;
+            const cart_item_id=req.body.productId;
+            const user=await User.findById(user_id);
+            const cart=user.cart;
+            console.log("cart filtering");
+            const newcart=cart.filter((cartitem)=>{
+            // console.log(cart_item_id);
+            // console.log(cartitem.productId);
+                if(cartitem.productId!=cart_item_id){
+                return cartitem}
+            });
+            console.log(cart);
+            console.log(newcart);
+            user.cart=newcart;
+            const usersave=user.save();
+            if(usersave){
+                res.status(200).json({itemRemoved:true});  
+            }
+            else{
+                res.status(200).json({itemnotRemoved:true});  
+            }
+        } 
+        catch (error) 
+        {
+            console.log(error);
+        }
+
+    };
+
+const checkoutCart=async(req,res)=>{
+    try {
+     const user = await User.findById(req.session.user_id);
+     const userData = await User.findById(req.session.user_id);
+     const userCart = await User.findOne({_id: req.session.user_id}).populate('cart.productId')
+     const categories = await Category.find();
+     console.log(user);
+     console.log(userCart);
+     res.render('checkoutcart',{
+       user: user,
+       userCart: userCart,
+       userData: userData,
+       categories: categories
+     })
+    
+   } catch (error) {
+     console.log(error.message);  
+    }
+
+    };
+
+const codcheckout=async (req,res)=> {
+        try {     
+          console.log(req.body);
+          const userId = req.session.user_id;
+          const user = await User.findById(req.session.user_id);
+          const cart = await User.findById(req.session.user_id, { cart: 1, _id: 0 });
+          let total = req.body.total;
+
+          const order = new Order({
+            customerId: userId,
+            quantity: req.body.quantity,
+            price: req.body.salePrice,
+            products: cart.cart,
+            coupon: req.body.couponName,
+            discount: '0',
+            totalAmount: total,
+            shippingAddress: req.body.address,
+            paymentDetails: req.body.payment_option,
+          });
+          const orderSuccess = await order.save();
+          const orderId = order._id;
+          if (orderSuccess) {
+            for (const cartItem of user.cart) {
+              const product = await Product.findById(cartItem.productId);
+              if (product) {
+                product.quantity -= cartItem.quantity;
+                await product.save();
+                console.log('quantity decreased');
+              }
+            }
+            // Make the cart empty
+            await User.updateOne({ _id: userId }, { $unset: { cart: 1 } });
+            res.redirect('/userHome');
+            }
+          }
+        catch (error) {
+          console.error(error.message);
+        }
+    };
+
+const updatequantity = async (req,res) => {
+        try {
+            console.log(req.body)
+            req.body.count = parseInt(req.body.count)
+            const updatedata = await User.updateOne({_id: req.session.user_id,'cart.productId': req.body.productId,},{$inc:{'cart.$.quantity': req.body.count,}},{new:true});
+            if(updatedata)
+            {
+                res.status(200).json({quantityupdated:true})
+            }
+
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
     
 module.exports = {
                 userhome,
@@ -303,11 +519,19 @@ module.exports = {
                 newUser,
                 userSignin,
                 userDashboard,
+                addaddressload,
+                addAddress,
+                updateaddressload,
+                updateaddress,
                 userLogout,
                 productShop,
                 categoryShop,
                 userCart,
                 addtoCart,
+                checkoutCart,
+                codcheckout,
+                removecartitem,
+                updatequantity,
                 usersignupOtp,
                 searchResult,                
             };

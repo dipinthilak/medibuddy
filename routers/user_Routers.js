@@ -27,7 +27,17 @@ user_routers.use(session({
 
 
   user_routers.get("/userCart",userauth.isLogin,userController.userCart);
-  user_routers.post("/addtocart",userController.addtoCart)
+  user_routers.post("/addtocart",userController.addtoCart);
+  user_routers.post("/removecartitem",userController.removecartitem);
+  user_routers.post("/changequantity",userController.updatequantity);
+  user_routers.get('/checkoutitems',userController.checkoutCart);
+  user_routers.post('/codcheckout',userController.codcheckout);
+
+  user_routers.get("/addaddress",userController.addaddressload);
+  user_routers.post("/addaddress",userController.addAddress);
+  user_routers.get("/updateaddressload",userController.updateaddressload);
+  user_routers.post("/updateaddress",userController.updateaddress);
+
   
   user_routers.get("/about",userController.userAbout);
   user_routers.get("/contact",userController.userContact);
