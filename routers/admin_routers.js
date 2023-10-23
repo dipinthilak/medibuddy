@@ -136,6 +136,7 @@ admin_routers.get("/productDelete",adminauth.isLogin,productControllers.productD
 
 //Order amanagement
 admin_routers.get("/ordermanagement",adminauth.isLogin,adminControllers.ordermanagement);
+admin_routers.get("/orderdetails",adminauth.isLogin,adminControllers.orderdetails);
 
 admin_routers.use("/*", adminauth.isLogin,(req, res) => {
   res.redirect("/admin");

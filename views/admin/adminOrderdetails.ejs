@@ -1,0 +1,265 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Evara Dashboard</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assetsbackend/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link href="/assetsbackend/css/main.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <div class="screen-overlay"></div>
+    <aside class="navbar-aside" id="offcanvas_aside">
+        <div class="aside-top">
+            <a href="index.html" class="brand-wrap">
+                <img src="/assetsbackend/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard">
+            </a>
+            <div>
+                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
+            </div>
+        </div>
+        <nav>
+            <ul class="menu-aside">
+                <li class="menu-item active">
+                    <a class="menu-link" href="/admin/adminDashboard"> <i class="icon material-icons md-home"></i>
+                        <span class="text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item ">
+                    <a class="menu-link" href="/admin/adminuserManagement"> <i class="icon material-icons md-person"></i>
+                        <span class="text">User Management</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/categorymanagement"> <i class="icon material-icons md-add_box"></i>
+                        <span class="text">Category Management</span>
+                    </a>
+                </li>
+                <li class="menu-item ">
+                    <a class="menu-link" href="/admin/productmanagement"> <i class="icon material-icons md-shopping_bag"></i>
+                        <span class="text">Product Management</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/ordermanagement"> <i class="icon material-icons md-shopping_cart"></i>
+                        <span class="text">Orders</span>
+                    </a>
+                </li>
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href="page-sellers-cards.html"> <i class="icon material-icons md-store"></i>
+                        <span class="text">Sellers</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="page-sellers-cards.html">Sellers cards</a>
+                        <a href="page-sellers-list.html">Sellers list</a>
+                        <a href="page-seller-detail.html">Seller profile</a>
+                    </div>
+                </li>
+
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href="page-transactions-1.html"> <i class="icon material-icons md-monetization_on"></i>
+                        <span class="text">Transactions</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="page-transactions-1.html">Transaction 1</a>
+                        <a href="page-transactions-2.html">Transaction 2</a>
+                        <a href="page-transactions-details.html">Transaction Details</a>
+                    </div>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="page-reviews.html"> <i class="icon material-icons md-comment"></i>
+                        <span class="text">Reviews</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="page-brands.html"> <i class="icon material-icons md-stars"></i>
+                        <span class="text">Brands</span> </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" disabled href="#"> <i class="icon material-icons md-pie_chart"></i>
+                        <span class="text">Statistics</span>
+                    </a>
+                </li>
+            </ul>
+            <hr>
+            <ul class="menu-aside">
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href="#"> <i class="icon material-icons md-settings"></i>
+                        <span class="text">Settings</span>
+                    </a>
+                    <div class="submenu">
+                        <a href="page-settings-1.html">Setting sample 1</a>
+                        <a href="page-settings-2.html">Setting sample 2</a>
+                    </div>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="page-blank.html"> <i class="icon material-icons md-local_offer"></i>
+                        <span class="text"> Starter page </span>
+                    </a>
+                </li>
+            </ul>
+            <br>
+            <br>
+        </nav>
+    </aside>
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Order detail</h2>
+                    <p>Details for Order ID: 3453012</p>
+                </div>
+            </div>
+            <div class="card">
+                <header class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
+                            <span>
+                                <i class="material-icons md-calendar_today"></i> <b><%=String(order.createdAt).slice(0,16)%></b>
+                            </span> <br>
+                            <small class="text-muted">Order ID: <%=String(order._id).slice(-6)%></small>
+                        </div>
+                        <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+                            <form action="/admin/change-status/<%=order._id%>" method="post">
+                                <span>Order Status: </span>
+                                <select aria-placeholder="Order Status" class="form-select d-inline-block mb-lg-0 mb-15 mw-200" name="status">
+                                  <option <%if(order.orderStatus=== "PENDING") { %> selected <% } %> value="PENDING">PENDING</option>
+                                    <option <%if(order.orderStatus=== "PLACED") { %> selected <% } %> value="PLACED">PLACED</option>
+                                    <option <%if(order.orderStatus=== "CANCELLED") { %> selected <% } %> value="CANCELLED">CANCELLED</option>
+                                    <option <%if(order.orderStatus=== "DELIVERED") { %> selected <% } %> value="DELIVERED">DELIVERED</option>
+                                </select>
+                                <input type="hidden" name="id"  value="<%=order._id%>">
+                                <button type="submit" class="btn btn-primary">Save</button>
+                                <!-- <a class="btn btn-primary" href="#">Save</a> -->
+                            </form>
+                            <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
+                        </div>
+                    </div>
+                </header> <!-- card-header end// -->
+                <div class="card-body">
+                    <div class="row mb-50 mt-20 order-info-wrap">
+                        <div class="col-md-4">
+                            <article class="icontext align-items-start">
+                                <span class="icon icon-sm rounded-circle bg-primary-light">
+                                    <i class="text-primary material-icons md-person"></i>
+                                </span>
+                                <div class="text">
+                                    <h6 class="mb-1">Customer</h6>
+                                    <p class="mb-1">
+                                        <%=order.customerId.name%> <br> <%=order.customerId.email%> <br> <%=order.customerId.phoneNumber%>
+                                    </p>
+                                </div>
+                            </article>
+                        </div> <!-- col// -->
+                        <div class="col-md-4">
+                            <article class="icontext align-items-start">
+                                <span class="icon icon-sm rounded-circle bg-primary-light">
+                                    <i class="text-primary material-icons md-local_shipping"></i>
+                                </span>
+                                <div class="text">
+                                    <h6 class="mb-1">Order info</h6>
+                                    <p class="mb-1">
+                                        <%=order.customerId.address[0].addressLine1%> <br> <%=order.customerId.address[0].addressLine2%><br> Status: new
+                                    </p>
+                                </div>
+                            </article>
+                        </div> 
+                        <!-- col// -->
+                        <div class="col-md-4">
+                            <article class="icontext align-items-start">
+                                <span class="icon icon-sm rounded-circle bg-primary-light">
+                                    <i class="text-primary material-icons md-money"></i>
+                                </span>
+                                <div class="text">
+                                    <h6 class="mb-1">Payment Details</h6>
+                                    <p class="mb-1">
+                                        Payment Type: <%=order.paymentDetails%> <br> Payment Status: <%=order.paymentStatus%>
+                                    </p>
+                                </div>
+                            </article>
+                        </div> 
+                    </div> <!-- row // -->
+                    <!-- <div class="row"> -->
+                        <div class="">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th width="40%">Product</th>
+                                            <th width="20%">Unit Price</th>
+                                            <th width="20%">Quantity</th>
+                                            <th width="20%" class="text-end">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <%var sum=0%>
+                                        <%for(let i=0;i<product.products.length;i++) {%>
+                                        <tr>
+                                            <td>
+                                                <a class="itemside" href="#">
+                                                    <div class="left">
+                                                        <img src="/assetsbackend/imgs/products/<%=product.products[i].productId.image[0]%>" width="40" height="40" class="img-xs" alt="Item">
+                                                    </div>
+                                                    <div class="info"> <%=product.products[i].productId.productName%> </div>
+                                                </a>
+                                            </td>
+                                            <td> <%=product.products[i].productId.salePrice%> </td>
+                                            <td> <%=product.products[i].quantity%> </td>
+                                            <td class="text-end"> <%=product.products[i].productId.salePrice * product.products[i].quantity%> </td>
+                                            <%sum = sum + product.products[i].productId.salePrice * product.products[i].quantity %>
+                                        </tr>
+                                        <%}%>
+                                        
+                                    </tbody>
+                                </table>
+                            </div> <!-- table-responsive// -->
+                            <!-- <a class="btn btn-primary" href="page-orders-tracking.html">View Order Tracking</a> -->
+                        </div> 
+                        
+                        <div class="row mb-50">
+                           <div class="col-lg-6 col-md-12">
+                                <div class=" p-md-4 p-30 border-radius cart-totals">
+                                    <div class="heading_s1 mb-3">
+                                        <h4>Totals</h4>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="cart_total_label">Cart Subtotal</td>
+                                                    <td class="cart_total_amount"><span class="font-lg fw-900 text-brand">₹<%=sum%></span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cart_total_label">Shipping</td>
+                                                    <td class="cart_total_amount"> <i class="ti-gift mr-5"></i> Free Shipping</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cart_total_label">Total</td>
+                                                    <td class="cart_total_amount"><strong><span class="font-xl fw-900 text-brand">₹<%=sum%></span></strong></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+    </main>
+    <script src="/assetsbackend/js/vendors/jquery-3.6.0.min.js"></script>
+    <script src="/assetsbackend/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="/assetsbackend/js/vendors/select2.min.js"></script>
+    <script src="/assetsbackend/js/vendors/perfect-scrollbar.js"></script>
+    <script src="/assetsbackend/js/vendors/jquery.fullscreen.min.js"></script>
+    <!-- Main Script -->
+    <script src="/assetsbackend/js/main.js" type="text/javascript"></script>
+</body>
+
+</html>

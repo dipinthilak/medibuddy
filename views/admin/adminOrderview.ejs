@@ -113,6 +113,7 @@
             <br>
         </nav>
     </aside>
+    
         <section class="content-main">
             <div class="content-header">
                 <div>
@@ -123,7 +124,7 @@
                     <input type="text" placeholder="Search order ID" class="form-control bg-white">
                 </div>
             </div>
-            <div class="card mb-4">
+            <div class="card ps-50 mb-4">
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover" id="dataTable">
@@ -164,7 +165,7 @@
                                     </td>
                                     <td><%=String(order[i].createdAt).slice(4, 16)%></td>
                                     <td class="text-end">
-                                        <a href="/admin/order-details/<%=order[i]._id%>" class="btn btn-md rounded font-sm">Edit</a>
+                                        <a href="#" class="btn btn-md rounded font-sm">Edit</a>
                                         
                                     </td>
                                 </tr>

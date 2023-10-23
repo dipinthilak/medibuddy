@@ -225,7 +225,8 @@ const deleteCategory = async (req, res) => {
         }      
 
 
-
+        /admin/orderdetails?ordrid=<%=order[i]._id%>
+        orderview path;
 
 
 

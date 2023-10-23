@@ -10,13 +10,10 @@ user_routers.use(session({
     saveUninitialized: false, 
   }));
 
-
-  
   user_routers.set('view engine','ejs');
-  user_routers.set('views','./views/user')
+  user_routers.set('views','./views/user');
   user_routers.use(bodyParser.json());
   user_routers.use(bodyParser.urlencoded({extended: true}));
-
 
 
   user_routers.get('/',userController.userhome);
@@ -35,7 +32,6 @@ user_routers.use(session({
   user_routers.get('/orderdetails',userauth.isLogin,userController.orderdetails);
 
 
-  
   user_routers.get("/addaddress",userController.addaddressload);
   user_routers.post("/addaddress",userController.addAddress);
   user_routers.get("/updateaddressload",userController.updateaddressload);
@@ -45,14 +41,12 @@ user_routers.use(session({
   user_routers.get("/about",userController.userAbout);
   user_routers.get("/contact",userController.userContact);
 
-
     
   user_routers.get("/userSignin",userauth.isLogout,userController.loadSignin);
   user_routers.get("/userSignup",userauth.isLogout,userController.loadSignup);
   user_routers.post("/userSignup",userController.newUser);
   user_routers.post("/usersignupOtp",userController.usersignupOtp);
   user_routers.post("/userSignin",userController.userSignin);
-
 
 
   user_routers.get("/userDashboard",userauth.isLogin,userController.userDashboard);

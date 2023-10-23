@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const Order=require('../models/orderSchema');
 const dotenv = require('dotenv');
+dotenv.config({ path: ".env" });
 
 
 
@@ -17,11 +18,10 @@ const generateOtp = () => {
 const sendMail = async (name, email) => {
     try {
         const otp = generateOtp();
-        console.log(otp +"hhjghghjg");
-
+        console.log(otp +"<< Otp");
         const transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
-            port: 587,
+            port: 465,
             secure: false,
             requireTLS: true,
             auth: {
@@ -33,11 +33,11 @@ const sendMail = async (name, email) => {
         const mailOptions = {
             from: 'medibuddycc@gmail.com',
             to: email,
-            subject: 'OTP || Medibuddy',
+            subject: 'OTP - Medibuddy',
             text: `Thank you ,${name} for choosing Medibuddy. Use this otp to finish your signup: ${otp}`,
         };
 
-        transporter.sendMail(mailOptions, function (error, info) {
+       await transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 console.log(error);
             } else {
@@ -201,10 +201,7 @@ const newUser = async(req, res) => {
             password : req.body.password,
          };     
          console.log(user.email);
-        const otp = generateOtp();
-
-
-        //  const otp=sendMail(user.name,user.email);
+         const otp=sendMail(user.name,user.email);
          req.session.otp=otp;
          console.log(otp);
 
@@ -230,7 +227,6 @@ const usersignupOtp=async (req,res)=>{
         try {
             if(req.session.otp==req.body.otp)
             {
-                console.log("SDHJASDGASHDGASDGHASGDHSAGDHG");
              const user = new User({
                     name : req.body.username,
                     email : req.body.email,
@@ -245,7 +241,6 @@ const usersignupOtp=async (req,res)=>{
             if(userData)
             {
                 res.render('userSignin')
-    
             }
             }
             else

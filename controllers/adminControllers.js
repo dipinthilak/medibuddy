@@ -121,6 +121,18 @@ const ordermanagement=async (req,res)=>{
   }
 
 };
+
+const orderdetails=async (req,res)=>{
+    try {
+        const orderId = req.query.ordrid;
+        const order = await Order.findById(orderId).populate('customerId');
+        const product = await Order.findById(orderId).populate('products.productId');
+
+        res.render('adminOrderview',{order: order, product: product})
+    } catch (error) {
+        console.log(error.message);
+    }
+};
 module.exports = {
   loadLogin,
   adminSignin,
@@ -130,5 +142,6 @@ module.exports = {
   userUpdate,
   adminSignout,
   adminDashboard,
-  ordermanagement
+  ordermanagement,
+  orderdetails
 };

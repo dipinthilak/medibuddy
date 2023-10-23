@@ -86,7 +86,8 @@ const updateProduct=async(req,res)=>{
         description: req.body.description,
         regularPrice: req.body.productprice,
         salePrice: req.body.saleprice,
-        quantity: req.body.productquantity
+        quantity: req.body.productquantity,
+        isListed:true
           }
           // console.log(pres);9
           const productUpdateres=await Product.findOneAndUpdate({_id:productId},newproductdata);
