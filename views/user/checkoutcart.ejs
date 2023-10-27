@@ -602,7 +602,7 @@
                             <div class="col-lg-6">
                                 <div class="card mb-3 mb-lg-0">
                                     <div class="card-header">
-                                        <input class="form-check-input" value="<%= JSON.stringify(user.address[i]) %>" type="radio" name="address" id="address">
+                                        <input class="form-check-input" value="<%= JSON.stringify(user.address[i]) %>" <%=i===0 ? 'checked' : '' %> type="radio" name="address" id="address">
                                         <label class="form-check-label" for="flexRadioDefault1">
                                                 <h5 class="mb-0"> <%= user.address[i].addressType %></h5>
                                             </label>
@@ -668,14 +668,21 @@
                                 </div>
                                 <div class="payment_option">
                                     <div class="custome-radio">
-                                        <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios4" value="COD" checked="">
+                                        <input class="form-check-input" required="" type="radio" name="payment_option" value="razorpay" id="exampleRadios3" checked="">
+                                        <label class="form-check-label" for="exampleRadios3" data-bs-toggle="collapse" data-target="#bankTranfer" aria-controls="bankTranfer">Online Payment</label>
+                                        <div class="form-group collapse in" id="bankTranfer">
+                                            <p class="text-muted mt-5">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration. </p>
+                                        </div>
+                                    </div>
+                                    <div class="custome-radio">
+                                        <input class="form-check-input" required="" type="radio" name="payment_option" value="COD" id="exampleRadios4" >
                                         <label class="form-check-label" for="exampleRadios4" data-bs-toggle="collapse" data-target="#cashOnDelivery" aria-controls="checkPayment"  >Cash On Delivery</label>
                                         <div class="form-group collapse in" id="checkPayment">
                                             <p class="text-muted mt-5">Please send your cheque to Store Name, Store Street, Store Town, Store State / County, Store Postcode. </p>
                                         </div>
-                                    </div>
-                                    </div>
+                                    </div>                                   
                                 </div>
+                            </div>
                             </div>
                             <button id="place-order-button" type="submit" class="btn btn-fill-out btn-block mt-30">Place Order</button>                        </div>
                     </div>

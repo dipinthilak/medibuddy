@@ -5,8 +5,14 @@ const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const Order=require('../models/orderSchema');
 const dotenv = require('dotenv');
+const Razorpay=require('razorpay')
 dotenv.config({ path: ".env" });
 
+
+const razorpay = new Razorpay({
+    key_id: "rzp_test_RYYLyYcGwveVst",
+    key_secret: "m2uATo0jzjf681FDD9nl8B16",
+  });
 
 
 //generate otp
@@ -341,8 +347,9 @@ try {
         const userCart = await User.findOne({_id: req.session.user_id}).populate('cart.productId');
         let cartAmount=0;
         for(let i =0;i<userCart.cart.length;i++){
-            cartAmount= cartAmount + parseInt(userCart.cart[i].productId.salePrice)* parseInt(userCart.cart[i].quantity)
+            cartAmount= cartAmount + parseInt(userCart.cart[i].productId?.salePrice)* parseInt(userCart.cart[i]?.quantity)
         }
+        console.log("5555555555555555555"+userCart);
         console.log(cartAmount);
         res.render('userCart',{category:category,user:user,product:product,userCart:userCart,cartAmount:cartAmount})  
     }
@@ -354,14 +361,13 @@ try {
 } catch (error) {
     console.error(error);
 }
-
     };
 
 const addtoCart=async (req,res)=>{
     try {
-        console.log("add cart router");
+
         const productId =req.body.productid ;
-        console.log("productId   "+productId);
+        console.log("FGGHFGHFGHFGHFGHFGHFGHFGHFGFGH"+productId);
         const prdct=await Product.findById(productId);
         console.log(prdct);
         if (!req.session.user_id) 
@@ -408,8 +414,6 @@ const removecartitem=async (req,res)=>{
             const cart=user.cart;
             console.log("cart filtering");
             const newcart=cart.filter((cartitem)=>{
-            // console.log(cart_item_id);
-            // console.log(cartitem.productId);
                 if(cartitem.productId!=cart_item_id){
                 return cartitem}
             });
@@ -517,7 +521,96 @@ const updatequantity = async (req,res) => {
         } catch (error) {
             console.log(error.message);
         }
+    };
+
+const userWishlist=async (req,res)=>{
+    try {
+        const category =await Category.find();
+        const product=await Product.find(); 
+    
+        if(req.session.user_id)
+        {
+            const user=await User.findById(req.session.user_id);
+            const userwishlist = await User.findOne({_id: req.session.user_id}).populate('wishlist.productId');
+            res.render('userWishlist',{category:category,user:user,product:product,userwishlist:userwishlist})  
+        }
+        else
+    
+        {    
+        res.redirect("userSignin");
+        }
+    } catch (error) {
+        console.error(error);
     }
+    };
+
+
+const addtoWishlist=async(req,res)=>{
+    try {
+        const productId =req.body.productid ;
+        const prdct=await Product.findById(productId);
+        if (!req.session.user_id) 
+        {
+            res.status(200).json({notlogin:true});
+        }
+        const user = await User.findById(req.session.user_id);
+        console.log(user);
+        if(user)
+        {
+        const existingitem = user.wishlist.find((item)=>
+                item.productId.equals(productId)
+            );
+
+        if(existingitem){
+            console.log("existingitem>>>>>>>>>");
+            console.log(existingitem);
+            res.status(200).json({exsting:true});
+        }else{
+            const wishlistItem=await User.findByIdAndUpdate({_id:req.session.user_id},{$push:{wishlist:{productId:productId}}});
+            if (wishlistItem) {
+                res.status(200).json({towishlist:true});
+              } else {
+                res.status(200).json({towishlist:false});
+              }
+        }
+    }
+
+    }  catch (error) {
+        console.log(error);
+    }
+    };
+
+const removeWishitem=async (req,res)=>{
+    try {
+        console.log("remove item router");
+        const user_id=req.session.user_id;
+        const wish_item_id=req.body.productId;
+        const user=await User.findById(user_id);
+        const wishlist=user.wishlist;
+        console.log("wishlist filtering");
+        const newwishlist=wishlist.filter((wish_item)=>{
+            if(wish_item.productId!=wish_item_id){
+            return wish_item}
+        });
+        console.log(wishlist);
+        console.log(newwishlist);
+        user.wishlist=newwishlist;
+        const usersave=user.save();
+        console.log("deleted at db");
+        if(usersave){
+            res.status(200).json({itemRemoved:true});  
+        }
+        else{
+            res.status(200).json({itemnotRemoved:true});  
+        }
+    } 
+    catch (error) 
+    {
+        console.log(error);
+    }
+    };
+
+
     
 module.exports = {
                 userhome,
@@ -543,5 +636,8 @@ module.exports = {
                 removecartitem,
                 updatequantity,
                 usersignupOtp,
-                searchResult,                
+                searchResult,
+                userWishlist,
+                addtoWishlist,
+                removeWishitem                
             };

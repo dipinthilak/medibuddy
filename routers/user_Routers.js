@@ -31,6 +31,11 @@ user_routers.use(session({
   user_routers.post('/codcheckout',userController.codcheckout);
   user_routers.get('/orderdetails',userauth.isLogin,userController.orderdetails);
 
+  user_routers.post("/addtowishlist",userController.addtoWishlist);
+  user_routers.get("/userWishlist",userauth.isLogin,userController.userWishlist);
+  user_routers.post("/removewishitem",userController.removeWishitem);
+
+
 
   user_routers.get("/addaddress",userController.addaddressload);
   user_routers.post("/addaddress",userController.addAddress);

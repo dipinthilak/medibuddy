@@ -57,7 +57,7 @@
                 <div class="header-action-right">
                   <div class="header-action-2">
                     <div class="header-action-icon-2">
-                      <a href="shop-wishlist.html">
+                      <a href="/userWishlist">
                         <img
                           class="svgInject"
                           alt="Evara"
@@ -498,22 +498,21 @@
                         <a
                           aria-label="Quick view"
                           class="action-btn hover-up"
-                          data-bs-toggle="modal"
-                          data-bs-target="#quickViewModal"
+                          href="/userShopproduct?pid=<%= product[i]._id%>"  
                           ><i class="fi-rs-eye"></i
                         ></a>
                         <a
                           aria-label="Add To Wishlist"
                           class="action-btn hover-up"
-                          href="shop-wishlist.html"
+                          onclick="addtoWishlist('<%=product[i]._id%>')"
                           ><i class="fi-rs-heart"></i
                         ></a>
-                        <a
+                        <!-- <a
                           aria-label="Compare"
                           class="action-btn hover-up"
                           href="shop-compare.html"
                           ><i class="fi-rs-shuffle"></i
-                        ></a>
+                        ></a> -->
                       </div>
                       <div
                         class="product-badges product-badges-position product-badges-mrg"
@@ -806,7 +805,7 @@
                   /></a>
                 </figure>
                 <h5>
-                  <a href="shop-grid-right.html"><%= category[i].name %></a>
+                  <a href="/userCategoryproduct?cid=<%=category[i]._id%>"><%= category[i].name %></a>
                 </h5>
               </div>
               <%}%>
@@ -2822,6 +2821,41 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Template  JS -->
     <script>
+function addtoWishlist(productid)
+{
+  $.ajax({
+    method:'POST',
+    url:'/addtowishlist',
+    data:{productid},
+    success : function(res){
+                // Handle the response
+                if(res.notlogin){
+                  Swal.fire(
+                              'You should login first'
+                            ).then(function(){
+                              window.location.href="/userSignin";
+
+                            });
+                }
+                else if(res.exsting){
+                  Swal.fire(
+                    'item already in wishlist'
+                  )
+
+                }
+                else if(res.towishlist){
+                  Swal.fire(
+                              'Item added to wishlist'
+                            );
+                }
+                else{
+                  Swal.fire(
+                              'Item not added to wishlist'
+                            );
+                }
+            }
+        });
+}
 
 function addtoCart(productid)
       {
