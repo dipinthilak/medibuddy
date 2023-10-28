@@ -18,7 +18,7 @@ app.use('/admin-assets',express.static(path.resolve(__dirname,"public/admin")))
 app.use('/', userRouters);
 app.use('/admin', admin_routers);
 
-
+ 
 app.listen(3000, () => {
     console.log('Server started...');
 })

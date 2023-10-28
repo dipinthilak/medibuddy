@@ -590,7 +590,7 @@
         </div>
         <section class="mt-50 mb-50">
             <div class="container">
-                <form class= "payment-form" action="/codcheckout" method="post">
+                <form class= "payment-form" id="checkoutform" action="#" method="post">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-25">
@@ -692,6 +692,8 @@
         </section>
     </main>
    
+
+
     <!-- Vendor JS-->
     <script src="assets/js/vendor/modernizr-3.6.0.min.js"></script>
     <script src="assets/js/vendor/jquery-3.6.0.min.js"></script>
@@ -714,6 +716,94 @@
     <!-- Template  JS -->
     <script src="./assets/js/main.js?v=3.4"></script>
     <script src="./assets/js/shop.js?v=3.4"></script>
+ <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <script>
+
+    $(document).ready(function () 
+    {                 
+        $('#checkoutform').submit(function (event) 
+            { 
+                event.preventDefault(); 
+                let form = document.getElementById('checkoutform'); 
+                let formData = $(this).serialize()  
+                console.log(formData);
+
+                $.ajax
+                ({
+                    method: 'POST',
+                    url: '/codcheckout',
+                    data: formData, 
+                    success : function(res)
+                    {
+                        if(res.success){
+                        var options = {
+                            "key":""+res.key_id+"",
+                            "amount" : ""+res.amount+"",
+                            "currency" : "INR",
+                            "order_id" : ""+res.order_id+"",
+                            "receipt" : ""+res.receipt+"",
+                            
+                            "handler":function(response){
+                                // alert(res.reciept)
+                                // alert("payment success")
+                                verifyPayment(response, res.order_id ,res.reciept)
+                                window.open("/ordersuccess?ordid="+res.reciept+"", "_self")
+
+                            },
+                            "prefill" : {
+                                "contact" : ""+res.contact+"",
+                                "name" : ""+res.name+"",
+                                "email" : ""+res.email+""
+                            },
+                            "theme" : {
+                                "color" : "#2300a3"
+                            }
+                        }
+                        var razorpayObj = new Razorpay(options);
+                        razorpayObj.on('payment.failed', function(response){
+                            alert("payment failed")
+                        })
+                        razorpayObj.open();
+                    }else{
+                        alert(res.msg)
+                    }
+                    if (res.status) 
+                    {
+                        console.log(res.ordid);
+                            window.open("/ordersuccess?ordid="+res.ordid, "_self")
+                    } 
+                    }
+                });
+            });
+    });
+
+    function verifyPayment(payment, order, orderId) {
+            $.ajax({
+                url: '/verifypayment',
+                data: {
+                    payment,
+                    order,
+                    orderId
+                },
+                method: 'post',
+                success: function () {
+
+                    Swal.fire({
+                        title: 'Your Order Placed Successfully!',
+                        text: 'View your orders',
+                        icon: 'success',
+                        showConfirmButton: true,
+                        confirmButtonText: "View order"
+                    }).then(function () {
+                        window.location.href = "/userDashboard"
+
+                    })
+                }
+            })
+        }
+    </script>
+
 </body>
 
 </html>

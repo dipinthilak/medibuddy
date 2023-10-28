@@ -128,7 +128,7 @@ const orderdetails=async (req,res)=>{
         const order = await Order.findById(orderId).populate('customerId');
         const product = await Order.findById(orderId).populate('products.productId');
 
-        res.render('adminOrderview',{order: order, product: product})
+        res.render('adminOrderdetails',{order: order, product: product})
     } catch (error) {
         console.log(error.message);
     }

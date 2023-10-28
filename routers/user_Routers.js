@@ -30,6 +30,9 @@ user_routers.use(session({
   user_routers.get('/checkoutitems',userauth.isLogin,userController.checkoutCart);
   user_routers.post('/codcheckout',userController.codcheckout);
   user_routers.get('/orderdetails',userauth.isLogin,userController.orderdetails);
+  user_routers.get('/ordersuccess',userController.ordersuccess);
+  user_routers.post('/verifypayment',userController.verifypayment);
+
 
   user_routers.post("/addtowishlist",userController.addtoWishlist);
   user_routers.get("/userWishlist",userauth.isLogin,userController.userWishlist);

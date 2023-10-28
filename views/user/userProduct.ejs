@@ -263,11 +263,18 @@
                             </div>
                         </div>
                         <div class="col-6">
-                            <div class="search-style-2">
-                                <form action="#">
-                                    <input type="text" placeholder="Search for medicines , supplements">
-                                </form>
-                            </div>
+                                <div style="border-style: solid; border-color: black; border-radius: 10px;" class="col-6">
+                                    <div class="search-style-2" >
+                                      <form action="/searchproduct">
+                                        <input
+                                          type="text"
+                                          name="searchquery"
+                                          placeholder="Search for medicines , supplements"
+                                        />
+                    
+                                      </form>
+                                    </div>
+                                  </div>
                         </div>
                         <div class="main-menu main-menu-padding-1 main-menu-lh-2 d-none d-lg-block mr-45 ">
                             <nav>
@@ -594,7 +601,7 @@
                                                 <a href="#" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
                                             </div>
                                             <div class="product-extra-link2">
-                                                <button type="submit" class="button button-add-to-cart">Add to cart</button>
+                                                <button type="submit"  onclick="addtoCart('<%=product._id%>')" class="button button-add-to-cart">Add to cart</button>
                                                 <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
                                                 <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
                                             </div>
@@ -1274,9 +1281,44 @@
     <script src="assets/js/plugins/jquery.vticker-min.js"></script>
     <script src="assets/js/plugins/jquery.theia.sticky.js"></script>
     <script src="assets/js/plugins/jquery.elevatezoom.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Template  JS -->
     <script src="./assets/js/main.js?v=3.4"></script>
     <script src="./assets/js/shop.js?v=3.4"></script>
+    <script>
+        function addtoCart(productid)
+      {
+        $.ajax({
+            method: 'POST',
+            url: '/addtocart',
+            data: { productid }, 
+            success : function(res){
+                // Handle the response
+                if(res.notlogin){
+                  Swal.fire(
+                              'You should login first'
+                            ).then(function(){
+                              window.location.href="/userSignin";
+
+                            });
+                }
+                else if(res.toCart){
+                  Swal.fire(
+                              'Item added to cart'
+                            );
+                }
+                else{
+                  Swal.fire(
+                              'Item not added to cart'
+                            );
+                }
+            }
+        });
+      }
+
+
+    </script>
 </body>
 
 </html>

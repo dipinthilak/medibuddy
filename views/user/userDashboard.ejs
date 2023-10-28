@@ -788,6 +788,7 @@
                                                             <tr>
                                                                 <th>Order</th>
                                                                 <th>Date</th>
+                                                                <th>payment</th>
                                                                 <th>Status</th>
                                                                 <th>Total</th>
                                                                 <th>Actions</th>
@@ -799,6 +800,7 @@
                                                                 <tr>
                                                                     <td>ODR-<%=String(order[i]._id).slice(-10)%></td>
                                                                     <td><%= String(order[i].createdAt).slice(4, 16) %></td>
+                                                                    <td><%=order[i].paymentDetails%> - <%=order[i].paymentStatus%></td>
                                                                     <td><%=order[i].orderStatus%></td>
                                                                     <td>₹ <%=order[i].totalAmount%> </td>
                                                                     <td><a href="/orderdetails?ordid=<%=order[i]._id%>" class="btn-small d-block">View</a></td>

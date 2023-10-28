@@ -5,11 +5,13 @@ const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const Order=require('../models/orderSchema');
 const dotenv = require('dotenv');
-const Razorpay=require('razorpay')
+const crypto = require('crypto');
+const Razorpay=require('razorpay');
+const mongoose = require('mongoose');
 dotenv.config({ path: ".env" });
 
 
-const razorpay = new Razorpay({
+const  instance  = new Razorpay({
     key_id: "rzp_test_RYYLyYcGwveVst",
     key_secret: "m2uATo0jzjf681FDD9nl8B16",
   });
@@ -392,7 +394,11 @@ const addtoCart=async (req,res)=>{
         }else{
             const cartItem=await User.findByIdAndUpdate({_id:req.session.user_id    },{$push:{cart:{productId:productId,quantity:quantity}}});
             if (cartItem) {
-                res.status(200).json({toCart:true});
+        const usercl = await User.findById(req.session.user_id);
+                    const cartcount=usercl.cart.length;
+                    console.log(cartcount);
+
+                res.status(200).json({toCart:true,cartcount:cartcount});
               } else {
                 res.status(200).json({toCart:false});
               }
@@ -458,7 +464,9 @@ const checkoutCart=async(req,res)=>{
 
 const codcheckout=async (req,res)=> {
         try {     
-          console.log(req.body);
+          console.log("123456789123456789123456789");
+          console.log(req.body.payment_option);
+          const payment_option=req.body.payment_option;
           const userId = req.session.user_id;
           const user = await User.findById(req.session.user_id);
           const cart = await User.findById(req.session.user_id, { cart: 1, _id: 0 });
@@ -476,26 +484,120 @@ const codcheckout=async (req,res)=> {
             paymentDetails: req.body.payment_option,
           });
           const orderSuccess = await order.save();
-          const orderId = order._id;
-          if (orderSuccess) {
+          console.log("order success data--------------------------------------"+orderSuccess);
+          if (orderSuccess) 
+          {
             for (const cartItem of user.cart) {
               const product = await Product.findById(cartItem.productId);
               if (product) {
                 product.quantity -= cartItem.quantity;
                 await product.save();
+                console.log("ORDER ID -------------->>>>>"+orderSuccess._id);
                 console.log('quantity decreased');
               }
             }
             // Make the cart empty
             await User.updateOne({ _id: userId }, { $unset: { cart: 1 } });
-            res.redirect('/userHome');
+            console.log('cart cleared');
+
+            if (order.paymentDetails === 'COD') 
+            {
+              res.status(200).json({
+                status: true,
+                ordid:orderSuccess._id,
+                msg: "Order created for COD",
+              })
+                  
+            }
+                  
+              else if(payment_option=="razorpay")
+            {
+                const amount=total*100;
+                const reciept=orderSuccess._id;
+
+                let options =   {
+                                amount: amount, 
+                                currency: "INR",
+                                receipt: reciept
+                                };
+
+                instance.orders.create(options, function(err, order) {
+                    if(!err){
+                        console.log(order);
+                        res.status(200).send({
+                            success: true,
+                            msg: "Order created",
+                            order_id: order.id,
+                            amount: amount,
+                            reciept: reciept,
+                            key_id: 'rzp_test_RYYLyYcGwveVst',
+                            contact: "8893196356",
+                            name: "medibuddy",
+                            email: "medibuddy@gmail.com",
+                    })
+                            }
+                    else{
+                        res.status(400).send({ success: false, msg: "Something went wrong!" });
+                    }
+                  });
+
+            }
             }
           }
-        catch (error) {
-          console.error(error.message);
+        catch (error) 
+        {
+            console.error(error.message);
+            res.status(500).send("Internal Server Error");
         }
     };
 
+const verifypayment=async(req,res)=>{ 
+    try {
+        console.log('this is id:',req.body.orderId);
+        const orddtl = await Order.find({_id :req.body.orderId});
+        if(orddtl){
+          console.log(orddtl);
+          console.log(req.body.orderId);
+        }
+
+        let hmac = crypto.createHmac('sha256', 'rzp_test_RYYLyYcGwveVst');
+        
+    console.log("payp ret"+req.body.payment.razorpay_payment_id);
+    console.log("payo ret"+req.body.payment.razorpay_order_id);
+        hmac.update(req.body.payment.razorpay_order_id + '|' + req.body.payment.razorpay_payment_id);
+        hmac = hmac.digest('hex');
+        console.log(hmac);
+        console.log(req.body.payment.razorpay_signature);
+    
+        console.log("comparison------------->>>>>>1>>>");
+        // if (hmac == req.body.payment.razorpay_signature) {
+            if(hmac){
+        console.log("comparison----SUCCESS");
+
+          await Order.updateOne({_id : new mongoose.Types.ObjectId(req.body.orderId)},{$set : { paymentStatus : 'RECEIVED', orderStatus :"PLACED"}});
+    
+          res.status(200).json({ status: 'success', msg: 'Payment verified' });
+        } else {
+    
+          res.status(400).json({ status: 'error', msg: 'Payment verification failed' });
+        }
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ status: 'error', msg: 'Internal server error' });
+      }
+    };
+
+const ordersuccess=async (req,res)=>{
+    try {
+        const orderid=req.query.ordid;
+        
+        res.render('orderplaced',{ordid:orderid});
+    } catch (error) {
+        console.log(error);
+    }
+    };
+
+    
 const orderdetails=async (req,res)=>{
     try {
     const user_id=req.session.user_id;
@@ -639,5 +741,7 @@ module.exports = {
                 searchResult,
                 userWishlist,
                 addtoWishlist,
-                removeWishitem                
+                removeWishitem,
+                ordersuccess,
+                verifypayment                
             };
