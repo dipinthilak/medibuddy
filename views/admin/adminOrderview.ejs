@@ -56,58 +56,6 @@
                         <span class="text">Orders</span>
                     </a>
                 </li>
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="page-sellers-cards.html"> <i class="icon material-icons md-store"></i>
-                        <span class="text">Sellers</span>
-                    </a>
-                    <div class="submenu">
-                        <a href="page-sellers-cards.html">Sellers cards</a>
-                        <a href="page-sellers-list.html">Sellers list</a>
-                        <a href="page-seller-detail.html">Seller profile</a>
-                    </div>
-                </li>
-
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="page-transactions-1.html"> <i class="icon material-icons md-monetization_on"></i>
-                        <span class="text">Transactions</span>
-                    </a>
-                    <div class="submenu">
-                        <a href="page-transactions-1.html">Transaction 1</a>
-                        <a href="page-transactions-2.html">Transaction 2</a>
-                        <a href="page-transactions-details.html">Transaction Details</a>
-                    </div>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="page-reviews.html"> <i class="icon material-icons md-comment"></i>
-                        <span class="text">Reviews</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="page-brands.html"> <i class="icon material-icons md-stars"></i>
-                        <span class="text">Brands</span> </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" disabled href="#"> <i class="icon material-icons md-pie_chart"></i>
-                        <span class="text">Statistics</span>
-                    </a>
-                </li>
-            </ul>
-            <hr>
-            <ul class="menu-aside">
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="#"> <i class="icon material-icons md-settings"></i>
-                        <span class="text">Settings</span>
-                    </a>
-                    <div class="submenu">
-                        <a href="page-settings-1.html">Setting sample 1</a>
-                        <a href="page-settings-2.html">Setting sample 2</a>
-                    </div>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="page-blank.html"> <i class="icon material-icons md-local_offer"></i>
-                        <span class="text"> Starter page </span>
-                    </a>
-                </li>
             </ul>
             <br>
             <br>
@@ -130,8 +78,7 @@
                     </ul>
                 </div>
             </header>
-            <section class="content-main">
-                <section class="content-main">
+                <section class="content-main" style="padding: 1% ;">
                     <div class="content-header">
                         <div>
                             <h2 class="content-title card-title">Order Management </h2>
@@ -140,9 +87,6 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="row">   
-                                
-
-
                                 <div class="table-responsive">
                                     <table class="table table-hover" id="dataTable">
                                         <thead>
@@ -159,7 +103,7 @@
                                         <tbody>
                                             <%for(let i=0;i<order.length;i++) {%>
                                             <tr>
-                                                <td><%=String(order[i]._id).slice(-6)%></td>
+                                                <td><%=String(order[i]._id).slice(-8)%></td>
                                                 <td><b><%= order[i].customerId.name %></b></td>
                                                 <td><%= order[i].customerId.email %></td>
                                                 <td><%=order[i].totalAmount%></td>
@@ -182,7 +126,7 @@
                                                 </td>
                                                 <td><%=String(order[i].createdAt).slice(4, 16)%></td>
                                                 <td class="text-end">
-                                                    <a href="/admin/orderdetails?ordrid=<%= order[i]._id%>" class="btn btn-md rounded font-sm">Edit</a>
+                                                    <a href="/admin/orderdetails?ordrid=<%= order[i]._id%>" class="btn btn-md rounded font-sm">View & Update</a>
                                                     
                                                 </td>
                                             </tr>
@@ -191,26 +135,16 @@
                                            
                                         </tbody>
                                     </table>
-                                </div> <!-- table-responsive //end -->
-
-
-
-
-                            </div> <!-- .row // -->
-                        </div> <!-- card body .// -->
-                    </div> <!-- card .// -->
-            </section> <!-- content-main end// -->
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
             <footer class="main-footer font-xs">
                 <div class="row pb-30 pt-15">
                     <div class="col-sm-6">
                         <script>
                         document.write(new Date().getFullYear())
                         </script> ©
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="text-sm-end">
-                            All rights reserved
-                        </div>
                     </div>
                 </div>
             </footer>

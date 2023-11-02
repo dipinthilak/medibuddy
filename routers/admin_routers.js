@@ -108,6 +108,7 @@ admin_routers.get("/",adminauth.isLogout, adminControllers.loadLogin);
 admin_routers.post("/login", adminControllers.adminSignin);
 admin_routers.get("/logout",adminauth.isLogin, adminControllers.adminSignout);
 admin_routers.get("/adminDashboard",adminauth.isLogin,adminControllers.adminDashboard);
+admin_routers.get("/createreport",adminauth.isLogin,adminControllers.createreport);
 
 
 //User management
@@ -137,6 +138,7 @@ admin_routers.get("/productDelete",adminauth.isLogin,productControllers.productD
 //Order amanagement
 admin_routers.get("/ordermanagement",adminauth.isLogin,adminControllers.ordermanagement);
 admin_routers.get("/orderdetails",adminauth.isLogin,adminControllers.orderdetails);
+admin_routers.post("/orderstatus",adminauth.isLogin,adminControllers.orderstatus);
 
 admin_routers.use("/*", adminauth.isLogin,(req, res) => {
   res.redirect("/admin");

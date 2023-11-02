@@ -63,18 +63,20 @@
                           alt="Evara"
                           src="assets/imgs/theme/icons/icon-heart.svg"
                         />
-                        <span class="pro-count blue"></span>
+                        <span id="wlicon" class="pro-count blue"><%=user.wishlist.length%></span>
                       </a>
                     </div>
-                    <div class="header-action-icon-2">
+
+
+                    <div class="header-action-icon-2" onclick="userCart()">
                       <!-- <a onclick="userCart('<%=user%>')" id="user" class="mini-cart-icon" > -->
-                        <a  id="user" class="mini-cart-icon" href="/userCart">
+                        <a  id="user" class="mini-cart-icon">
                         <img
                           alt="Evara"
                           src="assets/imgs/theme/icons/icon-cart.svg"
                         />
                         <%if(user){%>
-                        <span id="clength" class="pro-count blue"><%=user.cart.length??0%></span>
+                        <span id="clength" class="pro-count blue"><%=user.cart.length%></span>
                         <%}else{%>
                           <span class="pro-count blue">0</span>
                         <%}%>
@@ -104,6 +106,11 @@
                       class="categori-dropdown-wrap categori-dropdown-active-large"
                     >
                       <ul>
+                        <li>
+                          <a href="/allProducts"
+                            ><i class="evara-font-kite"></i>All Products</a
+                          >
+                        </li>
                         <% for (let i = 0; i < category.length; i++) { %>
                         <li>
                           <a href="/userCategoryproduct?cid=<%=category[i]._id%>"
@@ -2767,23 +2774,13 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Template  JS -->
     <script>
-//       function userCart(user)
-//       {
-// if(user)
-// {
-//   $.ajax({
-//     method:'POST',
-//     url:'/',
-// }
-//       }
-//     }
-function addtoWishlist(productid)
-{
-  $.ajax({
-    method:'POST',
-    url:'/addtowishlist',
-    data:{productid},
-    success : function(res){
+        function addtoWishlist(productid)
+        {
+          $.ajax({
+            method:'POST',
+            url:'/addtowishlist',
+            data:{productid},
+            success : function(res){
                 // Handle the response
                 if(res.notlogin){
                   Swal.fire(
@@ -2800,6 +2797,11 @@ function addtoWishlist(productid)
 
                 }
                 else if(res.towishlist){
+                  if(typeof(res.wlsize)=="number")
+                  {
+                  const wlicon=document.getElementById("wlicon");
+                  wlicon.innerHTML=res.wlsize;
+                  }
                   Swal.fire(
                               'Item added to wishlist'
                             );
@@ -2810,7 +2812,32 @@ function addtoWishlist(productid)
                             );
                 }
             }
-        });
+          });
+        }
+
+function userCart()
+{
+  console.log("userCart");
+  $.ajax({
+    method:'GET',
+    url:'/cartOpen',
+    success: function(res){
+      console.log("cart open check");
+      if(res.notlogin){
+        console.log("no login");
+        Swal.fire(
+          'you should login first'
+        ).then(function()
+        {
+          window.location.href="/userSignin";
+        })
+      }
+      else if(res.userlogin){
+        window.location.href="/userCart";
+      }
+
+    }
+  });
 }
 
 function addtoCart(productid)
@@ -2833,7 +2860,8 @@ function addtoCart(productid)
                   if(typeof(res.cartcount)=="number")
                   {
                     alert(res.cartcount);
-                    document.getElementById("clength").innerHTML(res.cartcount);
+                    const cartl=document.getElementById("clength");
+                    cartl.innerHTML=res.cartcount;
                   }
 
                   Swal.fire(
@@ -2846,7 +2874,7 @@ function addtoCart(productid)
                               'Item not added to cart'
                             );
                 }
-            }
+            } 
         });
       }
 

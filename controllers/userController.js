@@ -8,34 +8,38 @@ const dotenv = require('dotenv');
 const crypto = require('crypto');
 const Razorpay=require('razorpay');
 const mongoose = require('mongoose');
+const { log } = require('console');
 dotenv.config({ path: ".env" });
 
-
+ 
 const  instance  = new Razorpay({
     key_id: "rzp_test_RYYLyYcGwveVst",
     key_secret: "m2uATo0jzjf681FDD9nl8B16",
   });
 
-
+ 
 //generate otp
 const generateOtp = () => {
-    return Math.floor(Math.random() * 90000 + 10000);
+    const otp= Math.floor(Math.random() * 900000 + 100000);
+    return otp;
     };
-
-//send mail
-const sendMail = async (name, email) => {
+ 
+// send mail
+const sendMail = async (name="user", email) => {
     try {
-        const otp = generateOtp();
-        console.log(otp +"<< Otp");
+        const otp =generateOtp();
+        const rotp=otp;
+        console.log(otp);
+
         const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
+            host: "smtp.gmail.com",
+            port: 587,
             secure: false,
             requireTLS: true,
             auth: {
                 user: process.env.EMAIL,
-                pass: process.env.PASSWORD
-            }
+                pass: process.env.PASSWORD,
+            },
         });
 
         const mailOptions = {
@@ -45,20 +49,17 @@ const sendMail = async (name, email) => {
             text: `Thank you ,${name} for choosing Medibuddy. Use this otp to finish your signup: ${otp}`,
         };
 
-       await transporter.sendMail(mailOptions, function (error, info) {
-            if (error) {
-                console.log(error);
-            } else {
-                console.log('Email has been sent', info.response);
-            }
-        });
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Email has been sent', info.response);
+        console.log(rotp);
+        return rotp ;
+    }   
 
-        return otp;
-    } catch (error) {
-        console.log(error.message);
-        throw error;
+    catch (error) {
+        console.log(error);
     }
     };
+ 
 
 const ecryptpassword = async(password)=> {
         try {
@@ -97,7 +98,7 @@ const loadSignup=async(req,res)=>{
 
 const userDashboard =async (req,res)=>{
     const user = await User.findById(req.session.user_id);
-    const order=await Order.find({customerId:req.session.user_id});
+    const order=await Order.find({customerId:req.session.user_id}).sort({ createdAt: -1 });
     console.log(order.length);
     res.render('userDashboard',{user:user,order:order})
     };
@@ -201,7 +202,6 @@ const loadSignin=async(req,res)=>{
 
 const newUser = async(req, res) => {
     try {
-        // const hashedpassword =await ecryptpassword(req.body.password);
         const user ={
             name : req.body.username,
             email : req.body.email,
@@ -209,19 +209,10 @@ const newUser = async(req, res) => {
             password : req.body.password,
          };     
          console.log(user.email);
-         const otp=sendMail(user.name,user.email);
+         const otp= await sendMail(user.name,user.email);
          req.session.otp=otp;
+         console.log("otp    --->>>"+otp);
          console.log(otp);
-
-        //  const user = new User({
-        //     name : req.body.username,
-        //     email : req.body.email,
-        //     mobile : req.body.number,
-        //     password : req.body.password,
-        //  });
-
-        // const userData = await user.save();
-        // console.log(userData);
          res.render('usersignupwithOtp',{user,wrongotp:false});
         }
     catch (error) 
@@ -231,8 +222,13 @@ const newUser = async(req, res) => {
     };
 
 const usersignupOtp=async (req,res)=>{
-        const hashedpassword =await ecryptpassword(req.body.password);
-        try {
+    try {
+            const hashedpassword =await ecryptpassword(req.body.password);
+            console.log("-------------------");
+            console.log(req.session.otp);
+            console.log(req.session.otp?.otp);
+            console.log(req.body.otp);
+            console.log("-------------------");
             if(req.session.otp==req.body.otp)
             {
              const user = new User({
@@ -278,7 +274,7 @@ const userSignin=async (req,res)=>{
         {
             req.session.user_id=udetails._id;
             req.session.user=udetails.name;
-            const order=await Order.find({customerId:req.session.user_id});
+            const order = await Order.find({ customerId: req.session.user_id }).sort({ createdAt: -1 });
             console.log(order);
             res.render('userDashboard',{user : udetails,order:order})
         }
@@ -290,6 +286,85 @@ const userSignin=async (req,res)=>{
 
     }
     };
+
+const loadForgot=async (req,res)=>{
+    try {
+        res.render("forgotpassword");
+    } catch (error) {
+        
+    }
+    };
+
+const passwordForgot=async(req,res)=>{
+    try {
+        const email=req.body.email;
+        const user=await User.findOne({email:email});
+        console.log("-------------------->>>>>>>>>>>>"+user);
+
+        if(!user){
+            res.redirect('/forgotpassword');
+        }
+        else{
+            const rotp=await sendMail('',email);
+            req.session.rotp=rotp;
+            console.log(rotp);
+            const forgotdata=
+            {
+                email:req.body.email,
+                password:req.body.password,
+            }
+            res.render('forgotpasswordotp',{forgotdata});
+
+        }
+    } catch (error) {
+        
+    }
+
+    };
+
+const updatepw=async (req,res)=>{
+        try {
+            console.log(req.body);
+            if(req.body.npassword == req.body.cpassword)
+            {
+                const hpassowd=await ecryptpassword(req.body.npassword);
+                console.log("123123123"+hpassowd);
+                console.log(req.session.user_id);
+                const pwupdate= await User.findByIdAndUpdate({_id:req.session.user_id},{password:hpassowd});
+                if(pwupdate)
+                {
+                    res.redirect("/userDashboard");
+                }
+
+            }
+            
+        } catch (error) {
+            
+        }
+
+    }
+
+const passwordForgototp=async(req,res)=>{
+    try {
+        console.log(req.body);
+        if(req.body.otp== req.session.rotp)
+        {
+            const hpassowd =await ecryptpassword(req.body.password);
+            console.log("hashed "+hpassowd);
+            const pwupdate=await  User.findOneAndUpdate({email:req.body.email},{password:hpassowd});
+            if(pwupdate){
+                console.log(pwupdate?._id);
+                req.session.user_id=pwupdate?._id;
+                res.redirect("/userSignin");
+            }
+        }
+    } catch (error) {
+        console.log(error);
+    }
+
+    };
+
+
 
 const userLogout = async(req,res)=>{
     try {
@@ -322,6 +397,7 @@ const categoryShop=async (req,res)=>{
 
 
 const searchResult=async (req,res)=>{
+try {
     const searchq=req.query.searchquery;
     console.log(searchq);
     const category =await Category.find();
@@ -336,7 +412,30 @@ const searchResult=async (req,res)=>{
     else{
         res.render('userSearchitems',{category:category,product:product,user:null})  
         }
+    
+} catch (error) {
+    console.log(error);
+    res.status(500).send("Internal Server Error");
+}
     };
+
+const cartOpen=async (req,res)=>{
+    try {
+        console.log(req.session.user_id);
+        if(req.session.user_id){
+            res.status(200).json({userlogin:true});  
+        }
+        else 
+        {
+            res.status(200).json({notlogin:true});
+        }
+
+        
+    } catch (error) {
+        console.log(error);
+    }
+
+}
 
 const userCart=async (req,res)=>{
 try {
@@ -345,15 +444,18 @@ try {
 
     if(req.session.user_id)
     {
-        const user=await User.findById(req.session.user_id);
         const userCart = await User.findOne({_id: req.session.user_id}).populate('cart.productId');
+        const user=await User.findById(req.session.user_id);
+        const userWish = await User.findOne({_id: req.session.user_id}).populate('wishlist.productId');
         let cartAmount=0;
         for(let i =0;i<userCart.cart.length;i++){
             cartAmount= cartAmount + parseInt(userCart.cart[i].productId?.salePrice)* parseInt(userCart.cart[i]?.quantity)
         }
         console.log("5555555555555555555"+userCart);
         console.log(cartAmount);
-        res.render('userCart',{category:category,user:user,product:product,userCart:userCart,cartAmount:cartAmount})  
+        console.log("852852"+userWish.wishlist.length);
+
+        res.render('userCart',{category:category,user:user,product:product,userCart:userCart,cartAmount:cartAmount,userWish:userWish})  
     }
     else
 
@@ -610,6 +712,95 @@ const orderdetails=async (req,res)=>{
     }
     };
 
+
+const downloadInvoice = async (req, res) => {
+        try {
+          const orderId = req.body.orderId;
+          // console.log(orderId);
+          const order = await Order.findById(orderId).populate("products.productId");
+      
+          // console.log("order");
+          // console.log(order);
+          // console.log(productId);
+      
+          const product = order.products.map((item, i) => {
+            return {
+              quantity: parseInt(item.quantity),
+              discount: parseInt(order.couponDiscount),
+              total: parseInt(order.paidAmount),
+              description: item.productId.name,
+              price: parseInt(item.productId.price),
+              "tax-rate": 0,
+            };
+          });
+      
+          // console.log("product");
+          // console.log(product);
+          var data = {
+            //   "images": {
+            //       "logo": "/assets/imgs/theme/logo1.png"
+            //  },
+            // Your own data
+      
+            sender: {
+              company: "VisionVogue",
+              address: "Vison Nagar, Gandhi Street,78,Kadavanthra",
+              zip: "688535",
+              city: "Ernakulam",
+              state: "Kerala",
+              country: "India",
+            },
+            // Your recipient
+            client: {
+              company: order.shippingAddress.customerName,
+              address: order.shippingAddress.addressLine1,
+              zip: order.shippingAddress.zipcode,
+              city: order.shippingAddress.city,
+              state: order.shippingAddress.state,
+              country: "INDIA",
+            },
+      
+            information: {
+              // Invoice number
+              number: order.orderId,
+              // Invoice data
+              date: String(order.createdAt).slice(4, 16),
+              // Invoice due date
+              "due-date": String(order.createdAt).slice(4, 16),
+            },
+            // The products you would like to see on your invoice
+            // Total values are being calculated automatically
+            products: product,
+            // The message you would like to display on the bottom of your invoice
+            "bottom-notice": "Kindly keep your invoice till warranty period.",
+            // Settings to customize your invoice
+            settings: {
+              currency: "INR", // See documentation 'Locales and Currency' for more info. Leave empty for no currency.
+              // "locale": "nl-NL", // Defaults to en-US, used for number formatting (See documentation 'Locales and Currency')
+              // "margin-top": 25, // Defaults to '25'
+              // "margin-right": 25, // Defaults to '25'
+              // "margin-left": 25, // Defaults to '25'
+              // "margin-bottom": 25, // Defaults to '25'
+              // "format": "A4", // Defaults to A4, options: A3, A4, A5, Legal, Letter, Tabloid
+              // "height": "1000px", // allowed units: mm, cm, in, px
+              // "width": "500px", // allowed units: mm, cm, in, px
+              // "orientation": "landscape", // portrait or landscape, defaults to portrait
+            },
+          };
+      
+          console.log("data");
+          console.log(data);
+          res.json(data);
+        } catch (error) {
+          console.error(error.message);
+          res
+            .status(500)
+            .json({ status: "error", msg: "Unable to download invoice" });
+        }
+      };
+
+
+
 const updatequantity = async (req,res) => {
         try {
             console.log(req.body)
@@ -711,7 +902,70 @@ const removeWishitem=async (req,res)=>{
         console.log(error);
     }
     };
+const allProduct=async (req,res)=>{
+    const category =await Category.find();
+    const categoryname ={name:'all'}
+    console.log(categoryname.name);
+    const user = await User.findById(req.session.user_id);
+    const product=await Product.find();
+    console.log("--------------------------------------------------------------------");
+    console.log(product);
+    res.render("userallProduct",{product,user,category});
 
+
+};
+
+const allProduct1 = async (req, res) => {
+    try {
+      req.session.originalURL = '/allProducts';
+  
+      var page = 1;
+      if (req.query.page) {
+        page = req.query.page;
+      }
+  
+      const limit = 3;
+      const productsQuery = Product.find();
+      console.log(productsQuery);
+  
+      const products = await paginateQuery(productsQuery, page, limit).exec();
+      console.log("products:", products); // Log products to check if they are retrieved correctly.
+  
+      const count = await Product.find().populate("category").countDocuments();
+      console.log("count is " + count);
+  
+      const category = await Category.find({ isListed: true });
+      const user = await User.findById(req.session.user_id);
+      const secret = true;
+  
+      res.render("userallProduct", {
+        product: products,
+        category: category,
+        user: user,
+        pathurl: '/allProducts',
+        totalPages: Math.ceil(count / limit),
+        count: count,
+        page: page,
+        search: undefined,
+        secret: secret,
+      });
+    } catch (error) {
+      console.log("Error in allProduct:", error);
+      // Handle the error, you can send an error response to the client if needed.
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  };
+  
+  function paginateQuery(query, page, limit) {
+    try {
+      const skip = (page - 1) * limit;
+      return query.skip(skip).limit(limit);
+    } catch (error) {
+      console.error("Error in paginateQuery:", error);
+      throw error;
+    }
+  }
+  
 
     
 module.exports = {
@@ -730,6 +984,7 @@ module.exports = {
                 userLogout,
                 productShop,
                 categoryShop,
+                cartOpen,
                 userCart,
                 addtoCart,
                 checkoutCart,
@@ -743,5 +998,11 @@ module.exports = {
                 addtoWishlist,
                 removeWishitem,
                 ordersuccess,
-                verifypayment                
+                verifypayment,
+                loadForgot,
+                passwordForgot,
+                passwordForgototp,  
+                updatepw,
+                downloadInvoice,
+                allProduct         
             };

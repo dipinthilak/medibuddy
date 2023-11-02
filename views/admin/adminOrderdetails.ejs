@@ -18,7 +18,9 @@
 </head>
 
 <body>
-    <div class="screen-overlay"></div>
+    <div class="screen-overlay">
+
+    </div>
     <aside class="navbar-aside" id="offcanvas_aside">
         <div class="aside-top">
             <a href="index.html" class="brand-wrap">
@@ -55,63 +57,12 @@
                         <span class="text">Orders</span>
                     </a>
                 </li>
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="page-sellers-cards.html"> <i class="icon material-icons md-store"></i>
-                        <span class="text">Sellers</span>
-                    </a>
-                    <div class="submenu">
-                        <a href="page-sellers-cards.html">Sellers cards</a>
-                        <a href="page-sellers-list.html">Sellers list</a>
-                        <a href="page-seller-detail.html">Seller profile</a>
-                    </div>
-                </li>
-
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="page-transactions-1.html"> <i class="icon material-icons md-monetization_on"></i>
-                        <span class="text">Transactions</span>
-                    </a>
-                    <div class="submenu">
-                        <a href="page-transactions-1.html">Transaction 1</a>
-                        <a href="page-transactions-2.html">Transaction 2</a>
-                        <a href="page-transactions-details.html">Transaction Details</a>
-                    </div>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="page-reviews.html"> <i class="icon material-icons md-comment"></i>
-                        <span class="text">Reviews</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="page-brands.html"> <i class="icon material-icons md-stars"></i>
-                        <span class="text">Brands</span> </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" disabled href="#"> <i class="icon material-icons md-pie_chart"></i>
-                        <span class="text">Statistics</span>
-                    </a>
-                </li>
-            </ul>
-            <hr>
-            <ul class="menu-aside">
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="#"> <i class="icon material-icons md-settings"></i>
-                        <span class="text">Settings</span>
-                    </a>
-                    <div class="submenu">
-                        <a href="page-settings-1.html">Setting sample 1</a>
-                        <a href="page-settings-2.html">Setting sample 2</a>
-                    </div>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="page-blank.html"> <i class="icon material-icons md-local_offer"></i>
-                        <span class="text"> Starter page </span>
-                    </a>
-                </li>
             </ul>
             <br>
             <br>
         </nav>
     </aside>
+    <main class="main-wrap">
         <section class="content-main">
             <div class="content-header">
                 <div>
@@ -128,15 +79,14 @@
                         <small class="text-muted">Order ID: <%=String(order._id).slice(-6)%></small>
                     </div>
                     <div class="col-lg-6 col-md-6 ms-auto text-md-end">
-                        <form action="/admin/change-status/<%=order._id%>" method="post">
+                        <form action="/admin/orderstatus?ordrid=<%=order._id%>" method="post">
                             <span>Order Status: </span>
                             <select aria-placeholder="Order Status" class="form-select d-inline-block mb-lg-0 mb-15 mw-200" name="status">
                               <option <%if(order.orderStatus=== "PENDING") { %> selected <% } %> value="PENDING">PENDING</option>
                                 <option <%if(order.orderStatus=== "PLACED") { %> selected <% } %> value="PLACED">PLACED</option>
-                                <option <%if(order.orderStatus=== "CANCELLED") { %> selected <% } %> value="CANCELLED">CANCELLED</option>
+                                <!-- <option <%if(order.orderStatus=== "CANCELLED") { %> selected <% } %> value="CANCELLED">CANCELLED</option> -->
                                 <option <%if(order.orderStatus=== "DELIVERED") { %> selected <% } %> value="DELIVERED">DELIVERED</option>
                             </select>
-                            <input type="hidden" name="id"  value="<%=order._id%>">
                             <button type="submit" class="btn btn-primary">Save</button>
                             <!-- <a class="btn btn-primary" href="#">Save</a> -->
                         </form>
@@ -205,7 +155,7 @@
                                             <td>
                                                 <a class="itemside" href="#">
                                                     <div class="left">
-                                                        <img src="/assetsbackend/imgs/products/<%=product.products[i].productId.image[0]%>" width="40" height="40" class="img-xs" alt="Item">
+                                                        <img src="/admin-assets/product/<%=product.products[i].productId.image[0]%>" width="40" height="40" class="img-xs" alt="Item">
                                                     </div>
                                                     <div class="info"> <%=product.products[i].productId.productName%> </div>
                                                 </a>
@@ -251,6 +201,8 @@
                             </div>
                         </div>
                     </div>
+                    </div>
+                    </section>
     </main>
     <script src="/assetsbackend/js/vendors/jquery-3.6.0.min.js"></script>
     <script src="/assetsbackend/js/vendors/bootstrap.bundle.min.js"></script>

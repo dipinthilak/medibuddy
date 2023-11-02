@@ -133,6 +133,143 @@ const orderdetails=async (req,res)=>{
         console.log(error.message);
     }
 };
+
+
+const orderstatus=async (req,res)=>{
+  try {
+    console.log(req.body);
+    console.log(req.query.ordrid);
+    const order=await Order.findById(req.query.ordrid);
+
+
+
+    if(req.body.status=='DELIVERED')
+    {
+      if(order.paymentDetails=="COD")
+      {
+      const orderdata=await Order.findByIdAndUpdate({_id:req.query.ordrid},{paymentStatus:'RECEIVED',orderStatus:'DELIVERED'})
+      }
+      else if(order.paymentDetails=="razorpay")
+      {
+      const orderdata=await Order.findByIdAndUpdate({_id:req.query.ordrid},{orderStatus:'DELIVERED'})
+      } 
+
+    }
+
+      else if(req.body.status=='PLACED')
+      {
+        if(order.paymentDetails=="COD")
+        {
+        const orderdata=await Order.findByIdAndUpdate({_id:req.query.ordrid},{orderStatus:'PLACED'})
+        }
+        else if(order.paymentDetails=="razorpay")
+        {
+        const orderdata=await Order.findByIdAndUpdate({_id:req.query.ordrid},{orderStatus:'PLACED'})
+        }
+      }
+    res.redirect('/admin/ordermanagement');
+  } catch (error) {
+    console.log(error);
+  }
+
+};
+
+
+
+const createreport = async (req, res) => {
+  try {
+    console.log("report processing");
+    let orders = await Order.find().populate('products.productId');
+
+    const PDFDocument = require('pdfkit');
+
+    // Create a document with custom page size and margins
+    const doc = new PDFDocument({ size: 'letter', margin: 50 });
+
+    // Pipe its output somewhere, like to a file or HTTP response
+    // See below for browser usage
+    doc.pipe(res);
+
+    // Title
+    doc.fontSize(20).text('Sales Report', { align: 'center' });
+    doc.moveDown(); // Move down to create space below the title
+
+    // Define table headers
+    const headers = [
+      'Index',
+      'Date',
+      'Order Id',
+      'Qnty',
+      'Total',
+      'Discount',
+      'Final Price',
+    ];
+    // Calculate column widths
+    const colWidths = [35, 90, 140, 50, 70, 70, 70];
+
+    // Set initial position for drawing
+    let x = 50;
+    let y = doc.y;
+
+    // Draw table headers
+    headers.forEach((header, index) => {
+      doc
+        .font('Helvetica-Bold')
+        .fontSize(12)
+        .text(header, x, y, { width: colWidths[index], align: 'center' });
+      x += colWidths[index];
+    });
+
+    // Draw table rows
+    let currentPageY = y;
+    orders.forEach((order, index) => {
+      const total = order.totalAmount;
+      const discount =order.discount;
+      const orderId ="Odr-"+String(order._id).slice(4, 12);
+      const date = String(order.createdAt).slice(4, 16);
+
+      order.products.forEach((product) => {
+        const quantity = product.quantity;
+
+        const finalPrice = total - discount;
+
+        // Create an array of row data with the Indian Rupee symbol and formatted prices
+        const rowData = [
+          index + 1,
+          date,
+          orderId,
+          quantity,
+          total, // Format total price
+          discount, // Format discount
+          finalPrice, // Format final price
+        ];
+
+        x = 50;
+        currentPageY += 20;
+
+        // Check if the current row will fit on the current page, if not, create a new page
+        if (currentPageY + 20 > doc.page.height - 50) {
+          doc.addPage(); // Create a new page
+          currentPageY = 50; // Reset the current Y position
+        }
+
+        // Draw row data
+        rowData.forEach((value, index) => {
+          doc.font('Helvetica').fontSize(12).text(value.toString(), x, currentPageY, {
+            width: colWidths[index],
+            align: 'center',
+          });
+          x += colWidths[index];
+        });
+      });
+    });
+
+    // Finalize PDF file
+    doc.end();
+  } catch (error) {
+    console.log(error.message);
+  }
+};
 module.exports = {
   loadLogin,
   adminSignin,
@@ -143,5 +280,7 @@ module.exports = {
   adminSignout,
   adminDashboard,
   ordermanagement,
-  orderdetails
+  orderdetails,
+  createreport,
+  orderstatus
 };
