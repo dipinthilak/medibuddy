@@ -113,7 +113,7 @@ admin_routers.get("/createreport",adminauth.isLogin,adminControllers.createrepor
 
 //User management
 admin_routers.get("/adminuserManagement", adminauth.isLogin,adminControllers.loadUsermanagement);
-admin_routers.get("/adminuserStatus", adminauth.isLogin,adminControllers.userstatusChange);
+admin_routers.post("/adminuserStatus", adminauth.isLogin,adminControllers.userstatusChange);
 admin_routers.get("/AdminuserUpdate", adminauth.isLogin,adminControllers.userdataUpdate);
 admin_routers.post("/userdataUpate", adminControllers.userUpdate);
 

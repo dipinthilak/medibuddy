@@ -861,7 +861,8 @@ const addtoWishlist=async(req,res)=>{
         }else{
             const wishlistItem=await User.findByIdAndUpdate({_id:req.session.user_id},{$push:{wishlist:{productId:productId}}});
             if (wishlistItem) {
-                res.status(200).json({towishlist:true});
+                const wlsize=wishlistItem.wishlist.length;
+                res.status(200).json({towishlist:true,wlsize:wlsize});
               } else {
                 res.status(200).json({towishlist:false});
               }
@@ -902,23 +903,21 @@ const removeWishitem=async (req,res)=>{
         console.log(error);
     }
     };
-const allProduct=async (req,res)=>{
-    const category =await Category.find();
-    const categoryname ={name:'all'}
-    console.log(categoryname.name);
-    const user = await User.findById(req.session.user_id);
-    const product=await Product.find();
-    console.log("--------------------------------------------------------------------");
-    console.log(product);
-    res.render("userallProduct",{product,user,category});
+// const allProduct1=async (req,res)=>{
+//     const category =await Category.find();
+//     const categoryname ={name:'all'}
+//     console.log(categoryname.name);
+//     const user = await User.findById(req.session.user_id);
+//     const product=await Product.find();
+//     console.log("--------------------------------------------------------------------");
+//     console.log(product);
+//     res.render("userallProduct",{product,user,category});
+// };
 
-
-};
-
-const allProduct1 = async (req, res) => {
+const allProduct = async (req, res) => {
     try {
       req.session.originalURL = '/allProducts';
-  
+      console.log(req.query.page);  
       var page = 1;
       if (req.query.page) {
         page = req.query.page;

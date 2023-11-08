@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const userauth=require('../authentication/userAuth')
 const userController = require("../controllers/userController");
+const User=require("../models/userSchema");
+const Category=require("../models/categorySchema");
 user_routers.use(session({
     secret: "firstprkey",
     resave: false, 
@@ -67,5 +69,23 @@ user_routers.use(session({
 
   user_routers.get("/userDashboard",userauth.isLogin,userController.userDashboard);
   user_routers.get("/userlogout",userauth.isLogin,userController.userLogout);
+
+//   user_routers.get("/postman",(req,res)=>{
+//     const id='651ec5873ec49e4550745496';
+// const userPromise = User.findById(id);
+// const userDataPromise = User.findById(id);
+// const userCartPromise = User.findOne({_id: id}).populate('cart.productId');
+// const categoriesPromise = Category.find();
+
+// Promise.all([userPromise, userDataPromise, userCartPromise, categoriesPromise])
+//   .then(([user, userData, userCart, categories]) => {
+//    res.send({user:user});
+//   })
+//   .catch(error => {
+//     // Handle any errors that might occur during the Promise.all
+//   });
+
+//   }
+//   );
 
   module.exports = user_routers;

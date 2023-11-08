@@ -172,10 +172,23 @@
                                         <a href="/admin/AdminuserUpdate?userId=<%=users[i]._id%>"  class="btn btn-sm font-sm  btn-dark rounded ">
                                             <i class="material-icons md-edit"></i> Edit</a>
                                            
-                                            <a href="/admin/AdminuserStatus?userId=<%=users[i]._id%>"  class="btn btn-sm font-sm mx-2 btn-danger rounded ">
-                                                <i class="material-icons md-edit"></i> 
-                                                <% if (users[i].isActive) { %>Block<% } else { %> Unblock<% } %>
-                                            </a>
+                                            
+                                                    <% if (users[i].isActive) { %>
+                                                    <span id="<%=users[i]._id%>" style="min-width: 15vh; background-color: red; color: white;" class="btn btn-sm font-sm mx-2 rounded " onclick="changeStatus('<%=users[i]._id%>')" >
+                                                    <i class="material-icons md-edit"></i> 
+                                                    <span  id="<%=users[i]._id%>">
+                                                    Block
+                                                    </span>
+                                                    </span>
+                                                    <% } else { %> 
+                                                    <span id="<%=users[i]._id%>" style=" min-width: 15vh; background-color:hsl(176, 88%, 27%); color:white;" class="btn btn-sm font-sm mx-2  rounded " onclick="changeStatus('<%=users[i]._id%>')" >
+                                                    <i class="material-icons md-edit"></i> 
+                                                    <span  >
+                                                    Unblock
+                                                    </span>
+                                                    </span>
+                                                    <% } %>
+                                            
                                     <% } %> 
                           </table>
                     </article> <!-- itemlist  .// -->
@@ -209,13 +222,45 @@
             </div>
         </footer>
     </main>
-    <script>
-        new DataTable('#dataTable', {
-    lengthMenu: [
-        [10, 25, 50, -1],
-        [10, 25, 50, 'All']
-    ]
-});
+<script>
+        function changeStatus(userid)
+        {
+            alert(userid);
+            const ustatus=document.getElementById(userid);
+            console.log(ustatus);
+            $.ajax({
+            method:'POST',
+            url:'/admin/AdminuserStatus',
+            data:{userid},
+            success: function(res)
+            {
+            console.log("User status change request");
+            // Create a new child element (e.g., a <p> element)
+                var iconElement = document.createElement("i");
+                iconElement.className = "material-icons md-edit";
+// Add the child element to the parent
+
+            if(res.blocked){
+            console.log(userid +" blocked");
+            var iconElement = document.createElement("i");
+            iconElement.className = "material-icons md-edit";
+            ustatus.appendChild(iconElement);
+            ustatus.innerHTML="Unblock";
+            ustatus.style.color = "white";
+            ustatus.style.background = "hsl(176, 88%, 27%)"                
+            }
+            if(res.unblocked){
+            console.log(userid +" unblocked");
+            var iconElement = document.createElement("i");
+            iconElement.className = "material-icons md-edit";
+            ustatus.appendChild(iconElement);
+            ustatus.innerHTML="Block";
+            ustatus.style.color = "white";
+            ustatus.style.background = "red"
+            }
+            }
+        });
+    }
     </script>
     <script src="/assetsbackend/js/vendors/jquery-3.6.0.min.js"></script>
     <script src="/assetsbackend/js/vendors/bootstrap.bundle.min.js"></script>

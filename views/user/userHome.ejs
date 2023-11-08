@@ -63,7 +63,11 @@
                           alt="Evara"
                           src="assets/imgs/theme/icons/icon-heart.svg"
                         />
+                        <%if(user){%>
                         <span id="wlicon" class="pro-count blue"><%=user.wishlist.length%></span>
+                        <%} else { %>
+                        <span id="wlicon"></span>
+                        <%}%>
                       </a>
                     </div>
 
@@ -78,7 +82,7 @@
                         <%if(user){%>
                         <span id="clength" class="pro-count blue"><%=user.cart.length%></span>
                         <%}else{%>
-                          <span class="pro-count blue">0</span>
+                          <span id="clength"></span>
                         <%}%>
                       </a>
                     </div>
@@ -2799,6 +2803,7 @@
                 else if(res.towishlist){
                   if(typeof(res.wlsize)=="number")
                   {
+                    alert(res.wlsize);
                   const wlicon=document.getElementById("wlicon");
                   wlicon.innerHTML=res.wlsize;
                   }
