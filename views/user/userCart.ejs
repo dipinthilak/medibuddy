@@ -48,7 +48,7 @@
                                 <div class="header-action-right">
                                     <div class="header-action-2">
                                         <div class="header-action-icon-2">
-                                            <a href="shop-wishlist.html">
+                                            <a href="/userWishlist">
                                                 <img class="svgInject" alt="Evara" src="assets/imgs/theme/icons/icon-heart.svg">
                                                 <span class="pro-count blue"><%=userWish.wishlist.length%></span>
                                             </a>
@@ -191,7 +191,7 @@
                                     <tr id="cart-row-<%=i%>">
                                         <td class="image product-thumbnail"><img src="/admin-assets/product/<%= userCart.cart[i].productId?.image[0]%>" alt="#"></td>
                                         <td class="product-des product-name">
-                                            <h5 class="product-name"><a href="shop-product-right.html"><%=userCart.cart[i].productId?.productName%></a></h5>
+                                            <h5 class="product-name"><a href="#"><%=userCart.cart[i].productId?.productName%></a></h5>
                                             <p class="font-xs"><%=userCart.cart[i].productId?.category%><br> <%=userCart.cart[i].productId?.brandName%>
                                             </p>
                                         </td>

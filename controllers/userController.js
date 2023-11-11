@@ -16,7 +16,6 @@ const  instance  = new Razorpay({
     key_id: "rzp_test_RYYLyYcGwveVst",
     key_secret: "m2uATo0jzjf681FDD9nl8B16",
   });
-
  
 //generate otp
 const generateOtp = () => {
@@ -98,9 +97,9 @@ const loadSignup=async(req,res)=>{
 
 const userDashboard =async (req,res)=>{
     const user = await User.findById(req.session.user_id);
+    const wallet=await User.findOne({_id:req.session.user_id},{wallet:1});
     const order=await Order.find({customerId:req.session.user_id}).sort({ createdAt: -1 });
-    console.log(order.length);
-    res.render('userDashboard',{user:user,order:order})
+    res.render('userDashboard',{user:user,order:order,wallet:wallet})
     };
 
 const addaddressload=async(req,res)=>{
@@ -197,22 +196,33 @@ const updateaddress=async (req,res)=>{
     }
 
 const loadSignin=async(req,res)=>{
-    res.render('userSignin')
+    try {
+        if (req.session.wcreds) 
+        {
+            delete req.session.wcreds;
+        res.render('userSignin',{message:true})            
+        }
+        else
+        {
+    res.render('userSignin',{message:false})
+        }
+        } 
+        catch (error)
+        {
+            console.log(error);
+        }
     };
 
 const newUser = async(req, res) => {
     try {
         const user ={
-            name : req.body.username,
-            email : req.body.email,
-            mobile : req.body.number,
-            password : req.body.password,
-         };     
-         console.log(user.email);
+                    name : req.body.username,
+                    email : req.body.email,
+                    mobile : req.body.number,
+                    password : req.body.password,
+                    };     
          const otp= await sendMail(user.name,user.email);
          req.session.otp=otp;
-         console.log("otp    --->>>"+otp);
-         console.log(otp);
          res.render('usersignupwithOtp',{user,wrongotp:false});
         }
     catch (error) 
@@ -224,10 +234,6 @@ const newUser = async(req, res) => {
 const usersignupOtp=async (req,res)=>{
     try {
             const hashedpassword =await ecryptpassword(req.body.password);
-            console.log("-------------------");
-            console.log(req.session.otp);
-            console.log(req.session.otp?.otp);
-            console.log(req.body.otp);
             console.log("-------------------");
             if(req.session.otp==req.body.otp)
             {
@@ -244,7 +250,7 @@ const usersignupOtp=async (req,res)=>{
         
             if(userData)
             {
-                res.render('userSignin')
+                res.render('userSignin',{message:''})
             }
             }
             else
@@ -272,13 +278,17 @@ const userSignin=async (req,res)=>{
         const passwordMatch = await bcrypt.compare(req.body.password, udetails.password);
         if(passwordMatch)
         {
+        const wallet=await User.findOne({email:email},{wallet:1});
             req.session.user_id=udetails._id;
             req.session.user=udetails.name;
             const order = await Order.find({ customerId: req.session.user_id }).sort({ createdAt: -1 });
             console.log(order);
-            res.render('userDashboard',{user : udetails,order:order})
+            console.log("123123123123");
+            console.log(wallet);
+            res.render('userDashboard',{user : udetails,order:order,wallet:wallet})
         }
         else{
+            req.session.wcreds=true;
             res.redirect('/userSignin');
         }
     }
@@ -289,11 +299,22 @@ const userSignin=async (req,res)=>{
 
 const loadForgot=async (req,res)=>{
     try {
-        res.render("forgotpassword");
+        let message=null;
+        if(req.session.message)
+        {
+            console.log("--------"+req.session.message);
+            message=req.session.message;
+            console.log(message);
+            console.log("session element before deleted");
+
+            delete req.session.message;
+            console.log("session element after deleted");
+        }
+        res.render("forgotpassword",{message});
     } catch (error) {
         
     }
-    };
+    }; 
 
 const passwordForgot=async(req,res)=>{
     try {
@@ -302,6 +323,8 @@ const passwordForgot=async(req,res)=>{
         console.log("-------------------->>>>>>>>>>>>"+user);
 
         if(!user){
+            req.session.message='username invalid';
+            console.log("redirect forgot");
             res.redirect('/forgotpassword');
         }
         else{
@@ -364,8 +387,6 @@ const passwordForgototp=async(req,res)=>{
 
     };
 
-
-
 const userLogout = async(req,res)=>{
     try {
         req.session.destroy();
@@ -376,11 +397,16 @@ const userLogout = async(req,res)=>{
     };
     
 const productShop=async (req,res)=>{
+try {
     const id=req.query.pid;
     const category =await Category.find();
     const user = await User.findById(req.session.user_id);
     const product=await Product.findById(id);
     res.render("userProduct",{product,user,category});
+} catch (error) {
+    console.log(error);
+    res.status(404).render('error',{message:"product not found"});   
+}
     };
 
 const categoryShop=async (req,res)=>{
@@ -394,7 +420,6 @@ const categoryShop=async (req,res)=>{
     console.log(product);
     res.render("userCategoryproducts",{product,user,category});
     };
-
 
 const searchResult=async (req,res)=>{
 try {
@@ -410,7 +435,7 @@ try {
             user:user,product:product})  
     }
     else{
-        res.render('userSearchitems',{category:category,product:product,user:null})  
+        res.render('userSearchitems',{category:category,product:product,user:null,search:searchq})  
         }
     
 } catch (error) {
@@ -435,7 +460,7 @@ const cartOpen=async (req,res)=>{
         console.log(error);
     }
 
-}
+    };
 
 const userCart=async (req,res)=>{
 try {
@@ -566,7 +591,6 @@ const checkoutCart=async(req,res)=>{
 
 const codcheckout=async (req,res)=> {
         try {     
-          console.log("123456789123456789123456789");
           console.log(req.body.payment_option);
           const payment_option=req.body.payment_option;
           const userId = req.session.user_id;
@@ -698,7 +722,6 @@ const ordersuccess=async (req,res)=>{
         console.log(error);
     }
     };
-
     
 const orderdetails=async (req,res)=>{
     try {
@@ -709,20 +732,15 @@ const orderdetails=async (req,res)=>{
     res.render('userorderdetails',{order:order,user:user})
     } catch (error) {
         console.error(error);
+        res.status(404).render('error',{message:"product not found"});   
+
     }
     };
-
 
 const downloadInvoice = async (req, res) => {
         try {
           const orderId = req.body.orderId;
-          // console.log(orderId);
           const order = await Order.findById(orderId).populate("products.productId");
-      
-          // console.log("order");
-          // console.log(order);
-          // console.log(productId);
-      
           const product = order.products.map((item, i) => {
             return {
               quantity: parseInt(item.quantity),
@@ -733,9 +751,6 @@ const downloadInvoice = async (req, res) => {
               "tax-rate": 0,
             };
           });
-      
-          // console.log("product");
-          // console.log(product);
           var data = {
             //   "images": {
             //       "logo": "/assets/imgs/theme/logo1.png"
@@ -743,8 +758,8 @@ const downloadInvoice = async (req, res) => {
             // Your own data
       
             sender: {
-              company: "VisionVogue",
-              address: "Vison Nagar, Gandhi Street,78,Kadavanthra",
+              company: "Medibuddy",
+              address: "M R Nagar, Vikas Street,56,Kadavanthra",
               zip: "688535",
               city: "Ernakulam",
               state: "Kerala",
@@ -793,13 +808,10 @@ const downloadInvoice = async (req, res) => {
           res.json(data);
         } catch (error) {
           console.error(error.message);
-          res
-            .status(500)
-            .json({ status: "error", msg: "Unable to download invoice" });
+          res.status(404).render('error',{message:"product not found"});   
+
         }
-      };
-
-
+    };
 
 const updatequantity = async (req,res) => {
         try {
@@ -813,6 +825,8 @@ const updatequantity = async (req,res) => {
 
         } catch (error) {
             console.log(error.message);
+          res.status(404).render('error',{message:"product not found"});   
+
         }
     };
 
@@ -834,9 +848,10 @@ const userWishlist=async (req,res)=>{
         }
     } catch (error) {
         console.error(error);
+        res.status(404).render('error',{message:"product not found"});   
+
     }
     };
-
 
 const addtoWishlist=async(req,res)=>{
     try {
@@ -871,6 +886,8 @@ const addtoWishlist=async(req,res)=>{
 
     }  catch (error) {
         console.log(error);
+        res.status(404).render('error',{message:"product not found"});   
+
     }
     };
 
@@ -901,18 +918,10 @@ const removeWishitem=async (req,res)=>{
     catch (error) 
     {
         console.log(error);
+        res.status(404).render('error',{message:"product not found"});   
+
     }
     };
-// const allProduct1=async (req,res)=>{
-//     const category =await Category.find();
-//     const categoryname ={name:'all'}
-//     console.log(categoryname.name);
-//     const user = await User.findById(req.session.user_id);
-//     const product=await Product.find();
-//     console.log("--------------------------------------------------------------------");
-//     console.log(product);
-//     res.render("userallProduct",{product,user,category});
-// };
 
 const allProduct = async (req, res) => {
     try {
@@ -953,9 +962,102 @@ const allProduct = async (req, res) => {
       // Handle the error, you can send an error response to the client if needed.
       res.status(500).json({ error: "Internal Server Error" });
     }
-  };
+    };
+
+const cancelOrder = async (req,res) => {
+        try {
+            console.log(req.query.oid);
+          const id = req.query.oid;
+          const update = {
+            orderStatus: "CANCELLED",
+          };
+          const order = await Order.findById(id);
+          const orderUpdate = await Order.findByIdAndUpdate(id, update);
+          const user = await User.findById(req.session.user_id);
+      
+          if (order) {
+            for (const orderItem of order.products) {
+              const product = await Product.findById(orderItem.productId);
+      
+              if (product) {
+                product.quantity += orderItem.quantity;
+                await product.save();
+                console.log("quantity increased");
+              }
+            }
+
+            let wupdate = {
+                orderId: order._id,
+                amount: order.totalAmount,
+                transactionType: "CREDIT",
+                remarks: "CANCELLED",
+              };
+          
+              console.log(user.wallet);
+              user.wallet.push(wupdate);
+              await user.save();
+          }
+          console.log(user.wallet);      
+          res.redirect("/userDashboard");
+        } catch (error) {
+          console.log(error.message);        
+          res.status(404).render('error',{message:"product not found"});   
+
+        }
+      };
+      
+const returnOrder = async (req,res) => {
+    try {
+        // const reason = req.body.reason;
+        const id = req.query.oid;
+        const order = await Order.findById({
+          _id: new mongoose.Types.ObjectId(id),
+        });
+        // await Order.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(id) },
+        //   { $set: { returnReason: reason, orderStatus: "RETURNED" } }
+        // ).lean();
+
+        await Order.findByIdAndUpdate({ _id: new mongoose.Types.ObjectId(id) },
+        { $set: {orderStatus: "RETURNED" } }
+      ).lean();
+
+        const user = await User.findById(req.session.user_id)
+    
+        if (order) {
+          for (const orderItem of order.products) {
+            const product = await Product.findById(orderItem.productId);
+    
+            if (product) {
+              product.quantity += orderItem.quantity;
+              await product.save();
+              console.log("quantity increased");
+            }
+          }
+          
+          let wtransact = {
+            orderId: order._id,
+            amount: order.totalAmount,
+            transactionType: "CREDIT",
+            remarks: "RETURNED",
+          };
+      
+          user.wallet.push(wtransact);
+          await user.save();
+    
+        }
+        res.redirect("/userDashboard")
+      } catch (error) {
+        console.log(error.message);          
+        res.status(404).render('error',{message:"product not found"});   
+
+      }
+      };
+
+
+
+
   
-  function paginateQuery(query, page, limit) {
+function paginateQuery(query, page, limit) {
     try {
       const skip = (page - 1) * limit;
       return query.skip(skip).limit(limit);
@@ -963,10 +1065,8 @@ const allProduct = async (req, res) => {
       console.error("Error in paginateQuery:", error);
       throw error;
     }
-  }
-  
+    };
 
-    
 module.exports = {
                 userhome,
                 userAbout,
@@ -1003,5 +1103,7 @@ module.exports = {
                 passwordForgototp,  
                 updatepw,
                 downloadInvoice,
-                allProduct         
+                allProduct,
+                returnOrder,
+                cancelOrder         
             };

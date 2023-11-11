@@ -18,6 +18,13 @@ app.use('/admin-assets',express.static(path.resolve(__dirname,"public/admin")))
 app.use('/', userRouters);
 app.use('/admin', admin_routers);
 
+
+app.set('view engine','ejs');
+app.set('views','./views/user');
+app.use(function(req,res){
+    res.status(404).render('user/error');
+});
+
  
 app.listen(3000, () => {
     console.log('Server started...');

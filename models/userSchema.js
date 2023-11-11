@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const moment = require('moment-timezone');
 
 const addressSchema = new mongoose.Schema({
     name: {
@@ -61,7 +62,21 @@ const userSchema = new mongoose.Schema({
     [{productId:{type :mongoose.Schema.Types.ObjectId, ref:'Product',}
       }],
   
-   address: [addressSchema]
+   address: [addressSchema],
+   wallet: [{
+    orderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'order'
+    },
+    transactionType: String,
+    amount: Number,
+    remarks: String,
+    createdOn: {
+      type: Date,
+      default: () => moment.tz(Date.now(), "Asia/Kolkata")
+    }
+
+ }],
 
 })
 

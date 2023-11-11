@@ -3,6 +3,8 @@ const User = require("../models/userSchema");
 const bcrypt = require("bcrypt");
 const Order = require("../models/orderSchema");
 const path = require("path");
+const Product=require("../models/productSchema")
+const Category=require("../models/categorySchema")
 const { render } = require("../routers/user_Routers");
 
 const loadLogin = (req, res) => {
@@ -26,7 +28,7 @@ const adminSignin = async (req, res) => {
         );
         if (passwordMatch) {
           req.session.admin = adetails._id;
-          res.render("adminDashboard");
+          res.redirect("/admin/adminDashboard");
         } else {
           res.redirect("/admin/?credential=wrong");
         }
@@ -42,7 +44,122 @@ const adminSignin = async (req, res) => {
 };
 
 const adminDashboard = async (req, res) => {
-  res.render("adminDashboard");
+  try {
+    console.log("Dashboard");
+    const adminData = await Admin.find();
+
+    const revenue = await Order.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$totalAmount" },
+        },
+      },
+    ]);
+    const totalRevenue = revenue[0].totalAmount.toLocaleString("en-IN");
+    // counts for display
+    const orderCount = await Order.count();
+    const productCount = await Product.count();
+    const categoryCount = await Category.count();
+    const userCount = await User.count();
+  
+  
+    const monthlyRevenue = await Order.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+            $lt: new Date(
+              new Date().getFullYear(),
+              new Date().getMonth() + 1,
+              1
+            ),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$totalAmount" },
+        },
+      },
+    ]);
+  
+  
+    
+    const mRevenue = monthlyRevenue[0]?.total.toLocaleString("en-IN") || 0 ;
+  
+  
+    const monthlySales = await Order.aggregate([
+      {
+        $project: {
+          year: { $year: "$createdAt" },
+          month: { $month: "$createdAt" },
+        },
+      },
+      {
+        $group: {
+          _id: { year: "$year", month: "$month" },
+          totalOrders: { $sum: 1 },
+        },
+      },
+      {
+        $sort: {
+          "_id.year": 1,
+          "_id.month": 1,
+        },
+      },
+    ]);
+  
+    const graphDataSales = [];
+  
+    // Loop through the 12 months (1 to 12)
+    for (let month = 1; month <= 12; month++) {
+      const resultForMonth = monthlySales.find(
+        (result) => result._id.month === month
+      );
+      if (resultForMonth) {
+        graphDataSales.push(resultForMonth.totalOrders);
+      } else {
+        graphDataSales.push(0);
+      }
+    }
+  
+  
+    const productCountData = await Product.aggregate([
+      {
+        $group: {
+          _id: "$category",
+          count: { $sum: 1 }, // Count the documents in each category
+        },
+      },
+    ]);
+  
+    
+  
+      // console.log(productCountData);
+      const categoryNames = productCountData.map((item) => item._id);
+      const categoryCounts = productCountData.map((item) => item.count);
+  
+  
+  
+  
+  
+    res.render("adminDashboard",{  adminData: adminData,
+        totalRevenue: totalRevenue,
+        orderCount: orderCount,
+        productCount: productCount,
+        categoryCount: categoryCount,
+        monthlyRevenue: mRevenue,
+        graphDataSales: graphDataSales,
+        categoryNames: categoryNames,
+        categoryCounts: categoryCounts,
+        userCount: userCount,});
+
+  } catch (error) {
+    console.log(error);
+  }
+
 };
 
 const loadUsermanagement = async (req, res) => {
@@ -136,7 +253,13 @@ const orderstatus = async (req, res) => {
           { _id: req.query.ordrid },
           { paymentStatus: "RECEIVED", orderStatus: "DELIVERED" }
         );
-      } else if (order.paymentDetails == "razorpay") {
+      } else if (order.paymentDetails == "razorpay" && order.paymentStatus == 'PENDING') {
+        const orderdata = await Order.findByIdAndUpdate(
+          { _id: req.query.ordrid },
+          {paymentDetails:'COD', paymentStatus:'RECEIVED' ,orderStatus: "DELIVERED" }
+        );
+      }
+      else if (order.paymentDetails == "razorpay" && order.paymentStatus == 'RECEIVED') {
         const orderdata = await Order.findByIdAndUpdate(
           { _id: req.query.ordrid },
           { orderStatus: "DELIVERED" }

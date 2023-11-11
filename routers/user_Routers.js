@@ -37,6 +37,8 @@ user_routers.use(session({
   user_routers.get('/ordersuccess',userController.ordersuccess);
   user_routers.post('/verifypayment',userController.verifypayment);
   user_routers.get('/downloadInvoice',userController.downloadInvoice);
+  user_routers.get('/cancelOrder',userauth.isLogin,userController.cancelOrder);
+  user_routers.get('/returnOrder',userauth.isLogin,userController.returnOrder);
 
 
   user_routers.post("/addtowishlist",userController.addtoWishlist);
@@ -67,8 +69,10 @@ user_routers.use(session({
   user_routers.post("/userSignin",userController.userSignin);
 
 
+
   user_routers.get("/userDashboard",userauth.isLogin,userController.userDashboard);
   user_routers.get("/userlogout",userauth.isLogin,userController.userLogout);
+  // user_routers.use('*',(req,res)=>{res.render('error',{message:''})})
 
 //   user_routers.get("/postman",(req,res)=>{
 //     const id='651ec5873ec49e4550745496';
@@ -87,5 +91,6 @@ user_routers.use(session({
 
 //   }
 //   );
+
 
   module.exports = user_routers;

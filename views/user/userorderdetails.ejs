@@ -592,7 +592,8 @@
         <section class="mt-50 mb-50">
             <div class="container">
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-2"></div>
+                    <div class="col-8">
                         <div class="table-responsive">
                             <table class="table shopping-summery text-center clean">
                                 <thead>
@@ -668,7 +669,7 @@
                                 </div>
 
                             </div>
-                            <div class="col-lg-6 col-md-12">
+                            <div class="col-lg-6 col-md-8">
                                 <div class="border p-md-4 p-30 border-radius cart-totals">
                                     <div class="heading_s1 mb-3">
                                         <h4>Order Details</h4>
@@ -696,11 +697,26 @@
                                         </table>
                                     </div>
                                 </div>
-                                <tr>                                         
+                                <tr>    
+
+                                    <div class="cart-action text-end mt-55">
+                                        <%if(order.orderStatus =='DELIVERED'){%>
+                                            <a href="/returnOrder?oid=<%=order._id%>" class="btn "><i class="fi-rs-shopping-bag mr-10"></i>RETURN</a>
+                                            <%}else if(order.orderStatus== 'PENDING'){%>
+                                                <a href="/cancelOrder?oid=<%=order._id%>" class="btn "><i class="fi-rs-shopping-bag mr-10"></i>CANCEL</a>                                          <a href="/returnOrder?oid=<%=order._id%>" class="btn "><i class="fi-rs-shopping-bag mr-10"></i>RETURN</a>
+                                                <%}else if(order.orderStatus=='PLACED'){%>
+                                                    <a href="/cancelOrder?oid=<%=order._id%>" class="btn "><i class="fi-rs-shopping-bag mr-10"></i>CANCEL</a>
+                                                    <%} else {%>
+                                                        <p></p>
+                                                    <%}%>
+                                    </div>
+
+                                    
+
                                     <div class="cart-action text-end mt-55">
                                         <a href="/" class="btn "><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
                                     </div>
-                                    </tr>
+                                </tr>
                             </div>
                         </div>
                     </div>

@@ -48,9 +48,9 @@
                                 <div class="header-action-right">
                                     <div class="header-action-2">
                                         <div class="header-action-icon-2">
-                                            <a href="shop-wishlist.html">
+                                            <a href="/userCart">
                                                 <img class="svgInject" alt="Evara" src="assets/imgs/theme/icons/icon-heart.svg">
-                                                <span class="pro-count blue">##@###</span>
+                                                <span class="pro-count blue"></span>
                                             </a>
                                         </div>
 <!-- dumb elements -->
@@ -88,7 +88,7 @@
                                                         </div>
                                                         <div class="shopping-cart-button">
                                                             <a href="/userCart" class="outline">View cart</a>
-                                                            <a href="shop-checkout.html">Checkout</a>
+                                                            
                                                         </div>
                                                     </div>
                                             </div>
@@ -169,6 +169,8 @@
         </div>
             <section class="mt-50 mb-50">
                 <div class="container">
+<%if(userwishlist.wishlist.length>0){%>
+
                     <div class="row">
                         <div class="col-12">
                             <div class="table-responsive">
@@ -215,6 +217,10 @@
                             </div>
                         </div>
                     </div>
+<%}else{%>
+    <div style="height: 25vh;" class="row"></div>
+<%}%>
+<p style="display: flex ; align-items:normal; justify-content: center; font-size: larger; color: brown;"> Wishlist Empty</p>
                 </div>
             </section>
 
