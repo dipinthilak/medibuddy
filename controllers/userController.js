@@ -70,13 +70,26 @@ const ecryptpassword = async(password)=> {
     };
 
 const userhome=async (req,res)=>{
+    if(req.session.message)
+    {
+        const message = req.session.message;
+    }
+    else
+    {
+        const message="";
+    }
     const category =await Category.find();
     const product=await Product.find({isListed:true});
     if(req.session.user_id)
     {
         const user=await User.findById(req.session.user_id);
-        res.render('userHome',{category:category,
-            user:user,product:product})  
+        res.render('userHome',
+            {
+            category:category,
+            user:user,
+            product:product
+            }
+            )  
     }
     else{
         res.render('userHome',{category:category,product:product,user:null})  
@@ -574,7 +587,7 @@ const checkoutCart=async(req,res)=>{
      const userData = await User.findById(req.session.user_id);
      const userCart = await User.findOne({_id: req.session.user_id}).populate('cart.productId')
      const categories = await Category.find();
-     console.log(user);
+    //  console.log(user);
      console.log(userCart);
      res.render('checkoutcart',{
        user: user,
@@ -589,7 +602,7 @@ const checkoutCart=async(req,res)=>{
 
     };
 
-const codcheckout=async (req,res)=> {
+const checkout=async (req,res)=> {
         try {     
           console.log(req.body.payment_option);
           const payment_option=req.body.payment_option;
@@ -597,7 +610,11 @@ const codcheckout=async (req,res)=> {
           const user = await User.findById(req.session.user_id);
           const cart = await User.findById(req.session.user_id, { cart: 1, _id: 0 });
           let total = req.body.total;
+          
+        //   if(cart.cart.length>0)
+        //   {
 
+        //   }
           const order = new Order({
             customerId: userId,
             quantity: req.body.quantity,
@@ -610,10 +627,11 @@ const codcheckout=async (req,res)=> {
             paymentDetails: req.body.payment_option,
           });
           const orderSuccess = await order.save();
-          console.log("order success data--------------------------------------"+orderSuccess);
+          console.log("order success data-----------------"+orderSuccess);
           if (orderSuccess) 
           {
-            for (const cartItem of user.cart) {
+            for (const cartItem of user.cart) 
+            {
               const product = await Product.findById(cartItem.productId);
               if (product) {
                 product.quantity -= cartItem.quantity;
@@ -647,8 +665,10 @@ const codcheckout=async (req,res)=> {
                                 receipt: reciept
                                 };
 
-                instance.orders.create(options, function(err, order) {
-                    if(!err){
+                instance.orders.create(options, function(err, order) 
+                {
+                    if(!err)
+                    {
                         console.log(order);
                         res.status(200).send({
                             success: true,
@@ -661,11 +681,12 @@ const codcheckout=async (req,res)=> {
                             name: "medibuddy",
                             email: "medibuddy@gmail.com",
                     })
-                            }
+                            
+                    }
                     else{
                         res.status(400).send({ success: false, msg: "Something went wrong!" });
                     }
-                  });
+                });
 
             }
             }
@@ -1087,7 +1108,7 @@ module.exports = {
                 userCart,
                 addtoCart,
                 checkoutCart,
-                codcheckout,
+                checkout,
                 orderdetails,
                 removecartitem,
                 updatequantity,

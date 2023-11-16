@@ -26,19 +26,19 @@ user_routers.use(session({
   user_routers.get("/searchproduct",userController.searchResult);
 
 
-  user_routers.get("/userCart",userauth.isLogin,userController.userCart);
+  user_routers.get("/userCart",userController.userCart);
   user_routers.get("/cartOpen",userController.cartOpen);
-  user_routers.post("/addtocart",userController.addtoCart);
+  user_routers.post("/addtoCart",userController.addtoCart);
   user_routers.post("/removecartitem",userController.removecartitem);
   user_routers.post("/changequantity",userController.updatequantity);
-  user_routers.get('/checkoutitems',userauth.isLogin,userController.checkoutCart);
-  user_routers.post('/codcheckout',userController.codcheckout);
-  user_routers.get('/orderdetails',userauth.isLogin,userController.orderdetails);
-  user_routers.get('/ordersuccess',userController.ordersuccess);
+  user_routers.get('/checkoutitems',userauth.isLogin,userauth.isActive,userController.checkoutCart);
+  user_routers.post('/codcheckout',userController.checkout);
+  user_routers.get('/orderdetails',userauth.isLogin,userauth.isActive,userController.orderdetails);
+  user_routers.get('/ordersuccess',userauth.isLogin,userauth.isActive,userController.ordersuccess);
   user_routers.post('/verifypayment',userController.verifypayment);
-  user_routers.get('/downloadInvoice',userController.downloadInvoice);
-  user_routers.get('/cancelOrder',userauth.isLogin,userController.cancelOrder);
-  user_routers.get('/returnOrder',userauth.isLogin,userController.returnOrder);
+  user_routers.get('/downloadInvoice',userauth.isLogin,userauth.isActive,userController.downloadInvoice);
+  user_routers.get('/cancelOrder',userauth.isLogin,userauth.isActive,userController.cancelOrder);
+  user_routers.get('/returnOrder',userauth.isLogin,userauth.isActive,userController.returnOrder);
 
 
   user_routers.post("/addtowishlist",userController.addtoWishlist);
@@ -47,9 +47,9 @@ user_routers.use(session({
 
 
 
-  user_routers.get("/addaddress",userController.addaddressload);
+  user_routers.get("/addaddress",userauth.isLogin,userController.addaddressload);
   user_routers.post("/addaddress",userController.addAddress);
-  user_routers.get("/updateaddressload",userController.updateaddressload);
+  user_routers.get("/updateaddressload",userauth.isLogin,userController.updateaddressload);
   user_routers.post("/updateaddress",userController.updateaddress);
 
 

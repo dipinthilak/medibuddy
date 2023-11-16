@@ -1,31 +1,43 @@
-const express=require('express');
-const app=express();
-const mongoose=require('mongoose')
-const path = require('path')
-const nocache = require('nocache')
-const logger = require('morgan')
+const express = require("express");
+const app = express();
+const mongoose = require("mongoose");
+const path = require("path");
+const nocache = require("nocache");
+const logger = require("morgan");
 // app.use(logger('dev'))
-mongoose.connect("mongodb://127.0.0.1:27017/medibuddy")
-const userRouters = require('./routers/user_Routers');
-const admin_routers = require('./routers/admin_routers');
+mongoose
+  .connect(
+    "mongodb+srv://dipint2023:keEorbwWwmyc2Fw3@medibuddy.d7zcvqv.mongodb.net/medibuddy"
+  )
+  .then(() => {
+    console.log("connected to ;mongo server");
+  });
+// mongoose.connect("mongodb://127.0.0.1:27017/medibuddy")
+const userRouters = require("./routers/user_Routers");
+const admin_routers = require("./routers/admin_routers");
 
 app.use(nocache());
 
-app.use('/assets',express.static('public/user/assets'));
-app.use('/assetsbackend',express.static(path.resolve(__dirname,"public/admin/assets")))
-app.use('/admin-assets',express.static(path.resolve(__dirname,"public/admin")))
+app.use("/assets", express.static("public/user/assets"));
+app.use(
+  "/assetsbackend",
+  express.static(path.resolve(__dirname, "public/admin/assets"))
+);
+app.use(
+  "/admin-assets",
+  express.static(path.resolve(__dirname, "public/admin"))
+);
 
-app.use('/', userRouters);
-app.use('/admin', admin_routers);
+app.use("/", userRouters);
+app.use("/admin", admin_routers);
 
+app.set("view engine", "ejs");
+app.set("views", "./views/user");
 
-app.set('view engine','ejs');
-app.set('views','./views/user');
-app.use(function(req,res){
-    res.status(404).render('user/error');
+app.use(function (req, res) {
+  res.status(404).render("error");
 });
 
- 
 app.listen(3000, () => {
-    console.log('Server started...');
+  console.log("Server started... http://localhost:3000");
 });
