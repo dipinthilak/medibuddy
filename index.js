@@ -4,10 +4,13 @@ const mongoose = require("mongoose");
 const path = require("path");
 const nocache = require("nocache");
 const logger = require("morgan");
+const dotenv = require('dotenv');
+dotenv.config({path: '.env'})
+
 // app.use(logger('dev'))
 mongoose
   .connect(
-    "mongodb+srv://dipint2023:keEorbwWwmyc2Fw3@medibuddy.d7zcvqv.mongodb.net/medibuddy"
+    process.env.MONGO_URL 
   )
   .then(() => {
     console.log("connected to ;mongo server");
