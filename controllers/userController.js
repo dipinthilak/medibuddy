@@ -13,8 +13,8 @@ dotenv.config({ path: ".env" });
 
  
 const  instance  = new Razorpay({
-    key_id: "rzp_test_RYYLyYcGwveVst",
-    key_secret: "m2uATo0jzjf681FDD9nl8B16",
+    key_id: process.env.rz_key,
+    key_secret: process.env.rz_sct,
   });
  
 //generate otp
@@ -676,8 +676,8 @@ const checkout=async (req,res)=> {
                             order_id: order.id,
                             amount: amount,
                             reciept: reciept,
-                            key_id: 'rzp_test_RYYLyYcGwveVst',
-                            contact: "8893196356",
+                            key_id: process.env.rz_key,
+                            contact: "8093296456",
                             name: "medibuddy",
                             email: "medibuddy@gmail.com",
                     })
