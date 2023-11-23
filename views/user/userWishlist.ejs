@@ -219,8 +219,9 @@
                     </div>
 <%}else{%>
     <div style="height: 25vh;" class="row"></div>
+    2<p style="display: flex ; align-items:normal; justify-content: center; font-size: larger; color: brown;"> Wishlist Empty</p>
+
 <%}%>
-<p style="display: flex ; align-items:normal; justify-content: center; font-size: larger; color: brown;"> Wishlist Empty</p>
                 </div>
             </section>
 
@@ -354,7 +355,7 @@
         $.ajax({
             method: 'POST',
             url: '/addtocart',
-            data: { productid }, 
+            data: { productid ,ws:true}, 
             success : function(res){
                 // Handle the response
                 if(res.toCart){

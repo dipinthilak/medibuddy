@@ -31,14 +31,16 @@ user_routers.use(session({
   user_routers.post("/addtoCart",userController.addtoCart);
   user_routers.post("/removecartitem",userController.removecartitem);
   user_routers.post("/changequantity",userController.updatequantity);
+
+
   user_routers.get('/checkoutitems',userauth.isLogin,userauth.isActive,userController.checkoutCart);
-  user_routers.post('/codcheckout',userController.checkout);
   user_routers.get('/orderdetails',userauth.isLogin,userauth.isActive,userController.orderdetails);
   user_routers.get('/ordersuccess',userauth.isLogin,userauth.isActive,userController.ordersuccess);
-  user_routers.post('/verifypayment',userController.verifypayment);
   user_routers.get('/downloadInvoice',userauth.isLogin,userauth.isActive,userController.downloadInvoice);
   user_routers.get('/cancelOrder',userauth.isLogin,userauth.isActive,userController.cancelOrder);
   user_routers.get('/returnOrder',userauth.isLogin,userauth.isActive,userController.returnOrder);
+  user_routers.post('/checkout',userController.checkout);
+  user_routers.post('/verifypayment',userController.verifypayment);
 
 
   user_routers.post("/addtowishlist",userController.addtoWishlist);
@@ -58,6 +60,7 @@ user_routers.use(session({
   user_routers.get("/contact",userController.userContact);
 
     
+  user_routers.post("/userSignin",userController.userSignin);
   user_routers.get("/userSignin",userauth.isLogout,userController.loadSignin);
   user_routers.get("/userSignup",userauth.isLogout,userController.loadSignup);
   user_routers.get("/forgotpassword",userauth.isLogout,userController.loadForgot);
@@ -66,7 +69,6 @@ user_routers.use(session({
   user_routers.post("/forgotpasswordotp",userauth.isLogout,userController.passwordForgototp);
   user_routers.post("/userSignup",userController.newUser);
   user_routers.post("/usersignupOtp",userController.usersignupOtp);
-  user_routers.post("/userSignin",userController.userSignin);
 
 
 

@@ -220,7 +220,7 @@ const adminSignout = async (req, res) => {
 
 const ordermanagement = async (req, res) => {
   try {
-    const order = await Order.find().populate("customerId");
+    const order = await Order.find().sort({createdAt:1}).populate("customerId");
     res.render("adminOrderview", { order: order });
   } catch (error) {
     console.log(error);

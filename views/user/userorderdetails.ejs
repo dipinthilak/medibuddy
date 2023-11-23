@@ -700,16 +700,15 @@
                                 <tr>    
 
                                     <div class="cart-action text-end mt-55">
-                                        <%if(order.orderStatus =='DELIVERED'){%>
-                                            <a href="/returnOrder?oid=<%=order._id%>" class="btn "><i class="fi-rs-shopping-bag mr-10"></i>RETURN</a>
-                                            <%}else if(order.orderStatus== 'PENDING'){%>
-                                                <a href="/cancelOrder?oid=<%=order._id%>" class="btn "><i class="fi-rs-shopping-bag mr-10"></i>CANCEL</a>                                          <a href="/returnOrder?oid=<%=order._id%>" class="btn "><i class="fi-rs-shopping-bag mr-10"></i>RETURN</a>
-                                                <%}else if(order.orderStatus=='PLACED'){%>
-                                                    <a href="/cancelOrder?oid=<%=order._id%>" class="btn "><i class="fi-rs-shopping-bag mr-10"></i>CANCEL</a>
-                                                    <%} else {%>
-                                                        <p></p>
-                                                    <%}%>
+
+
+                                        <% if (order.orderStatus === "DELIVERED") { %>
+                                            <a href="/returnOrder?oid=<%= order._id %>" class="btn "><i class="fi-rs-shopping-bag mr-10"></i>RETURN</a>
+                                        <% } else if (order.orderStatus === "PENDING" || order.orderStatus === "PLACED" || order.orderStatus === "SHIPPING") { %>
+                                            <a href="/cancelOrder?oid=<%= order._id %>" class="btn "><i class="fi-rs-shopping-bag mr-10"></i>CANCEL</a>
+                                        <% } %>
                                     </div>
+                                    
 
                                     
 

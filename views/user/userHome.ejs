@@ -10,8 +10,11 @@
     <meta property="og:type" content="" />
     <meta property="og:url" content="" />
     <meta property="og:image" content="" />
+    
     <link rel="icon" type="image/x-icon" href="assets/imgs/theme/logo.svg">
     <link rel="stylesheet" href="assets/css/main.css?v=3.4" />
+    <!-- Include Toastr CSS -->
+    <link rel="stylesheet" href="assets/css/toastr.min.css">
   </head>
   <body>
     <!-- header -->
@@ -2754,6 +2757,20 @@
         </div>
       </div>
     </footer>
+
+
+    <div class="toast mt-3">
+      <div class="toast-header">
+        Toast Header
+      </div>
+      <div class="toast-body">
+        Some text inside the toast body
+      </div>
+    </div>
+    
+
+
+
     <!-- Vendor JS-->
     <script src="assets/js/vendor/modernizr-3.6.0.min.js"></script>
     <script src="assets/js/vendor/jquery-3.6.0.min.js"></script>
@@ -2776,10 +2793,31 @@
     <script src="assets/js/plugins/jquery.theia.sticky.js"></script>
     <script src="assets/js/plugins/jquery.elevatezoom.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Template  JS -->
+
+  
+<!-- toastr -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
     <script>
         function addtoWishlist(productid)
         {
+          toastr.options = 
+                      {
+                        "closeButton": false,
+                        "newestOnTop": false,
+                        "progressBar": true,
+                        "positionClass": "toast-bottom-right",
+                        "preventDuplicates": false,
+                        "onclick": null,
+                        "showDuration": "300",
+                        "hideDuration": "1000",
+                        "timeOut": "5000",
+                        "extendedTimeOut": "1000",
+                        "showEasing": "swing",
+                        "hideEasing": "linear",
+                        "showMethod": "fadeIn",
+                        "hideMethod": "fadeOut"
+                      }
           $.ajax({
             method:'POST',
             url:'/addtowishlist',
@@ -2795,26 +2833,28 @@
                             });
                 }
                 else if(res.exsting){
-                  Swal.fire(
-                    'item already in wishlist'
-                  )
+                  $(document).ready(function onDocumentReady() 
+                      {  
+                        toastr.error('Item already in WISHLIST'); 
+                      });
 
                 }
                 else if(res.towishlist){
                   if(typeof(res.wlsize)=="number")
                   {
-                    alert(res.wlsize);
                   const wlicon=document.getElementById("wlicon");
                   wlicon.innerHTML=res.wlsize;
                   }
-                  Swal.fire(
-                              'Item added to wishlist'
-                            );
+                  $(document).ready(function onDocumentReady() 
+                      {  
+                        toastr.success('Item added to WISHLIST'); 
+                      });
                 }
                 else{
-                  Swal.fire(
-                              'Item not added to wishlist'
-                            );
+                  $(document).ready(function onDocumentReady() 
+                      {  
+                        toastr.error('Item not added to WISHLIST'); 
+                      });
                 }
             }
           });
@@ -2852,6 +2892,23 @@ function addtoCart(productid)
             url: '/addtoCart',
             data: { productid }, 
             success : function(res){
+              toastr.options = 
+                      {
+                        "closeButton": false,
+                        "newestOnTop": false,
+                        "progressBar": true,
+                        "positionClass": "toast-bottom-right",
+                        "preventDuplicates": false,
+                        "onclick": null,
+                        "showDuration": "300",
+                        "hideDuration": "1000",
+                        "timeOut": "5000",
+                        "extendedTimeOut": "1000",
+                        "showEasing": "swing",
+                        "hideEasing": "linear",
+                        "showMethod": "fadeIn",
+                        "hideMethod": "fadeOut"
+                      }
                 // Handle the response
                 if(res.notlogin){
                   Swal.fire(
@@ -2864,20 +2921,22 @@ function addtoCart(productid)
                 else if(res.toCart){
                   if(typeof(res.cartcount)=="number")
                   {
-                    alert(res.cartcount);
+                    // alert(res.cartcount);
                     const cartl=document.getElementById("clength");
                     cartl.innerHTML=res.cartcount;
                   }
 
-                  Swal.fire(
-                              'Item added to cart',
-                              
-                            );
+                    $(document).ready(function onDocumentReady() 
+                      {  
+                        toastr.success("'Item added to cart'"); 
+                      });
                 }
                 else{
-                  Swal.fire(
-                              'Item not added to cart'
-                            );
+                    $(document).ready(function onDocumentReady() 
+                      {  
+                        toastr.error("'Item not added to cart'"); 
+                      });
+
                 }
             } 
         });

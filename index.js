@@ -7,7 +7,7 @@ const logger = require("morgan");
 const dotenv = require('dotenv');
 dotenv.config({path: '.env'})
 
-// app.use(logger('dev'))
+app.use(logger('dev'))
 mongoose
   .connect(
     process.env.MONGO_URL 

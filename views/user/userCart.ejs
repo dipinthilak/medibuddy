@@ -13,8 +13,10 @@
     <meta property="og:image" content="">
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/favicon.svg">
-    <!-- Template CSS -->
+        <!-- Template CSS -->
     <link rel="stylesheet" href="assets/css/main.css?v=3.4">
+        <!-- Include Toastr CSS -->
+    <link rel="stylesheet" href="assets/css/toastr.min.css">
 </head>
 
 <body>
@@ -393,7 +395,9 @@
             </div>
         </div>
     </footer>
-
+    
+    <!-- toastr -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
     function changeQuantity(productId,count,price,subTotal,cartSubTotal,total,quantity,stock)
             {
@@ -440,11 +444,27 @@
             document.getElementById('total').innerHTML = parseInt(grandTotalValue)-parseInt(price);
             document.getElementById(quantity).innerHTML = parseInt(quantityValue)-1;
         }
-        Swal.fire(
-                'Updated!',
-                'item quantity has been updated.',
-                'success'
-            );
+        toastr.options = 
+                      {
+                        "closeButton": false,
+                        "newestOnTop": false,
+                        "progressBar": true,
+                        "positionClass": "toast-bottom-right",
+                        "preventDuplicates": false,
+                        "onclick": null,
+                        "showDuration": "300",
+                        "hideDuration": "1000",
+                        "timeOut": "5000",
+                        "extendedTimeOut": "1000",
+                        "showEasing": "swing",
+                        "hideEasing": "linear",
+                        "showMethod": "fadeIn",
+                        "hideMethod": "fadeOut"
+                      }
+                        toastr.error('Item already in WISHLIST'); 
+
+
+                        toastr.success('item quantity has been updated.'); 
         }
         else{
             Swal.fire(
@@ -518,6 +538,9 @@
         
         }
     </script>
+
+    
+
     <!-- Vendor JS-->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="assets/js/vendor/modernizr-3.6.0.min.js"></script>
