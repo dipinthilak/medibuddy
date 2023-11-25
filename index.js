@@ -5,9 +5,10 @@ const path = require("path");
 const nocache = require("nocache");
 const logger = require("morgan");
 const dotenv = require('dotenv');
+
+// app.use(logger('dev'));
 dotenv.config({path: '.env'})
 
-app.use(logger('dev'))
 mongoose
   .connect(
     process.env.MONGO_URL 

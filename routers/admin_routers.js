@@ -7,6 +7,7 @@ const session = require("express-session");
 const adminControllers = require("../controllers/adminControllers");
 const categoryControllers = require("../controllers/categoryControllers");
 const productControllers = require("../controllers/productController");
+const couponControllers = require("../controllers/couponController");
 const multer = require("multer");
 const sharp = require("sharp");
 const fs = require("fs");
@@ -122,7 +123,7 @@ admin_routers.post("/userdataUpate", adminControllers.userUpdate);
 admin_routers.get("/categorymanagement",adminauth.isLogin,categoryControllers.loadcategoryManagement);
 admin_routers.get("/addnewCategories", adminauth.isLogin,categoryControllers.addCategory);
 admin_routers.post("/addnewCategories",upload.single("image"),sharpcrop,categoryControllers.addnewCategory);
-admin_routers.get("/admincategoriesDelete",adminauth.isLogin,categoryControllers.deleteCategoryitem)
+admin_routers.get("/admincategoriesDelete",adminauth.isLogin,categoryControllers.sdeleteCategoryitem)
 admin_routers.get("/admincategoriesUpdate",adminauth.isLogin,categoryControllers.updateCategoryload)
 admin_routers.post("/adminupdateCategories",upload.single("image"),sharpcrop,categoryControllers.updateCategoryitem)
 
@@ -139,6 +140,14 @@ admin_routers.get("/productDelete",adminauth.isLogin,productControllers.productD
 admin_routers.get("/ordermanagement",adminauth.isLogin,adminControllers.ordermanagement);
 admin_routers.get("/orderdetails",adminauth.isLogin,adminControllers.orderdetails);
 admin_routers.post("/orderstatus",adminauth.isLogin,adminControllers.orderstatus);
+
+//coupon management
+admin_routers.get("/couponmanagement",adminauth.isLogin,couponControllers.loadCouponmanagement);
+admin_routers.get('/addcoupon',couponControllers.loadAddCoupon)
+admin_routers.post('/addcoupon',couponControllers.addCoupon)
+admin_routers.get('/editcoupon',couponControllers.editCoupon)
+admin_routers.get('/changestatuscoupon',couponControllers.changeStatusCoupon)
+
 
 admin_routers.use("/*", adminauth.isLogin,(req, res) => {
   res.redirect("/admin");

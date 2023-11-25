@@ -1,5 +1,6 @@
 
 const User = require("../models/userSchema");
+
 const isLogin = async(req, res, next)=> {
     try {
 
@@ -39,8 +40,19 @@ const isLogout = async(req, res, next)=> {
 
 const isActive=async(req,res,next)=>
 {
-    console.log("is active middleware   ->>>"+req.session.user_id);
-    next();
+    const user =await User.findById(req.session.user_id);
+    console.log(user.isActive);
+    if(user.isActive)
+    {
+        console.log("is active true middleware   ->>>"+req.session.user_id);
+        next();
+    }
+    else{
+        req.session.destroy();
+        console.log("is not active  middleware  ->>> session over");
+
+        res.redirect("/userSignin",)
+    }
 }
 
 module.exports = {

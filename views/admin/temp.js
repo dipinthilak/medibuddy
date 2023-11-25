@@ -1,232 +1,223 @@
-
-
-onclick="return confirm('This action is going to delete <%= categories[i].name %> ')"
-
-<table class="table table-hover" id="dataTable">
-<thead>
-    <tr>
-        <th class="text-center">Name</th>
-        <th class="text-center">Name</th>
-        <th class="text-center">Description</th>
-        <th class="text-center">isListed</th>
-        <th class="text-center">Image</th>
-        <th class="text-end">Action</th>
-    </tr>
-</thead>
-<tbody>
-    <% for(var i=0;i<category.length;i++){ %>
-        <tr>
-          <td><%= i+1 %></td>
-          <td><%= category[i].name %></td>
-          <td><%= category[i].description %></td>
-          <td><%= category[i].isListed %></td>
-          <td><img src="/admin-assets/category/<%= category[i].filename %>" class="img-sm img-thumbnail"  alt="check"></td>
-
-          <td> <div class="d-flex">
-            <a href="/admin/admincategoriesUpdate?id=<%= category[i]._id%>" class="btn-sm btn-info me-auto">Edit</a> <a type="button"  href="/admin/admincategoriesDelete?id/<%= category[i]._id %>" class="btn-sm btn-danger">Delete</a></div>
-        </tr>
-        <% } %>
+const checkout = async (req, res) => {
+    try {
+      console.log(req.body);
+      const userId = req.session.user_id;
+      const user = await User.findById(req.session.user_id);
+      const cart = await User.findById(req.session.user_id, { cart: 1, _id: 0 });
+      const coupon = await Coupon.findOne({
+        $and: [
+          { couponName: req.body.couponName },
+          { users: { $nin: [req.session.user_id] } },
+        ],
+      });
+      const walletResult = await User.aggregate([
+        {
+          $match: { _id: user._id }, // Match the user by _id
+        },
+        {
+          $unwind: "$wallet", // Unwind the 'wallet' array to work with individual transactions
+        },
+        {
+          $group: {
+            _id: null,
+            totalAmount: { $sum: "$wallet.amount" }, // Calculate the sum of 'amount' values
+          },
+        },
+      ]).exec();
+  
+      let walletBalance;
+  
+      if (walletResult && walletResult.length > 0) {
+        walletBalance = walletResult[0].totalAmount.toLocaleString("en-IN", {
+          style: "currency",
+          currency: "INR", // You can change 'USD' to 'INR' for Indian Rupees
+        });
+        console.log("Total Amount in Wallet:", walletBalance);
+      } else {
+        console.log("No wallet transactions found.");
+      }
+  
+      req.session.returnTo1 = "/checkout";
+  
+      console.log("walletout", walletBalance);
+  
+      let discount = 0;
+      let newTotal = req.body.total;
+      let total = 0;
+  
+      if (req.body.couponName) {
+        console.log("coupon present");
+        console.log(coupon);
+        if (parseInt(coupon.minAmt) <= parseInt(req.body.total)) {
+          console.log("if");
+          const discountedAmt = (req.body.total * coupon.discount) / 100;
+          console.log("discountedAmt");
+          console.log(discountedAmt);
+          console.log(discountedAmt < coupon.maxDiscount);
+          if (discountedAmt < coupon.maxDiscount) {
+            discount = discountedAmt;
+          } else {
+            discount = coupon.maxDiscount;
+          }
+          console.log("coupon.minAmt<total");
+          console.log(discount);
+          newTotal = req.body.total - discount;
+  
+          console.log("newTotal");
+          console.log(newTotal);
+        }
+      } else if (!req.body.couponName) {
+        console.log("no coupon used");
+      }
+  
+      if (newTotal) {
+        console.log("total if");
+        total = newTotal;
+      } else {
+        console.log("total else");
+  
+        total = req.body.total;
+      }
+      // console.log(cart.cart);
+      console.log(req.body);
+      const order = new Order({
+        customerId: userId,
+        quantity: req.body.quantity,
+        price: req.body.salePrice,
+        products: cart.cart,
+        coupon: req.body.couponName,
+        discount: discount,
+        totalAmount: total,
+        shippingAddress: JSON.parse(req.body.address),
+        paymentDetails: req.body.payment_option,
+      });
+      const orderSuccess = await order.save();
+      // console.log('order==',order);
+      // console.log('order');
+      // console.log(order._id);
+      const orderId = order._id;
+      // console.log(orderSuccess);
+      console.log(orderId);
+  
+      if (orderSuccess) {
+        // Make the cart empty
+        await User.updateOne({ _id: userId }, { $unset: { cart: 1 } });
+  
+        if (order.paymentDetails === "COD") {
+          await Order.updateOne(
+            { _id: new mongoose.Types.ObjectId(orderId) },
+            { $set: { orderStatus: "PLACED" } }
+          );
+          for (const cartItem of user.cart) {
+            const product = await Product.findById(cartItem.productId);
     
-</tbody>
-</table>
-
-
-const deleteCategory = async (req, res) => {
-    try{
-      const categoryId = req.query.id;
-      console.log("******************"+categoryId);
-      const catimg=await Category.findOne({_id:categoryId},{filename:1})
-      const catrem=await Category.deleteOne({_id:categoryId});
-      if(catrem)
-      {
-          //image removal
-          fs.unlink(
-            `C:/Users/dipin/Documents/VS Code/week11_14/medibuddy/public/admin/category/${catimg}`,
-            (err) => {
-              if (err) {
-                console.log(err);
-              } else {
-                console.log("File deleted successfully");
+            if (product) {
+              product.quantity -= cartItem.quantity;
+              await product.save();
+              console.log("quantity decreased");
+            }
+          }
+    
+          res.status(200).json({
+            status: true,
+            msg: "Order created for COD",
+            orderId: orderId
+          });
+        } else if (req.body.payment_option === "razorpay") {
+          console.log("razorpay");
+  
+          const amount = total * 100;
+          const options = {
+            amount: amount,
+            currency: "INR",
+            receipt: String(orderId),
+          };
+  
+          for (const cartItem of user.cart) {
+            const product = await Product.findById(cartItem.productId);
+    
+            if (product) {
+              product.quantity -= cartItem.quantity;
+              await product.save();
+              console.log("quantity decreased");
+            }
+          }
+  
+          // Create a Razorpay order
+          razorpay.orders.create(options, (err, order) => {
+            if (!err) {
+              console.log("Razorpay order created");
+              console.log(orderId);
+              
+  
+              // Send Razorpay response to the client
+              res.status(200).send({
+                success: true,
+                msg: "Order created",
+                order_id: order.id,
+                amount: amount,
+                reciept: orderId,
+                key_id: "rzp_test_7ETyzh4jBTZxal",
+                contact: "9876543210",
+                name: "admin",
+                email: "admin@gmail.com",
+                orderId: orderId
+              });
+            } else {
+              console.error("Razorpay order creation failed:", err);
+              res
+                .status(400)
+                .send({ success: false, msg: "Something went wrong!" });
+            }
+          });
+        }else if(req.body.payment_option === "WALLET"){
+          console.log(walletResult[0].totalAmount);
+          console.log(order.totalAmount);
+          if(walletResult[0].totalAmount<order.totalAmount){
+            console.log('if');
+            res.status(200).json({
+              lowWalletBalance: true,
+              message: 'bill amount exceed wallet balance'
+            })
+          }else{
+            console.log('else');
+            let transaction = {
+              orderId: orderId,
+              amount: -order.totalAmount,
+              transactionType: "DEBIT",
+              remarks: "CHECKOUT",
+            };
+        
+            user.wallet.push(transaction);
+            await user.save();
+            
+            await Order.updateOne(
+              { _id: new mongoose.Types.ObjectId(orderId) },
+              { $set: {
+                orderStatus: "PLACED",
+                paymentStatus: "RECIEVED" } }
+            );
+            for (const cartItem of user.cart) {
+              const product = await Product.findById(cartItem.productId);
+      
+              if (product) {
+                product.quantity -= cartItem.quantity;
+                await product.save();
+                console.log("quantity decreased");
               }
             }
-          );
-    }
-    res.redirect("admin/categorymanagement");
-    }
-    catch(er)
-    {
-      console.log(er);
-    }
   
+            res.status(200).json({
+              status: true,
+              msg: 'order created using wallet',
+              orderId: orderId
+            })
   
+          }
+        }
+      }
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send("Internal Server Error");
+    }
   };
-  const fs = require('fs');
-  const Category = require('path_to_category_model'); // Replace with the actual path to your Category model
-  
-
-
-  <div class="card mb-4">
-                <table class="table table-hover" id="dataTable">
-                    <thead>
-                      <tr>
-                        <th scope="col">id</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Brand Name</th>
-                        <th scope="col">Category</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Sale Price</th>
-                        <th scope="col">isListed</th>
-                        <th scope="col">Quantity</th>
-                        <th scope="col">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                        <% for(var i=0;i<products.length;i++){ %>
-                            <tr>
-                              <td><%= i+1 %></td>
-                              <td><%= products[i].productName %></td>
-                              <td><%= products[i].brandName %></td>
-                              <td><%= products[i].category %></td>
-                              <td><%= products[i].regularPrice %></td>
-                              <td><%= products[i].salePrice %></td>
-                              <td><%= products[i].isListed %></td>
-                              <td><%= products[i].quantity %></td>
-                              <td> <div class="d-flex"><a href="/admin/edit-product/<%=products[i]._id%>" class="btn-sm btn-info me-auto">Edit</a> <a type="button" href="/admin/delete-product/<%=products[i]._id%>" class="btn-sm btn-danger">Delete</a></div>
-                            </tr>
-                            <% } %>
-                  </table>
-            </div> <!-- card end// -->
-
-
-
-
-
-            <td class="text-center" data-title="Stock">
-                                                <div class=" radius  m-auto">
-                                                    <a class="btn px-2 py-0" onclick="changeQuantity('<%=userCart.cart[i].productId._id%>',-1,'<%=userCart.cart[i].productId.salePrice%>','subtot-0','cartSubTotal','total','qty-<%=userCart.cart[i].productId._id%>','<%=userCart.cart[i].productId.quantity%>',)">-</a>
-                                                    <span id="qty-64ee2faccd3d4af729ebd9cb" class="qty-val mx-3">
-                                                        1
-                                                    </span>
-                                                    <a class="btn px-2 py-0" onclick="changeQuantity('<%=userCart.cart[i].productId._id%>',1,'<%=userCart.cart[i].productId.salePrice%>','subtot-0','cartSubTotal','total','qty-<%=userCart.cart[i].productId._id%>','<%=userCart.cart[i].productId.quantity%>')">+</a>
-                                                </div>
-                                            </td>
-        function changeQuantity(productId, count1, price, subTotal, cartSubTotal, total, quantity, stock) {
-            // alert(stock)
-            const count = parseInt(count1)
-            // console.log(productId, count, price, subTotal, cartSubTotal, total, quantity);
-            const subtotalValue = document.getElementById(subTotal).innerHTML
-            const grandTotalValue = document.getElementById('grandTotal').innerHTML
-            const quantityValue = document.getElementById(quantity).innerHTML
-
-            let totalValue = parseInt(subtotalValue)
-
-            if (parseInt(quantityValue) + count > parseInt(stock)) {
-
-                if (count === 1) {
-                    Swal.fire(
-                        'Alert',
-                        'Insufficient Stock',
-                        'error'
-                    );
-                    return
-                }
-            }
-            console.log(quantityValue, count);
-            if (quantityValue == 1 && count == -1) {
-                return;
-            }
-            $.ajax({
-                url: '/change-quantity',
-                method: 'post',
-                data: {
-                    productId,
-                    count
-                },
-            })
-
-
-            if (count === 1) {
-                document.getElementById(subTotal).innerHTML = parseInt(price) + totalValue
-                document.getElementById('grandTotal').innerHTML = parseInt(price) + parseInt(grandTotalValue);
-                document.getElementById('total').innerHTML = parseInt(price) + parseInt(grandTotalValue);
-                document.getElementById(quantity).innerHTML = parseInt(quantityValue) + 1;
-
-
-            } else if (count === -1) {
-                document.getElementById(subTotal).innerHTML = totalValue - parseInt(price)
-                document.getElementById('grandTotal').innerHTML = parseInt(grandTotalValue) - parseInt(price);
-                document.getElementById('total').innerHTML = parseInt(grandTotalValue) - parseInt(price);
-                document.getElementById(quantity).innerHTML = parseInt(quantityValue) - 1;
-
-            }
-
-
-        }
-
-        function removeCart(id,subTotal) {
-
-            Swal.fire({
-                title: 'Are you sure?',
-                text: 'Do you want to delete this item from cart !',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes'
-            }).then((result) => {
-                if (result.isConfirmed) {
-
-                    $.ajax({
-                        url: '/remove-cart',
-                        method: 'post',
-                        data: {
-                            id: id
-                        },
-                        success: function (res) {
-                            if (res.success) {
-                                Swal.fire(
-                                    'Done!',
-                                    'Item has been deleted.',
-                                    'success'
-                                ).then(() => {
-                                    const rowToDelete = document.querySelector(`[data-wish-id="${id}"]`);
-                                    if (rowToDelete) {
-                                        // Delete the found row
-                                        rowToDelete.remove();
-                                        // Decrease the wishlist length
-                                        const cartLength = document.getElementById('cartLength');
-                                        cartLength.textContent = parseInt(cartLength.textContent) - 1;
-                                        grandTotal.textContent =document.getElementById('grandTotal').textContent-parseInt(subTotal)
-                                        total.textContent =document.getElementById('total').textContent-parseInt(subTotal)
-
-                                        if(cartLength.textContent ==0){
-                                            window.location.reload()
-                                        }
-                                    }
-
-
-                                })
-                            }
-                        }
-                    })
-
-                }
-            })
-
-        }
-
-
-        function noItem() {
-            Swal.fire(
-                'No Item in Cart!',
-                'Add some items to the Cart!',
-                'question'
-            )
-        }      
-
-
-        /admin/orderdetails?ordrid=<%=order[i]._id%>
-        orderview path;
-
-
-

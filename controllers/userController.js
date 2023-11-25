@@ -4,6 +4,7 @@ const Product=require("../models/productSchema")
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const Order=require('../models/orderSchema');
+const Coupon=require('../models/couponSchema');
 const dotenv = require('dotenv');
 const crypto = require('crypto');
 const Razorpay=require('razorpay');
@@ -112,6 +113,7 @@ const loadSignup=async(req,res)=>{
 
 const userDashboard =async (req,res)=>{
     const user = await User.findById(req.session.user_id);
+    console.log(user);
     const wallet=await User.findOne({_id:req.session.user_id},{wallet:1});
     const order=await Order.find({customerId:req.session.user_id}).sort({ createdAt: -1 });
     res.render('userDashboard',{user:user,order:order,wallet:wallet})
@@ -582,119 +584,535 @@ const removecartitem=async (req,res)=>{
 
     };
 
-const checkoutCart=async(req,res)=>{
-    try {
-     const user = await User.findById(req.session.user_id);
-     const userData = await User.findById(req.session.user_id);
-     const userCart = await User.findOne({_id: req.session.user_id}).populate('cart.productId')
-     const categories = await Category.find();
-    //  console.log(user);
-     console.log(userCart);
-     res.render('checkoutcart',{
-       user: user,
-       userCart: userCart,
-       userData: userData,
-       categories: categories
-     })
+// const checkoutCart=async(req,res)=>{
+//     try {
+//      const user = await User.findById(req.session.user_id);
+//      const userData = await User.findById(req.session.user_id);
+//      const userCart = await User.findOne({_id: req.session.user_id}).populate('cart.productId')
+//      const categories = await Category.find();
+//     //  console.log(user);
+//      console.log(userCart);
+//      res.render('checkoutcart',{
+//        user: user,
+//        userCart: userCart,
+//        userData: userData,
+//        categories: categories
+//      })
     
-   } catch (error) {
-     console.log(error.message);  
+//    } catch (error) {
+//      console.log(error.message);  
+//     }
+
+//     };
+
+const checkoutCart = async (req, res) => {
+    try {
+      const userData = await User.findById(req.session.user_id);
+      const userCart = await User.findOne({ _id: req.session.user_id }).populate(
+        "cart.productId"
+      );
+      const categories = await Category.find();
+  
+      // Use async/await to calculate wallet balance
+      const walletResult = await User.aggregate([
+        {
+          $match: { _id: userData._id }, // Match the user by _id
+        },
+        {
+          $unwind: "$wallet", // Unwind the 'wallet' array to work with individual transactions
+        },
+        {
+          $group: {
+            _id: null,
+            totalAmount: { $sum: "$wallet.amount" }, // Calculate the sum of 'amount' values
+          },
+        },
+      ]).exec();
+    
+  
+      let walletBalance;
+  
+      if (walletResult && walletResult.length > 0) {
+        walletBalance = walletResult[0].totalAmount.toLocaleString("en-IN", {
+          style: "currency",
+          currency: "INR", // You can change 'USD' to 'INR' for Indian Rupees
+        });
+        console.log("Total Amount in Wallet:", walletBalance);
+      } else {
+        console.log("No wallet transactions found.");
+      }
+  
+      console.log("walletout", walletBalance);
+  
+      res.render("checkoutcart", {
+        user: userData,
+        userCart: userCart,
+        userData: userData,
+        categories: categories,
+        walletBalance: walletBalance,
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  
+  //apply coupon
+  
+  const applyCoupon = async (req, res) => {
+    try {
+      const name = req.body.coupon;
+      const total = req.body.total;
+      console.log(req.body);
+      const userData = await User.findById(req.session.user_id);
+      const coupon = await Coupon.findOne({
+        $and: [{ couponName: name }, { users: { $nin: [req.session.user_id] } }],
+      });
+      console.log(coupon);
+      if (coupon) {
+        console.log(coupon.minAmt < total);
+        if (parseInt(coupon.minAmt) <= parseInt(total)) {
+          console.log("if");
+          const discountedAmt = (total * coupon.discount) / 100;
+          console.log("discountedAmt");
+          console.log(discountedAmt);
+          console.log(discountedAmt < coupon.maxDiscount);
+          if (discountedAmt < coupon.maxDiscount) {
+            var discount = discountedAmt;
+          } else {
+            var discount = coupon.maxDiscount;
+          }
+          console.log("discount");
+          console.log(discount);
+          var newTotal = total - discount;
+  
+          console.log("newTotal");
+          console.log(newTotal);
+  
+          await Coupon.updateOne(
+            { couponName: name },
+            { $push: { users: userData._id } }
+          );
+          res.status(200).json({
+            success: true,
+            coupon: coupon,
+            newTotal: newTotal,
+            discount: discount,
+          });
+        } else {
+          console.log("big else");
+          res.status(200).json({
+            success: false,
+            message: "coupon cannot be used",
+          });
+        }
+      } else {
+        console.log("coupon already used by the user");
+        res.status(200).json({
+          success: false,
+          message: "coupon already used by the user",
+        });
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+
+
+// const checkout=async (req,res)=> {
+//         try {     
+//           console.log(req.body.payment_option);
+//           const payment_option=req.body.payment_option;
+//           const userId = req.session.user_id;
+//           const user = await User.findById(req.session.user_id);
+//           const cart = await User.findById(req.session.user_id, { cart: 1, _id: 0 });
+//           let total = req.body.total;
+
+
+//             //order structure
+//           const order = new Order({
+//             customerId: userId,
+//             quantity: req.body.quantity,
+//             price: req.body.salePrice,
+//             products: cart.cart,
+//             coupon: req.body.couponName,
+//             discount: '0',
+//             totalAmount: total,
+//             shippingAddress: req.body.address,
+//             paymentDetails: req.body.payment_option,
+//           });
+          
+//             if (order.paymentDetails === 'COD') 
+//             {
+//                 //order saving
+//                 const orderSuccess = await order.save();
+//                 console.log("order success data-----------------"+orderSuccess);
+//                 if (orderSuccess) 
+//                 {
+//                   for (const cartItem of user.cart) 
+//                   {
+//                     const product = await Product.findById(cartItem.productId);
+//                     if (product) {
+//                       product.quantity -= cartItem.quantity;
+//                       await product.save();
+//                       console.log("ORDER ID -------------->>>>>"+orderSuccess._id);
+//                       console.log('quantity decreased');
+//                     }
+//                   }
+//                   // Make the cart empty
+//                   await User.updateOne({ _id: userId }, { $unset: { cart: 1 } });
+//                   console.log('cart cleared');
+      
+//                 };
+
+//                 res.status(200).json({
+//                 status: true,
+//                 ordid:orderSuccess._id,
+//                 msg: "Order created for COD",
+//             })
+                  
+//             }
+//             else if (order.paymentDetails === 'WALLET') 
+//             {
+//                                 //order saving
+//                                 const orderSuccess = await order.save();
+//                                 console.log("order success data-----------------"+orderSuccess);
+//                                 if (orderSuccess) 
+//                                 {
+//                                   for (const cartItem of user.cart) 
+//                                   {
+//                                     const product = await Product.findById(cartItem.productId);
+//                                     if (product) {
+//                                       product.quantity -= cartItem.quantity;
+//                                       await product.save();
+//                                       console.log("ORDER ID -------------->>>>>"+orderSuccess._id);
+//                                       console.log('quantity decreased');
+//                                     }
+//                                   }
+//                                   // Make the cart empty
+//                                   await User.updateOne({ _id: userId }, { $unset: { cart: 1 } });
+//                                   console.log('cart cleared');
+                      
+//                                 };
+
+//                 //WALLET AMOUNT DEDUCTION 
+//                     res.status(200).json({
+//                     status: true,
+//                     ordid:orderSuccess._id,
+//                     msg: "Order created for Wallet",
+//             })
+//             }
+                  
+//               else if(payment_option=="razorpay")
+//             {
+
+//                 //order saving
+//                 const orderSuccess = await order.save();
+//                 console.log("order success data-----------------"+orderSuccess);
+
+//                 const amount=total*100;
+//                 const reciept=orderSuccess._id;
+
+//                 let options =   {
+//                                 amount: amount, 
+//                                 currency: "INR",
+//                                 receipt: reciept
+//                                 };
+
+//                 instance.orders.create(options, function(err, order) 
+//                 {
+//                     if(!err)
+//                     {
+
+//                         console.log(""+order);
+//                         res.status(200).send({
+//                             success: true,
+//                             msg: "Order created",
+//                             order_id: order.id,
+//                             amount: amount,
+//                             reciept: reciept,
+//                             key_id: process.env.rz_key,
+//                             contact: "8093296456",
+//                             name: "medibuddy",
+//                             email: "medibuddy@gmail.com",
+//                     })
+                            
+//                     }
+//                     else{
+//                         const orderremove =async ()=>
+//                         {
+//                         await order.deleteOne({_id:orderSuccess._id});
+//                         }
+//                         orderremove();
+//                         res.status(400).send({ success: false, msg: "Something went wrong!" });
+//                     }
+//                 });
+
+//             }
+//             //order creation
+
+
+//               const orderSuccess = await order.save();
+//               console.log("order success data-----------------"+orderSuccess);
+//               if (orderSuccess) 
+//               {
+//                 for (const cartItem of user.cart) 
+//                 {
+//                   const product = await Product.findById(cartItem.productId);
+//                   if (product) {
+//                     product.quantity -= cartItem.quantity;
+//                     await product.save();
+//                     console.log("ORDER ID -------------->>>>>"+orderSuccess._id);
+//                     console.log('quantity decreased');
+//                   }
+//                 }
+//                 // Make the cart empty
+//                 await User.updateOne({ _id: userId }, { $unset: { cart: 1 } });
+//                 console.log('cart cleared');
+    
+//             }
+//           }
+//         catch (error) 
+//         {
+//             console.error(error.message);
+//             res.status(500).send("Internal Server Error");
+//         }
+//     };
+
+
+const checkout = async (req, res) => {
+  try {
+    console.log(req.body);
+    const userId = req.session.user_id;
+    const user = await User.findById(req.session.user_id);
+    const cart = await User.findById(req.session.user_id, { cart: 1, _id: 0 });
+    const coupon = await Coupon.findOne({
+      $and: [
+        { couponName: req.body.couponName },
+        { users: { $nin: [req.session.user_id] } },
+      ],
+    });
+    const walletResult = await User.aggregate([
+      {
+        $match: { _id: user._id }, // Match the user by _id
+      },
+      {
+        $unwind: "$wallet", // Unwind the 'wallet' array to work with individual transactions
+      },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$wallet.amount" }, // Calculate the sum of 'amount' values
+        },
+      },
+    ]).exec();
+
+    let walletBalance;
+
+    if (walletResult && walletResult.length > 0) {
+      walletBalance = walletResult[0].totalAmount.toLocaleString("en-IN", {
+        style: "currency",
+        currency: "INR", // You can change 'USD' to 'INR' for Indian Rupees
+      });
+      console.log("Total Amount in Wallet:", walletBalance);
+    } else {
+      console.log("No wallet transactions found.");
     }
 
-    };
+    req.session.returnTo1 = "/checkout";
 
-const checkout=async (req,res)=> {
-        try {     
-          console.log(req.body.payment_option);
-          const payment_option=req.body.payment_option;
-          const userId = req.session.user_id;
-          const user = await User.findById(req.session.user_id);
-          const cart = await User.findById(req.session.user_id, { cart: 1, _id: 0 });
-          let total = req.body.total;
+    console.log("walletout", walletBalance);
+
+    let discount = 0;
+    let newTotal = req.body.total;
+    let total = 0;
+
+    if (req.body.couponName) {
+      console.log("coupon present");
+      console.log(coupon);
+      if (parseInt(coupon.minAmt) <= parseInt(req.body.total)) {
+        console.log("if");
+        const discountedAmt = (req.body.total * coupon.discount) / 100;
+        console.log("discountedAmt");
+        console.log(discountedAmt);
+        console.log(discountedAmt < coupon.maxDiscount);
+        if (discountedAmt < coupon.maxDiscount) {
+          discount = discountedAmt;
+        } else {
+          discount = coupon.maxDiscount;
+        }
+        console.log("coupon.minAmt<total");
+        console.log(discount);
+        newTotal = req.body.total - discount;
+
+        console.log("newTotal");
+        console.log(newTotal);
+      }
+    } else if (!req.body.couponName) {
+      console.log("no coupon used");
+    }
+
+    if (newTotal) {
+      console.log("total if");
+      total = newTotal;
+    } else {
+      console.log("total else");
+
+      total = req.body.total;
+    }
+    // console.log(cart.cart);
+    console.log(req.body);
+    const order = new Order({
+      customerId: userId,
+      quantity: req.body.quantity,
+      price: req.body.salePrice,
+      products: cart.cart,
+      coupon: req.body.couponName,
+      discount: discount,
+      totalAmount: total,
+      shippingAddress: JSON.parse(req.body.address),
+      paymentDetails: req.body.payment_option,
+    });
+    const orderSuccess = await order.save();
+    // console.log('order==',order);
+    // console.log('order');
+    // console.log(order._id);
+    const orderId = order._id;
+    // console.log(orderSuccess);
+    console.log(orderId);
+
+    if (orderSuccess) {
+      // Make the cart empty
+      await User.updateOne({ _id: userId }, { $unset: { cart: 1 } });
+
+      if (order.paymentDetails === "COD") {
+        await Order.updateOne(
+          { _id: new mongoose.Types.ObjectId(orderId) },
+          { $set: { orderStatus: "PLACED" } }
+        );
+        for (const cartItem of user.cart) {
+          const product = await Product.findById(cartItem.productId);
+  
+          if (product) {
+            product.quantity -= cartItem.quantity;
+            await product.save();
+            console.log("quantity decreased");
+          }
+        }
+  
+        res.status(200).json({
+          status: true,
+          msg: "Order created for COD",
+          orderId: orderId
+        });
+      } else if (req.body.payment_option === "razorpay") {
+        console.log("razorpay");
+
+        const amount = total * 100;
+        const options = {
+          amount: amount,
+          currency: "INR",
+          receipt: String(orderId),
+        };
+
+        for (const cartItem of user.cart) {
+          const product = await Product.findById(cartItem.productId);
+  
+          if (product) {
+            product.quantity -= cartItem.quantity;
+            await product.save();
+            console.log("quantity decreased");
+          }
+        }
+
+        // Create a Razorpay order
+        instance.orders.create(options, (err, order) => {
+          if (!err) {
+            console.log("Razorpay order created");
+            console.log(orderId);
+            
+
+            // Send Razorpay response to the client
+            res.status(200).send({
+              success: true,
+              msg: "Order created",
+              order_id: order.id,
+              amount: amount,
+              reciept: orderId,
+              key_id: process.env.rz_key,
+              contact: "8093296456",
+              name: "medibuddy",
+              email: "medibuddy@gmail.com",
+              orderId: orderId
+            });
+          } else {
+            console.error("Razorpay order creation failed:", err);
+            res
+              .status(400)
+              .send({ success: false, msg: "Something went wrong!" });
+          }
+        });
+      }else if(req.body.payment_option === "WALLET"){
+        console.log(walletResult[0].totalAmount);
+        console.log(order.totalAmount);
+        if(walletResult[0].totalAmount<order.totalAmount){
+          console.log('if');
+          res.status(200).json({
+            lowWalletBalance: true,
+            message: 'bill amount exceed wallet balance'
+          })
+        }else{
+          console.log('else');
+          let transaction = {
+            orderId: orderId,
+            amount: -order.totalAmount,
+            transactionType: "DEBIT",
+            remarks: "CHECKOUT",
+          };
+      
+          user.wallet.push(transaction);
+          await user.save();
           
-
-          const order = new Order({
-            customerId: userId,
-            quantity: req.body.quantity,
-            price: req.body.salePrice,
-            products: cart.cart,
-            coupon: req.body.couponName,
-            discount: '0',
-            totalAmount: total,
-            shippingAddress: req.body.address,
-            paymentDetails: req.body.payment_option,
-          });
-          const orderSuccess = await order.save();
-          console.log("order success data-----------------"+orderSuccess);
-          if (orderSuccess) 
-          {
-            for (const cartItem of user.cart) 
-            {
-              const product = await Product.findById(cartItem.productId);
-              if (product) {
-                product.quantity -= cartItem.quantity;
-                await product.save();
-                console.log("ORDER ID -------------->>>>>"+orderSuccess._id);
-                console.log('quantity decreased');
-              }
-            }
-            // Make the cart empty
-            await User.updateOne({ _id: userId }, { $unset: { cart: 1 } });
-            console.log('cart cleared');
-
-            if (order.paymentDetails === 'COD') 
-            {
-              res.status(200).json({
-                status: true,
-                ordid:orderSuccess._id,
-                msg: "Order created for COD",
-              })
-                  
-            }
-                  
-              else if(payment_option=="razorpay")
-            {
-                const amount=total*100;
-                const reciept=orderSuccess._id;
-
-                let options =   {
-                                amount: amount, 
-                                currency: "INR",
-                                receipt: reciept
-                                };
-
-                instance.orders.create(options, function(err, order) 
-                {
-                    if(!err)
-                    {
-                        console.log(order);
-                        res.status(200).send({
-                            success: true,
-                            msg: "Order created",
-                            order_id: order.id,
-                            amount: amount,
-                            reciept: reciept,
-                            key_id: process.env.rz_key,
-                            contact: "8093296456",
-                            name: "medibuddy",
-                            email: "medibuddy@gmail.com",
-                    })
-                            
-                    }
-                    else{
-                        res.status(400).send({ success: false, msg: "Something went wrong!" });
-                    }
-                });
-
-            }
+          await Order.updateOne(
+            { _id: new mongoose.Types.ObjectId(orderId) },
+            { $set: {
+              orderStatus: "PLACED",
+              paymentStatus: "RECIEVED" } }
+          );
+          for (const cartItem of user.cart) {
+            const product = await Product.findById(cartItem.productId);
+    
+            if (product) {
+              product.quantity -= cartItem.quantity;
+              await product.save();
+              console.log("quantity decreased");
             }
           }
-        catch (error) 
-        {
-            console.error(error.message);
-            res.status(500).send("Internal Server Error");
+
+          res.status(200).json({
+            status: true,
+            msg: 'order created using wallet',
+            orderId: orderId
+          })
+
         }
-    };
+      }
+    }
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+
+
+
+
+
+
+
+
+
 
 const verifypayment=async(req,res)=>{ 
     try {
@@ -704,11 +1122,10 @@ const verifypayment=async(req,res)=>{
           console.log(orddtl);
           console.log(req.body.orderId);
         }
-
         let hmac = crypto.createHmac('sha256', 'rzp_test_RYYLyYcGwveVst');
-        
-    console.log("payp ret"+req.body.payment.razorpay_payment_id);
-    console.log("payo ret"+req.body.payment.razorpay_order_id);
+                  
+                console.log("payp ret"+req.body.payment.razorpay_payment_id);
+                console.log("payo ret"+req.body.payment.razorpay_order_id);
         hmac.update(req.body.payment.razorpay_order_id + '|' + req.body.payment.razorpay_payment_id);
         hmac = hmac.digest('hex');
         console.log(hmac);
@@ -721,7 +1138,11 @@ const verifypayment=async(req,res)=>{
 
           await Order.updateOne({_id : new mongoose.Types.ObjectId(req.body.orderId)},{$set : { paymentStatus : 'RECEIVED', orderStatus :"PLACED"}});
     
-          res.status(200).json({ status: 'success', msg: 'Payment verified' });
+          res.status(200).json({ status: 'success',
+          msg: 'Payment verified',
+          orderId:req.body.orderId
+
+         });
         } else {
     
           res.status(400).json({ status: 'error', msg: 'Payment verification failed' });
@@ -735,6 +1156,7 @@ const verifypayment=async(req,res)=>{
 const ordersuccess=async (req,res)=>{
     try {
         const orderid=req.query.ordid;
+        console.log(orderid);
         
         res.render('orderplaced',{ordid:orderid});
     } catch (error) {
@@ -1100,8 +1522,9 @@ module.exports = {
                 categoryShop,
                 cartOpen,
                 userCart,
-                addtoCart,
+                addtoCart, 
                 checkoutCart,
+                applyCoupon,
                 checkout,
                 orderdetails,
                 removecartitem,

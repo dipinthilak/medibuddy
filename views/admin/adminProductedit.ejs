@@ -189,6 +189,12 @@
                                                             <input required="true"  class="form-control square" id="product-quantity" value="<%= productdata[0].quantity %>" name="productquantity" type="number">
                                                         </div>
 
+                                                        <div class="form-group col-md-12 mt-25">
+                                                            <% productdata[0].image.forEach((image)=>{ %>
+                                                            <img src="/admin-assets/product/<%= image %>" style="height: 130px; margin-right: 10px; border: 1px solid #6d6969; border-radius: 5px;" alt="" srcset="">
+                                                            <% }) %>
+                                                        </div>
+
 
                                                         <div class="col-md-12">
                                                             <button type="submit" class="btn btn-danger mt-3 submit" name="submit" value="Submit">Update Product</button>

@@ -34,6 +34,7 @@ user_routers.use(session({
 
 
   user_routers.get('/checkoutitems',userauth.isLogin,userauth.isActive,userController.checkoutCart);
+  user_routers.post('/applycoupon',userController.applyCoupon);
   user_routers.get('/orderdetails',userauth.isLogin,userauth.isActive,userController.orderdetails);
   user_routers.get('/ordersuccess',userauth.isLogin,userauth.isActive,userController.ordersuccess);
   user_routers.get('/downloadInvoice',userauth.isLogin,userauth.isActive,userController.downloadInvoice);
@@ -60,8 +61,8 @@ user_routers.use(session({
   user_routers.get("/contact",userController.userContact);
 
     
-  user_routers.post("/userSignin",userController.userSignin);
   user_routers.get("/userSignin",userauth.isLogout,userController.loadSignin);
+  user_routers.post("/userSignin",userController.userSignin);
   user_routers.get("/userSignup",userauth.isLogout,userController.loadSignup);
   user_routers.get("/forgotpassword",userauth.isLogout,userController.loadForgot);
   user_routers.post("/forgotpassword",userauth.isLogout,userController.passwordForgot);
@@ -72,7 +73,7 @@ user_routers.use(session({
 
 
 
-  user_routers.get("/userDashboard",userauth.isLogin,userController.userDashboard);
+  user_routers.get("/userDashboard",userauth.isLogin,userauth.isActive,userController.userDashboard);
   user_routers.get("/userlogout",userauth.isLogin,userController.userLogout);
   // user_routers.use('*',(req,res)=>{res.render('error',{message:''})})
 

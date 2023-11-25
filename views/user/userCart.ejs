@@ -204,17 +204,7 @@
                                                 <span id="q-<%= userCart.cart[i].productId._id %>" class="qty-val mx-3"><%= userCart.cart[i].quantity %></span>
                                                 <a class="btn px-2 py-0" onclick="changeQuantity('<%=userCart.cart[i].productId._id%>',1,'<%= userCart.cart[i].productId?.salePrice %>','subtot-<%= i %>','cartSubTotal','total','q-<%= userCart.cart[i].productId._id %>','<%= userCart.cart[i].productId.quantity %>')" >+</a>
                                             </div>
-                                            <!-- <div class="m-auto">
-                                                <input type="number" onchange="" value=<%=userCart.cart[i].quantity%> id="quantity" name="quantity" min="1" max=<%=userCart.cart[i].productId.quantity%> >
-                                            </div> -->
                                         </td>
-                                        <!-- <td class="text-center" data-title="Stock">
-                                            <div class="detail-qty border radius  m-auto">
-                                                <a href="#" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
-                                                <span class="qty-val"><%=userCart.cart[i].quantity%></span>
-                                                <a href="#" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
-                                            </div>
-                                        </td> -->
                                         <td class="text-right"   data-title="Cart">
                                             <% sub[i]=userCart.cart[i].productId?.salePrice * userCart.cart[i].quantity%>
                                             <span id="subtot-<%= i %>">
@@ -230,11 +220,6 @@
                                         </td>
                                     </tr>
                                     <%}%>
-                                    <!-- <tr>
-                                        <td colspan="6" class="text-end">
-                                            <a href="#" class="text-muted"> <i class="fi-rs-cross-small"></i> Clear Cart</a>
-                                        </td>
-                                    </tr> -->
                                 </tbody>
                             </table>
                         </div>
@@ -444,27 +429,6 @@
             document.getElementById('total').innerHTML = parseInt(grandTotalValue)-parseInt(price);
             document.getElementById(quantity).innerHTML = parseInt(quantityValue)-1;
         }
-        toastr.options = 
-                      {
-                        "closeButton": false,
-                        "newestOnTop": false,
-                        "progressBar": true,
-                        "positionClass": "toast-bottom-right",
-                        "preventDuplicates": false,
-                        "onclick": null,
-                        "showDuration": "300",
-                        "hideDuration": "1000",
-                        "timeOut": "5000",
-                        "extendedTimeOut": "1000",
-                        "showEasing": "swing",
-                        "hideEasing": "linear",
-                        "showMethod": "fadeIn",
-                        "hideMethod": "fadeOut"
-                      }
-                        toastr.error('Item already in WISHLIST'); 
-
-
-                        toastr.success('item quantity has been updated.'); 
         }
         else{
             Swal.fire(
