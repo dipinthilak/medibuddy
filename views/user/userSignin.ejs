@@ -578,12 +578,12 @@
                                             </div>
                                             <div class="form-group">
                                                 <input required="" value="456456" type="password" name="password" placeholder="Password">
-                                            </div>
-                                            <%if(message){%>
-                                                <p style="color: red;">
-                                                Wrong credentials !!
-                                                </p>
-                                                <%}%>
+                                            </div>                                           
+                                                <%if(noti){%>
+                                                    <p style="color: red;">
+                                                    <%=noti%>
+                                                    </p>
+                                                    <%}%>
                                             <div style="justify-content: end;" class="login_footer form-group">
                                                 <a class="text-muted" href="/forgotpassword">Forgot password?</a>
                                             </div>

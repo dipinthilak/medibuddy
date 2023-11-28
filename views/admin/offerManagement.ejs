@@ -12,7 +12,7 @@
     <meta property="og:url" content="">
     <meta property="og:image" content="">
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/logo.svg">
+    <link rel="shortcut icon" type="image/x-icon" href="/assetsbackend/imgs/theme/logo.svg">
     <!-- Template CSS -->
     <link href="/assetsbackend/css/main.css" rel="stylesheet" type="text/css" />
     <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
@@ -31,7 +31,7 @@
         </div>
         <nav>
             <ul class="menu-aside">
-                <li class="menu-item ">
+                <li class="menu-item">
                     <a class="menu-link" href="/admin/adminDashboard"> <i class="icon material-icons md-home"></i>
                         <span class="text">Dashboard</span>
                     </a>
@@ -46,7 +46,7 @@
                         <span class="text">Category Management</span>
                     </a>
                 </li>
-                <li class="menu-item active">
+                <li class="menu-item">
                     <a class="menu-link" href="/admin/productmanagement"> <i class="icon material-icons md-shopping_bag"></i>
                         <span class="text">Product Management</span>
                     </a>
@@ -56,51 +56,24 @@
                         <span class="text">Orders</span>
                     </a>
                 </li>
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="page-form-product-1.html"> <i class="icon material-icons md-add_box"></i>
-                        <span class="text">Add product</span>
+                <li class="menu-item ">
+                    <a class="menu-link " disabled href="/admin/couponmanagement"> <i class="icon material-icons md-pie_chart"></i>
+                        <span class="text">Coupon Management</span>
                     </a>
-                    <div class="submenu">
-                        <a href="page-form-product-1.html">Add product 1</a>
-                        <a href="page-form-product-2.html">Add product 2</a>
-                        <a href="page-form-product-3.html">Add product 3</a>
-                        <a href="page-form-product-4.html">Add product 4</a>
-                    </div>
                 </li>
-                <li class="menu-item">
-                    <a class="menu-link" disabled href="#"> <i class="icon material-icons md-pie_chart"></i>
-                        <span class="text">Statistics</span>
+                <li class="menu-item active">
+                    <a class="menu-link" disabled href="/admin/offermanagement"> <i class="icon material-icons md-redeem"></i>
+                        <span class="text">Offer Management</span>
                     </a>
                 </li>
             </ul>
             <hr>
-            <ul class="menu-aside">
-                <li class="menu-item">
-                    <a class="menu-link" href="page-blank.html"> <i class="icon material-icons md-local_offer"></i>
-                        <span class="text"> Starter page </span>
-                    </a>
-                </li>
-            </ul>
             <br>
             <br>
         </nav>
     </aside>
     <main class="main-wrap">
         <header class="main-header navbar">
-            <div class="col-search">
-                <form class="searchform">
-                    <div class="input-group">
-                        <input list="search_terms" type="text" class="form-control" placeholder="Search term">
-                        <button class="btn btn-light bg" type="button"> <i class="material-icons md-search"></i></button>
-                    </div>
-                    <datalist id="search_terms">
-                        <option value="Products">
-                        <option value="New orders">
-                        <option value="Apple iphone">
-                        <option value="Ahmed Hassan">
-                    </datalist>
-                </form>
-            </div>
             <div class="col-nav">
                 <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
                 <ul class="nav">
@@ -144,73 +117,57 @@
             <section class="content-main">
                 <div class="content-header">
                     <div>
-                        <h2 class="content-title card-title">Product Management </h2>
+                        <h2 class="content-title card-title">Offers</h2>
+                    </div>
+                    <div>
+                        <a href="/admin/addOffer" class="btn btn-primary btn-sm rounded">Create new</a>
                     </div>
                 </div>
-                <div class="card">
+                <div class="card mb-4">
+                   
                     <div class="card-body">
-                        <div class="row">   
-                                                <form method="post" action="/admin/addnewProductsdata" enctype="multipart/form-data">
-                                                    <div class="row">
-                                                        <div class="form-group col-md-6">
-                                                            <label>Product Name <span class="required">*</span></label>
-                                                            <input required="true"  class="form-control square" id="productname" name="productname" type="text">
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label>Product Brand <span class="required">*</span></label>
-                                                            <input required="true"  class="form-control square" id="productbrand" name="productbrand" type="text">
-                                                        </div>
+                        <article class="itemlist">
+                            <table class="table table-hover" id="dataTable">
+                                <thead>
+                                    <tr>
+                                    <th scope="col">Cate. id</th>
+                                    <th scope="col">Offer Name</th>
+                                    <th scope="col">Discount %</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                              </table>
+                        </article> <!-- itemlist  .// -->
+                    </div> <!-- card-body end// -->
+                </div> <!-- card end// -->
+
+                <div class="card mb-4">
+                   
+                    <div class="card-body">
+                        <article class="itemlist">
+                            <table class="table table-hover" id="dataTable">
+                                <thead>
+                                    <tr>
+                                    <th scope="col">Prod. id</th>
+                                    <th scope="col">Offer Name</th>
+                                    <th scope="col">Discount %</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                              </table>
+                        </article> <!-- itemlist  .// -->
+                    </div> <!-- card-body end// -->
+                </div> <!-- card end// -->
+            </section>
 
 
 
-                                                        <div class="col-sm-6 mb-3">
-                                                            <label class="form-label">Category</label>
-                                                            <select class="form-select" name="productcategory">
-                                                                <% for (var i = 0; i < categorydata.length; i++) { %>
-                                                                    <option value="<%= categorydata[i].name %>"><%= categorydata[i].name %></option>
-                                                                <% } %>
-                                                            </select>
-                                                            
-                                                        </div>
 
-
-
-
-                                                        <div class="form-group col-md-12">
-                                                            <label>Description <span class="required">*</span></label>
-                                                            <input required="true"   class="form-control square" id="description" name="description" type="text">
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label>Regular Price<span class="required">*</span></label>
-                                                            <input required="true"  class="form-control square" id="product-price" name="productprice" type="number">
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label>Sale Price<span class="required">*</span></label>
-                                                            <input required="true"  class="form-control square" id="sale-price" name="saleprice" type="number">
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label>Quantity<span class="required">*</span></label>
-                                                            <input required="true"  class="form-control square" id="product-quantity" name="productquantity" type="number">
-                                                        </div>
-
-                                                        <div class=" mb-4">
-                                                            <div class="card-header">
-                                                                <h4>Media</h4>
-                                                            </div>
-
-                                                            <div class="input-upload">
-                                                                <img src="/assetsbackend/assets/imgs/theme/upload.svg" alt="">
-                                                                <input multiple required="true" name="image" id="image" type="file" class="form-control" type="file">
-                                                            </div>
-                                                        <div class="col-md-12">
-                                                            <button type="submit" class="btn btn-danger mt-3 submit" name="submit" value="Submit">Add Product</button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div> <!-- .row // -->
-                                        </div> <!-- card body .// -->
-                                    </div> <!-- card .// -->
-        </section> <!-- content-main end// -->
+        </section>
         <footer class="main-footer font-xs">
             <div class="row pb-30 pt-15">
                 <div class="col-sm-6">

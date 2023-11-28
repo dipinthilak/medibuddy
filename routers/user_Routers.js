@@ -17,7 +17,7 @@ user_routers.use(session({
   user_routers.use(bodyParser.json());
   user_routers.use(bodyParser.urlencoded({extended: true}));
 
-
+//common pages
   user_routers.get('/',userController.userhome);
   user_routers.get('/userHome',(req,res)=>{   res.redirect('/');  });
   user_routers.get("/userShopproduct",userController.productShop);
@@ -60,16 +60,20 @@ user_routers.use(session({
   user_routers.get("/about",userController.userAbout);
   user_routers.get("/contact",userController.userContact);
 
-    
-  user_routers.get("/userSignin",userauth.isLogout,userController.loadSignin);
-  user_routers.post("/userSignin",userController.userSignin);
+
+
   user_routers.get("/userSignup",userauth.isLogout,userController.loadSignup);
-  user_routers.get("/forgotpassword",userauth.isLogout,userController.loadForgot);
-  user_routers.post("/forgotpassword",userauth.isLogout,userController.passwordForgot);
-  user_routers.post("/updatepw",userController.updatepw);
-  user_routers.post("/forgotpasswordotp",userauth.isLogout,userController.passwordForgototp);
   user_routers.post("/userSignup",userController.newUser);
   user_routers.post("/usersignupOtp",userController.usersignupOtp);
+
+  user_routers.get("/userSignin",userauth.isLogout,userController.loadSignin);
+  user_routers.post("/userSignin",userController.userSignin);
+
+  user_routers.get("/forgotpassword",userauth.isLogout,userController.loadForgot);
+  user_routers.post("/forgotpassword",userauth.isLogout,userController.passwordForgot);
+  user_routers.post("/forgotpasswordotp",userauth.isLogout,userController.passwordForgototp);
+  user_routers.post("/updatepw",userController.updatepw);
+
 
 
 

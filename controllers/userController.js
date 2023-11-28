@@ -82,7 +82,7 @@ const  userhome=async (req,res)=>{
     const product = await Product.find({
         isListed: true,
         quantity: { $gt: 0 }
-      });      
+      }).limit(8);      
     if(req.session.user_id)
     {
         const user=await User.findById(req.session.user_id);
@@ -107,9 +107,6 @@ const userAbout=async(req,res)=>{
     res.render("about");
     };
 
-const loadSignup=async(req,res)=>{
-    res.render('userSignup')
-    };
 
 const userDashboard =async (req,res)=>{
     const user = await User.findById(req.session.user_id);
@@ -212,14 +209,16 @@ const updateaddress=async (req,res)=>{
 
 const loadSignin=async(req,res)=>{
     try {
-        if (req.session.wcreds) 
+      console.log(req.query.noti);
+        if (req.query.noti) 
         {
-            delete req.session.wcreds;
-        res.render('userSignin',{message:true})            
+          const noti=req.query.noti;
+          console.log(noti);
+          res.render('userSignin',{noti:noti})            
         }
         else
         {
-    res.render('userSignin',{message:false})
+          res.render('userSignin',{noti:''})
         }
         } 
         catch (error)
@@ -228,18 +227,39 @@ const loadSignin=async(req,res)=>{
         }
     };
 
+const loadSignup=async(req,res)=>{
+  if(req.query.noti)
+  {
+    console.log("user signbup load");
+    res.render('userSignup',{noti:req.query.noti})
+    }
+    else{
+      res.render('userSignup',{noti:''})
+    }
+    };
+
 const newUser = async(req, res) => {
     try {
+      console.log(req.body.email);
+      const usere=await User.find({email:req.body.email});
+      console.log(usere);
+      if(usere.length>0)
+      {
+        res.redirect('/userSignup?noti=User already exist with this email')
+      }
+      else
+      {
         const user ={
-                    name : req.body.username,
-                    email : req.body.email,
-                    mobile : req.body.number,
-                    password : req.body.password,
-                    };     
-         const otp= await sendMail(user.name,user.email);
-         req.session.otp=otp;
-         res.render('usersignupwithOtp',{user,wrongotp:false});
-        }
+          name : req.body.username,
+          email : req.body.email,
+          mobile : req.body.number,
+          password : req.body.password,
+          };     
+        const otp= await sendMail(user.name,user.email);
+        req.session.otp=otp;
+        res.render('usersignupwithOtp',{user,wrongotp:false});
+      }
+    }
     catch (error) 
     {
         console.log(error.message);
@@ -265,7 +285,7 @@ const usersignupOtp=async (req,res)=>{
         
             if(userData)
             {
-                res.render('userSignin',{message:''})
+                res.render('userSignin',{message:'',noti:''})
             }
             }
             else
@@ -290,22 +310,22 @@ const userSignin=async (req,res)=>{
     try{
         const email=req.body.email;
         const udetails=await User.findOne({email:email});
+
+        if ( !udetails.isActive) {
+          res.redirect('/userSignin?noti=Conatct admin, Your account is not active!! !');
+        }
+
         const passwordMatch = await bcrypt.compare(req.body.password, udetails.password);
-        if(passwordMatch)
+        if(passwordMatch )
         {
-            // const wallet=await User.findOne({email:email},{wallet:1});
             req.session.user_id=udetails._id;
-            req.session.user=udetails.name;
-            // const order = await Order.find({ customerId: req.session.user_id }).sort({ createdAt: -1 });
-            // console.log(order);
-            // console.log("123123123123");
-            // console.log(wallet);
-            // res.render('userDashboard',{user : udetails,order:order,wallet:wallet})
+            req.session.user=udetails.name;    
             res.redirect('/');
         }
-        else{
-            req.session.wcreds=true;
-            res.redirect('/userSignin');
+
+        else
+        {
+          res.redirect('/userSignin?noti=Wrong credentials!!');
         }
     }
     catch(er){
@@ -315,18 +335,14 @@ const userSignin=async (req,res)=>{
 
 const loadForgot=async (req,res)=>{
     try {
-        let message=null;
-        if(req.session.message)
+        if(!req.query.noti)
         {
-            console.log("--------"+req.session.message);
-            message=req.session.message;
-            console.log(message);
-            console.log("session element before deleted");
-
-            delete req.session.message;
-            console.log("session element after deleted");
+          res.render("forgotpassword",{noti:''});
         }
-        res.render("forgotpassword",{message});
+        else{
+      const noti =req.query.noti;
+      res.render("forgotpassword",{noti:noti});
+        }
     } catch (error) {
         
     }
@@ -339,9 +355,7 @@ const passwordForgot=async(req,res)=>{
         console.log("-------------------->>>>>>>>>>>>"+user);
 
         if(!user){
-            req.session.message='username invalid';
-            console.log("redirect forgot");
-            res.redirect('/forgotpassword');
+            res.redirect('/forgotpassword?noti=INVALID USER NAME!  ');
         }
         else{
             const rotp=await sendMail('',email);
@@ -532,6 +546,10 @@ const addtoCart=async (req,res)=>{
             console.log("existingitem>>>>>>>>>");
             console.log(existingitem);
             existingitem.quantity++;
+            if(existingitem.quantity>prdct.quantity)
+            {
+              existingitem.quantity=prdct.quantity;
+            }
             await user.save();
             res.status(200).json({toCart:true});
         }else{

@@ -70,21 +70,19 @@
             </a>
           </li>
           <li class="menu-item">
-            <a class="menu-link active" disabled href="/admin/couponmanagement">
+            <a class="menu-link" href="/admin/couponmanagement">
               <i class="icon material-icons md-pie_chart"></i>
               <span class="text">Coupon Management</span>
             </a>
           </li>
-        </ul>
-        <hr />
-        <ul class="menu-aside">
-          <li class="menu-item">
-            <a class="menu-link" href="#">
-              <i class="icon material-icons md-local_offer"></i>
-              <span class="text"> Starter page </span>
+          <li class="menu-item active">
+            <a class="menu-link" disabled href="/admin/offermanagement">
+              <i class="icon material-icons md-redeem"></i>
+              <span class="text">Offer Management</span>
             </a>
           </li>
         </ul>
+        <hr />
         <br />
         <br />
       </nav>
@@ -222,7 +220,7 @@
         <div class="row">
           <div class="col-9">
             <div class="content-header">
-              <h2 class="content-title">Add New Coupon</h2>
+              <h2 class="content-title">Add New Offer</h2>
             </div>
           </div>
           <div class="col-lg-6">
@@ -231,18 +229,25 @@
                 <form action="/admin/addcoupon" method="post">
                   <div class="mb-4">
                     <label for="coupon_name" class="form-label"
-                      >Coupon title</label
+                      >Offer Name</label
                     >
                     <input
                       type="text"
-                      name="couponName"
+                      name="offernName"
                       placeholder="Type here"
                       class="form-control"
                       id="product_title"
                     />
                   </div>
+                  <div class="col-md-12 mb-4">
+                    <label class="form-label">Offer type</label>
+                    <select class="form-select" name="offertype">
+                      <option value="category">Category</option>
+                      <option value="product">Product</option>
+                    </select>
+                  </div>
                   <div class="row">
-                    <div class="col-md-3 mb-4">
+                    <div class="col-md-12 mb-4">
                       <label for="discount" class="form-label">Discount%</label>
                       <input
                         type="text"
@@ -252,44 +257,13 @@
                         id="discount"
                       />
                     </div>
-                    <div class="col-md-3 mb-4">
-                      <label for="maxDiscount" class="form-label"
-                        >Max Discount</label
-                      >
-                      <input
-                        type="text"
-                        name="maxDiscount"
-                        placeholder="Type here"
-                        class="form-control"
-                        id="maxDiscount"
-                      />
-                    </div>
-                    <div class="col-md-3 mb-4">
-                      <label class="form-label">isListed</label>
-                      <select class="form-select" name="isListed">
-                        <option value="true">Yes</option>
-                        <option value="false">No</option>
-                      </select>
-                    </div>
-                    <div class="col-md-3 mb-4">
-                      <label for="minAmt" class="form-label"
-                        >Min order price</label
-                      >
-                      <input
-                        type="text"
-                        name="minAmt"
-                        placeholder="Type here"
-                        class="form-control"
-                        id="MinAmt"
-                      />
-                    </div>
                   </div>
                   <div>
                     <button
                       type="submit"
                       class="btn btn-md rounded font-sm hover-up"
                     >
-                      Publish
+                      Add Offer
                     </button>
                   </div>
                 </form>

@@ -24,6 +24,21 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    offerName:{
+        type:String,
+        default:""
+    },
+    offerType:{
+        type:String,
+        default:""
+    },
+    offerPerc:{
+        type:Number
+    },
+    offerPrice:{
+        type:Number,
+        default:Infinity 
+    },
     quantity:{
         type: Number
     },

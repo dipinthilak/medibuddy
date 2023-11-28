@@ -16,7 +16,7 @@ mongoose
   .then(() => {
     console.log("connected to ;mongo server");
   });
-// mongoose.connect("mongodb://127.0.0.1:27017/medibuddy")
+// mongoose.connect("mongodb://127.0.0.1:27017/medibuddy");
 const userRouters = require("./routers/user_Routers");
 const admin_routers = require("./routers/admin_routers");
 

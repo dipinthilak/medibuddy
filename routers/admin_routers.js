@@ -8,6 +8,8 @@ const adminControllers = require("../controllers/adminControllers");
 const categoryControllers = require("../controllers/categoryControllers");
 const productControllers = require("../controllers/productController");
 const couponControllers = require("../controllers/couponController");
+const offerControllers = require("../controllers/offerController");
+
 const multer = require("multer");
 const sharp = require("sharp");
 const fs = require("fs");
@@ -143,10 +145,17 @@ admin_routers.post("/orderstatus",adminauth.isLogin,adminControllers.orderstatus
 
 //coupon management
 admin_routers.get("/couponmanagement",adminauth.isLogin,couponControllers.loadCouponmanagement);
-admin_routers.get('/addcoupon',couponControllers.loadAddCoupon)
-admin_routers.post('/addcoupon',couponControllers.addCoupon)
-admin_routers.get('/editcoupon',couponControllers.editCoupon)
-admin_routers.get('/changestatuscoupon',couponControllers.changeStatusCoupon)
+admin_routers.get('/addcoupon',adminauth.isLogin,couponControllers.loadAddCoupon);
+admin_routers.post('/addcoupon',couponControllers.addCoupon);
+admin_routers.get('/editcoupon',adminauth.isLogin,couponControllers.editCoupon);
+admin_routers.get('/changestatuscoupon',adminauth.isLogin,couponControllers.changeStatusCoupon);
+
+
+//offer management
+admin_routers.get("/offermanagement",adminauth.isLogin,offerControllers.loadOffermanagement);
+admin_routers.get("/addOffer",adminauth.isLogin,offerControllers.loadaddOffer);
+
+
 
 
 admin_routers.use("/*", adminauth.isLogin,(req, res) => {

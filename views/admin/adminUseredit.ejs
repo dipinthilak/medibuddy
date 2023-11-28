@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>User Management</title>
+    <title>Medibuddy Dashboard</title>
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,10 +12,10 @@
     <meta property="og:url" content="">
     <meta property="og:image" content="">
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="/assetsbackend/imgs/theme/favicon.svg">
+    <link rel="shortcut icon" type="image/x-icon" href="assetsbackend/imgs/theme/logo.svg">
     <!-- Template CSS -->
-    <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
     <link href="/assetsbackend/css/main.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
@@ -31,17 +31,17 @@
         </div>
         <nav>
             <ul class="menu-aside">
-                <li class="menu-item ">
+                <li class="menu-item">
                     <a class="menu-link" href="/admin/adminDashboard"> <i class="icon material-icons md-home"></i>
                         <span class="text">Dashboard</span>
                     </a>
                 </li>
-                <li class="menu-item active">
+                <li class="menu-item active ">
                     <a class="menu-link" href="/admin/adminuserManagement"> <i class="icon material-icons md-person"></i>
                         <span class="text">User Management</span>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item ">
                     <a class="menu-link" href="/admin/categorymanagement"> <i class="icon material-icons md-add_box"></i>
                         <span class="text">Category Management</span>
                     </a>
@@ -56,24 +56,19 @@
                         <span class="text">Orders</span>
                     </a>
                 </li>
-            </ul>
-            <hr>
-            <ul class="menu-aside">
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="#"> <i class="icon material-icons md-settings"></i>
-                        <span class="text">Settings</span>
+                <li class="menu-item">
+                    <a class="menu-link" disabled href="/admin/couponmanagement"> <i class="icon material-icons md-pie_chart"></i>
+                        <span class="text">Coupon Management</span>
                     </a>
-                    <div class="submenu">
-                        <a href="page-settings-1.html">Setting sample 1</a>
-                        <a href="page-settings-2.html">Setting sample 2</a>
-                    </div>
                 </li>
                 <li class="menu-item">
-                    <a class="menu-link" href="page-blank.html"> <i class="icon material-icons md-local_offer"></i>
-                        <span class="text"> Starter page </span>
+                    <a class="menu-link" disabled href="/admin/offermanagement"> <i class="icon material-icons md-redeem"></i>
+                        <span class="text">Offer Management</span>
                     </a>
                 </li>
             </ul>
+            <hr>
+
             <br>
             <br>
         </nav>
@@ -81,7 +76,7 @@
     <main class="main-wrap">
         <header class="main-header navbar">
             <div class="col-search">
-                <form class="searchform">
+                <!-- <form class="searchform">
                     <div class="input-group">
                         <input list="search_terms" type="text" class="form-control" placeholder="Search term">
                         <button class="btn btn-light bg" type="button"> <i class="material-icons md-search"></i></button>
@@ -92,7 +87,7 @@
                         <option value="Apple iphone">
                         <option value="Ahmed Hassan">
                     </datalist>
-                </form>
+                </form> -->
             </div>
             <div class="col-nav">
                 <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
