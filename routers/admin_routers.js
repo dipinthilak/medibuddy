@@ -153,7 +153,11 @@ admin_routers.get('/changestatuscoupon',adminauth.isLogin,couponControllers.chan
 
 //offer management
 admin_routers.get("/offermanagement",adminauth.isLogin,offerControllers.loadOffermanagement);
-admin_routers.get("/addOffer",adminauth.isLogin,offerControllers.loadaddOffer);
+admin_routers.get("/productOffer",adminauth.isLogin,offerControllers.loadpaddOffer);
+admin_routers.post("/productOffer",adminauth.isLogin,offerControllers.paddOffer);
+admin_routers.get("/deleteOffer",adminauth.isLogin,offerControllers.deleteOffer);
+admin_routers.get("/catOffer",adminauth.isLogin,offerControllers.loadcatOffer);
+admin_routers.post("/catOffer",adminauth.isLogin,offerControllers.caddOffer);
 
 
 

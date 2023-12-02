@@ -59,7 +59,7 @@
                 <%}%>
                 <div class="header-action-right">
                   <div class="header-action-2">
-                    <div class="header-action-icon-2">
+                    <div class="header-action-icon-2" onclick="userWlist()">
                       <a href="/userWishlist">
                         <img
                           class="svgInject"
@@ -494,9 +494,15 @@
                         </span>
                       </div>
                       <div class="product-price">
-                        <span>&#8377;<%= product[i].salePrice%> </span>
+                        <span>&#8377;
+                          <%if(!product[i]?.offerPrice){%>
+                          <%= product[i]?.salePrice%>                           
+                            <%} else {%>
+                            <%= product[i].offerPrice%>
+                        <%}%></span>
                         <span class="old-price"
-                          >&#8377;<%= product[i].regularPrice%></span
+                          >&#8377;
+                          <%= product[i].regularPrice%></span
                         >
                       </div>
                       <div class="product-action-1 show">
@@ -1143,7 +1149,34 @@ function userCart()
 
     }
   });
-}
+};
+
+
+function userWlist()
+{
+  console.log("userWlist");
+  $.ajax({
+    method:'GET',
+    url:'/wsOpen',
+    success: function(res){
+      console.log("ws open check");
+      if(res.notlogin){
+        console.log("no login");
+        Swal.fire(
+          'you should login first'
+        ).then(function()
+        {
+          window.location.href="/userSignin";
+        })
+      }
+      else if(res.userlogin){
+        window.location.href="/userWishlist";
+      }
+
+    }
+  });
+};
+
 
 function addtoCart(productid)
       {
@@ -1201,9 +1234,6 @@ function addtoCart(productid)
             } 
         });
       }
-
-
-
     </script>
     <script src="./assets/js/main.js?v=3.4"></script>
     <script src="./assets/js/shop.js?v=3.4"></script>

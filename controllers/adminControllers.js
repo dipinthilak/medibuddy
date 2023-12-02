@@ -16,7 +16,7 @@ const loadLogin = (req, res) => {
   res.render("adminLogin", { crerror });
 };
 
-const adminSignin = async (req, res) => {
+const adminSignin = async (req, res) => { 
   try {
     const email = req.body.email;
     if (req.body.email != null && req.body.password != null) {

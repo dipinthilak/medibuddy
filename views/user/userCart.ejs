@@ -197,7 +197,16 @@
                                             <p class="font-xs"><%=userCart.cart[i].productId?.category%><br> <%=userCart.cart[i].productId?.brandName%>
                                             </p>
                                         </td>
-                                        <td class="price" data-title="Price"><span><%=userCart.cart[i].productId?.salePrice%></span></td>
+                                        <td class="price" data-title="Price"><span>
+                                            <%if(!userCart.cart[i].productId?.offerPrice){%>
+                                                <%= userCart.cart[i].productId?.salePrice%>                           
+                                                  <%} else {%>
+
+                                                <% userCart.cart[i].productId.salePrice = userCart.cart[i].productId.offerPrice %>                           
+
+                                                  <%= userCart.cart[i].productId?.offerPrice%>
+                                              <%}%>
+                                        </span></td>
                                         <td class="text-center" data-title="Stock">
                                             <div class=" radius  m-auto">
                                                 <a class="btn px-2 py-0" onclick="changeQuantity('<%=userCart.cart[i].productId._id%>',-1,'<%= userCart.cart[i].productId?.salePrice %>','subtot-<%= i %>','cartSubTotal','total','q-<%= userCart.cart[i].productId._id %>','<%= userCart.cart[i].productId.quantity %>')" >-</a>

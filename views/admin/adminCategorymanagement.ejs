@@ -165,6 +165,7 @@
                                                   <td><%= category[i].isListed %></td>
                                                   <td><img src="/admin-assets/category/<%= category[i].filename %>" class="img-sm img-thumbnail"  alt="check"></td>
                                                   <td class="text-end"> <div class=" align-items-center">
+                                                    <a href="/admin/catOffer?cid=<%= category[i]._id%>" class="btn-sm btn-dark mx-3">Add Offer</a>
                                                     <a href="/admin/admincategoriesUpdate?id=<%= category[i]._id%>" class="btn-sm btn-dark mx-3">Edit</a>
                                                     <a href="/admin/admincategoriesDelete?id=<%= category[i]._id %>" class="btn-sm  me-auto btn-danger">Delete</a>
                                                     </div>

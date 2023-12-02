@@ -15,6 +15,9 @@
     <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/favicon.svg">
     <!-- Template CSS -->
     <link rel="stylesheet" href="assets/css/main.css?v=3.4">
+    
+    <!-- Include Toastr CSS -->
+    <link rel="stylesheet" href="assets/css/toastr.min.css">
 </head>
 
 <body>
@@ -187,7 +190,7 @@
                                         <div class="header-action-icon-2">
                                             <a href="/userWishlist">
                                                 <img class="svgInject" alt="Evara" src="assets/imgs/theme/icons/icon-heart.svg">
-                                                <span class="pro-count blue"><%=user?.wishlist.length%></span>
+                                                <span id="wlicon" class="pro-count blue"><%=user?.wishlist.length%></span>
                                             </a>
                                         </div>
                                         <div class="header-action-icon-2">
@@ -282,7 +285,7 @@
                                         </li>
                                         <li>
                                             <div class="shopping-cart-img">
-                                                <a href="shop-product-right.html"><img alt="Evara" src="assets/imgs/shop/thumbnSail-4.jpg"></a>
+                                                <a href="shop-product-right.html"><img alt="Evara" src="assets/imgs/shop/thumbnail-4.jpg"></a>
                                             </div>
                                             <div class="shopping-cart-title">
                                                 <h4><a href="shop-product-right.html">Macbook Pro 2022</a></h4>
@@ -374,7 +377,16 @@
                                         </div>
                                         <div class="clearfix product-price-cover">
                                             <div class="product-price primary-color float-left">
-                                                <ins><span class="text-brand">&#8377;<%=product.salePrice%></span></ins>
+                                                <ins><span class="text-brand">&#8377;
+                                                    <%if(!product?.offerPrice){%>
+                                                        <%= product?.salePrice%>                           
+                                                          <%} else {%>
+                                                          <%= product.offerPrice%>
+                                                      <%}%>
+                                                
+                                                
+                                                
+                                                </span></ins>
                                                 <ins><span class="old-price font-md ml-15">&#8377;<%=product.regularPrice%></span></ins>
                                                 <span class="save-price  font-md color3 ml-15">25% Off</span>
                                             </div>
@@ -396,12 +408,12 @@
                                         <div class="detail-extralink">
                                             <div class="product-extra-link2">
                                                 <button type="submit"  onclick="addtoCart('<%=product._id%>')" class="button button-add-to-cart">Add to cart</button>
-                                                <a aria-label="Add To Wishlist" class="action-btn hover-up" href="#"><i class="fi-rs-heart"></i></a>
+                                                <a aria-label="Add To Wishlist"  onclick="addtoWishlist('<%=product._id%>')" class="action-btn hover-up" href=""><i class="fi-rs-heart"></i></a>
                                             </div>
                                         </div>
                                         <ul class="product-meta font-xs color-grey mt-50">
                                             <li class="mb-5">SKU: <a href="#">FWM15VKT</a></li>
-                                            <li class="mb-5">Tags: <a href="#" rel="tag">Cloth</a>, <a href="#" rel="tag"><%= product.category%></a>, <a href="#" rel="tag">Dress</a> </li>
+                                            <li class="mb-5">Tags: <a href="#" rel="tag">Cloth</a>, <a href="#" rel="tag"><%= product.category%></a>, <a href="" rel="tag">Dress</a> </li>
                                             <li>Availability:<span class="in-stock text-success ml-5"><%= product.quantity%> Items In Stock</span></li>
                                         </ul>
                                     </div>
@@ -584,11 +596,81 @@
     <script src="assets/js/plugins/jquery.theia.sticky.js"></script>
     <script src="assets/js/plugins/jquery.elevatezoom.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- toastr -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 
     <!-- Template  JS -->
     <script src="./assets/js/main.js?v=3.4"></script>
     <script src="./assets/js/shop.js?v=3.4"></script>
     <script>
+          function addtoWishlist(productid)
+        {
+          toastr.options = 
+                      {
+                        "closeButton": false,
+                        "newestOnTop": false,
+                        "progressBar": true,
+                        "positionClass": "toast-bottom-right",
+                        "preventDuplicates": false,
+                        "onclick": null,
+                        "showDuration": "300",
+                        "hideDuration": "1000",
+                        "timeOut": "5000",
+                        "extendedTimeOut": "1000",
+                        "showEasing": "swing",
+                        "hideEasing": "linear",
+                        "showMethod": "fadeIn",
+                        "hideMethod": "fadeOut"
+                      }
+          $.ajax({
+            method:'POST',
+            url:'/addtowishlist',
+            data:{productid},
+            success : function(res){
+                // Handle the response
+                if(res.notlogin){
+                  Swal.fire(
+                              'You should login first'
+                            ).then(function(){
+                              window.location.href="/userSignin";
+
+                            });
+                }
+                else if(res.exsting){
+                  $(document).ready(function onDocumentReady() 
+                      {  
+                        toastr.error('Item already in WISHLIST'); 
+                      });
+
+                }
+                else if(res.towishlist){
+                  if(typeof(res.wlsize)=="number")
+                  {
+                    console.log("dhfjsdhfhsdfhsdjkfhf"+res.wlsize+"dhfjsdhfhsdfhsdjkfhf");
+                  const wlicon=document.getElementById("wlicon");
+                  wlicon.innerHTML=res.wlsize;
+                  }
+                  $(document).ready(function onDocumentReady() 
+                      {  
+                        toastr.success('Item added to WISHLIST'); 
+                      });
+                }
+                else{
+                  $(document).ready(function onDocumentReady() 
+                      {  
+                        toastr.error('Item not added to WISHLIST'); 
+                      });
+                }
+            }
+          });
+        }
+
+
+
+
+
+
         function addtoCart(productid)
       {
         $.ajax({
@@ -606,14 +688,33 @@
                             });
                 }
                 else if(res.toCart){
-                  Swal.fire(
-                              'Item added to cart'
-                            );
+                    toastr.options = 
+                      {
+                        "closeButton": false,
+                        "newestOnTop": false,
+                        "progressBar": true,
+                        "positionClass": "toast-bottom-right",
+                        "preventDuplicates": false,
+                        "onclick": null,
+                        "showDuration": "300",
+                        "hideDuration": "1000",
+                        "timeOut": "5000",
+                        "extendedTimeOut": "1000",
+                        "showEasing": "swing",
+                        "hideEasing": "linear",
+                        "showMethod": "fadeIn",
+                        "hideMethod": "fadeOut"
+                      }
+                      $(document).ready(function onDocumentReady() 
+                      {  
+                        toastr.success("'Item added to cart'"); 
+                      });
                 }
                 else{
-                  Swal.fire(
-                              'Item not added to cart'
-                            );
+                    $(document).ready(function onDocumentReady() 
+                      {  
+                        toastr.success("'Item not added to cart'"); 
+                      });
                 }
             }
         });

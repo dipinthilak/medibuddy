@@ -45,7 +45,8 @@ user_routers.use(session({
 
 
   user_routers.post("/addtowishlist",userController.addtoWishlist);
-  user_routers.get("/userWishlist",userauth.isLogin,userController.userWishlist);
+  user_routers.get("/wsOpen",userController.wsOpen);
+  user_routers.get("/userWishlist",userController.userWishlist);
   user_routers.post("/removewishitem",userController.removeWishitem);
 
 

@@ -222,24 +222,24 @@
             <div class="content-header">
               <span>
                 <h2 class="content-title">Add New Offer</h2>
-                <h3>Category offer</h3>
+                <h3>Product offer</h3>
               </span>
             </div>
           </div>
           <div class="col-lg-5">
             <div class="card mb-4">
               <div class="card-body">
-                <form action="/admin/catOffer" method="post">
+                <form action="/admin/productOffer" method="post">
                   <div class="col-md-12 mb-4">
-                    <label for="discount" class="form-label">category Id</label>                    
+                    <label for="discount" class="form-label">product Id</label>                    
                     <input
                     type="text"
                     readonly
-                    name="cat_id"
+                    name="product_id"
                     placeholder="Type here"
                     class="form-control"
-                    value=<%=cid%>
-                    id="cat_id"
+                    value=<%=pid%>
+                    id="product_id"
                   />
                   </div>
                   <div class="row">

@@ -92,43 +92,15 @@
             <div class="col-nav">
                 <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
                 <ul class="nav">
-                    <li class="nav-item">
-                        <a class="nav-link btn-icon" href="#">
-                            <i class="material-icons md-notifications animation-shake"></i>
-                            <span class="badge rounded-pill">3</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i> </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="requestfullscreen nav-link btn-icon"><i class="material-icons md-cast"></i></a>
-                    </li>
-                    <li class="dropdown nav-item">
-                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownLanguage" aria-expanded="false"><i class="material-icons md-public"></i></a>
-                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownLanguage">
-                            <a class="dropdown-item text-brand" href="#"><img src="/assetsbackend/imgs/theme/flag-us.png" alt="English">English</a>
-                            <a class="dropdown-item" href="#"><img src="/assetsbackend/imgs/theme/flag-fr.png" alt="Français">Français</a>
-                            <a class="dropdown-item" href="#"><img src="/assetsbackend/imgs/theme/flag-jp.png" alt="Français">日本語</a>
-                            <a class="dropdown-item" href="#"><img src="/assetsbackend/imgs/theme/flag-cn.png" alt="Français">中国人</a>
-                        </div>
-                    </li>
                     <li class="dropdown nav-item">
                         <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="/assetsbackend/imgs/people/avatar2.jpg" alt="User"></a>
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
-                            <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>Edit Profile</a>
-                            <a class="dropdown-item" href="#"><i class="material-icons md-settings"></i>Account Settings</a>
-                            <a class="dropdown-item" href="#"><i class="material-icons md-account_balance_wallet"></i>Wallet</a>
-                            <a class="dropdown-item" href="#"><i class="material-icons md-receipt"></i>Billing</a>
-                            <a class="dropdown-item" href="#"><i class="material-icons md-help_outline"></i>Help center</a>
-                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item text-danger" href="/admin/logout"><i class="material-icons md-exit_to_app"></i>Logout</a>
                         </div>
                     </li>
                 </ul>
             </div>
         </header>
-        <section class="content-main">
             <section class="content-main">
                 <div class="content-header">
                     <div>
@@ -153,6 +125,7 @@
                                         <th scope="col">Sale Price</th>
                                         <th scope="col">isListed</th>
                                         <th scope="col">Quantity</th>
+                                        <th scope="col">Offer : price</th>
                                         <th scope="col">Actions</th>
                                       </tr>
                                     </thead>
@@ -167,8 +140,20 @@
                                               <td><%= products[i].salePrice %></td>
                                               <td><%= products[i].isListed %></td>
                                               <td><%= products[i].quantity %></td>
-                                              <td> <div class="d-flex "><a href="/admin/productEdit?pid=<%=products[i]._id%>" class="btn-sm btn-dark me-auto">Edit</a> 
-                                                <a type="button" href="/admin/productDelete?pid=<%=products[i]._id%>" class="btn-sm btn-danger">Unlist</a></div>
+                                              <td>
+                                                <%if(products[i].offerType ===''){%>
+                                                <a type="button" href="/admin/productOffer?pid=<%=products[i]._id%>" class="btn-sm btn-primary">Add Offer</a>
+                                                <%} else {%> 
+                                                   <div style="display: flex;">
+                                                    <a type="button" href="/admin/deleteOffer?pid=<%=products[i]._id%>" class="btn-sm btn-danger"> Offer X</a>
+                                                    <%=products[i].offerPrice%> 
+                                                   </div> <%}%>
+                                              </td>
+                                              <td> <div class="d-flex ">
+                                                <a href="/admin/productEdit?pid=<%=products[i]._id%>" class="btn-sm btn-dark me-auto">Edit</a> 
+                                                <a type="button" href="/admin/productDelete?pid=<%=products[i]._id%>" class="btn-sm btn-danger">Unlist</a>
+                                            </div>
+                                              </td>
                                             </tr>
                                             <% } %>
                                   </table>

@@ -416,6 +416,7 @@ const passwordForgototp=async(req,res)=>{
     }
 
     };
+    
 
 const userLogout = async(req,res)=>{
     try {
@@ -425,6 +426,7 @@ const userLogout = async(req,res)=>{
         console.log(error.message);
     }
     };
+
     
 const productShop=async (req,res)=>{
 try {
@@ -524,7 +526,7 @@ try {
 
 const addtoCart=async (req,res)=>{
     try {
-
+      let cartimax=false;
         const productId =req.body.productid ;
         console.log("FGGHFGHFGHFGHFGHFGHFGHFGHFGFGH"+productId);
         const prdct=await Product.findById(productId);
@@ -549,6 +551,7 @@ const addtoCart=async (req,res)=>{
             if(existingitem.quantity>prdct.quantity)
             {
               existingitem.quantity=prdct.quantity;
+              cartimax=true;
             }
             await user.save();
             res.status(200).json({toCart:true});
@@ -558,10 +561,13 @@ const addtoCart=async (req,res)=>{
         const usercl = await User.findById(req.session.user_id);
                     const cartcount=usercl.cart.length;
                     console.log(cartcount);
-
-                res.status(200).json({toCart:true,cartcount:cartcount});
+                    console.log(cartimax);
+              if(cartimax){
+                res.status(200).json({toCart:true,cartcount:cartcount,cartimax:true});
+              }
+                res.status(200).json({toCart:true,cartcount:cartcount,cartimax:false});
               } else {
-                res.status(200).json({toCart:false});
+                res.status(200).json({toCart:false,cartimax:false});
               }
         }
     }
@@ -1312,6 +1318,27 @@ const userWishlist=async (req,res)=>{
     }
     };
 
+    const wsOpen=async (req,res)=>{
+      try {
+          console.log(req.session.user_id);
+          if(req.session.user_id){
+              res.status(200).json({userlogin:true});  
+          }
+          else 
+          {
+              res.status(200).json({notlogin:true});
+          }
+  
+          
+      } catch (error) {
+          console.log(error);
+      }
+  
+      };
+
+
+
+
 const addtoWishlist=async(req,res)=>{
     try {
         const productId =req.body.productid ;
@@ -1561,5 +1588,6 @@ module.exports = {
                 downloadInvoice,
                 allProduct,
                 returnOrder,
-                cancelOrder         
+                cancelOrder,
+                wsOpen         
             };
