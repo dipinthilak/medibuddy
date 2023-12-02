@@ -1132,12 +1132,6 @@ const checkout = async (req, res) => {
 
 
 
-
-
-
-
-
-
 const verifypayment=async(req,res)=>{ 
     try {
         console.log('this is id:',req.body.orderId);
@@ -1204,18 +1198,38 @@ const orderdetails=async (req,res)=>{
 
 const downloadInvoice = async (req, res) => {
         try {
-          const orderId = req.body.orderId;
+          let product;
+          const orderId = req.query.orderId;
+          console.log("hdsjkfhjksdhfjksdhfjhsdfhsdjkfjhsdf");
           const order = await Order.findById(orderId).populate("products.productId");
-          const product = order.products.map((item, i) => {
-            return {
-              quantity: parseInt(item.quantity),
-              discount: parseInt(order.couponDiscount),
-              total: parseInt(order.paidAmount),
-              description: item.productId.name,
-              price: parseInt(item.productId.price),
-              "tax-rate": 0,
-            };
-          });
+          console.log(order);
+          if (order) {
+             product = order.products.map((item, i) => {
+              return {
+                quantity: parseInt(item.quantity),
+                discount: parseInt(order.discount),
+                total: parseInt(order.paidAmount),
+                description: item.productId.name,
+                price: parseInt(item.productId.price),
+                "tax-rate": 0,
+              };
+            });
+        
+        
+          }
+        
+          // const product = order.products.map((item, i) => {
+          //   return {
+          //     quantity: parseInt(item.quantity),
+          //     discount: parseInt(order.discount),
+          //     total: parseInt(order.paidAmount),
+          //     description: item.productId.name,
+          //     price: parseInt(item.productId.price),
+          //     "tax-rate": 0,
+          //   };
+          // });
+          console.log("hdsjkfhjksdhfjksdhfjhsdfhsdjkfjhsdf");
+
           var data = {
             //   "images": {
             //       "logo": "/assets/imgs/theme/logo1.png"
@@ -1231,6 +1245,7 @@ const downloadInvoice = async (req, res) => {
               country: "India",
             },
             // Your recipient
+            
             client: {
               company: order.shippingAddress.customerName,
               address: order.shippingAddress.addressLine1,
@@ -1277,6 +1292,92 @@ const downloadInvoice = async (req, res) => {
 
         }
     };
+
+  
+
+
+// print invoice
+
+// const downloadInvoice = async (req, res) => {
+//   try {
+//     console.log(req.body);
+//     const orderId = req.query.orderId;
+//     const orderData = await Order.findOne({ _id: orderId }).populate(
+//       "products.productId"
+//     );
+//     console.log(orderData.shippingAddress);
+
+//     const product = orderData.products.map((item, i) => {
+//       return {
+//         quantity: parseInt(item.quantity), // Use item.quantity
+//         description: item.productId.productName, // Use item.productId.productName
+//         price: parseInt(item.productId.salePrice), // Use item.productId.salePrice
+//         total: parseInt(item.totalAmount),
+//         "tax-rate": 0,
+//       };
+//     });
+
+//     console.log("product");
+//     console.log(product);
+//     var data = {
+//       //   "images": {
+//       //       "logo": "/assets/imgs/theme/logo1.png"
+//       //  },
+//       // Your own data
+//             sender: {
+//               company: "Medibuddy",
+//               address: "M R Nagar, Vikas Street,56,Kadavanthra",
+//               zip: "688535",
+//               city: "Ernakulam",
+//               state: "Kerala",
+//               country: "India",
+//             },
+//       // Your recipient
+//             client: {
+//               company: order.shippingAddress.customerName,
+//               address: order.shippingAddress.addressLine1,
+//               zip: order.shippingAddress.zipcode,
+//               city: order.shippingAddress.city,
+//               state: order.shippingAddress.state,
+//               country: "INDIA",
+//             },
+
+//       information: {
+//         // Invoice number
+//         number: orderData._id,
+//         // Invoice data
+//         date: orderData.createdAt,
+//         // Invoice due date
+//         "due-date": orderData.createdAt,
+//       },
+//       // The products you would like to see on your invoice
+//       // Total values are being calculated automatically
+//       products: product,
+//       // The message you would like to display on the bottom of your invoice
+//       "bottom-notice": "Kindly pay your invoice within 15 days.",
+//       // Settings to customize your invoice
+//       settings: {
+//         currency: "INR", // See documentation 'Locales and Currency' for more info. Leave empty for no currency.
+//         // "locale": "nl-NL", // Defaults to en-US, used for number formatting (See documentation 'Locales and Currency')
+//         // "margin-top": 25, // Defaults to '25'
+//         // "margin-right": 25, // Defaults to '25'
+//         // "margin-left": 25, // Defaults to '25'
+//         // "margin-bottom": 25, // Defaults to '25'
+//         // "format": "A4", // Defaults to A4, options: A3, A4, A5, Legal, Letter, Tabloid
+//         // "height": "1000px", // allowed units: mm, cm, in, px
+//         // "width": "500px", // allowed units: mm, cm, in, px
+//         // "orientation": "landscape", // portrait or landscape, defaults to portrait
+//       },
+//     };
+
+//     console.log("data");
+//     console.log(data);
+
+//     res.json(data);
+//   } catch (error) {
+//     console.log(error.message);
+//   }
+// };
 
 const updatequantity = async (req,res) => {
         try {

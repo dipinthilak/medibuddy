@@ -37,7 +37,7 @@ user_routers.use(session({
   user_routers.post('/applycoupon',userController.applyCoupon);
   user_routers.get('/orderdetails',userauth.isLogin,userauth.isActive,userController.orderdetails);
   user_routers.get('/ordersuccess',userauth.isLogin,userauth.isActive,userController.ordersuccess);
-  user_routers.get('/downloadInvoice',userauth.isLogin,userauth.isActive,userController.downloadInvoice);
+  user_routers.post('/invoicedownload',userauth.isLogin,userauth.isActive,userController.downloadInvoice);
   user_routers.get('/cancelOrder',userauth.isLogin,userauth.isActive,userController.cancelOrder);
   user_routers.get('/returnOrder',userauth.isLogin,userauth.isActive,userController.returnOrder);
   user_routers.post('/checkout',userController.checkout);
@@ -80,25 +80,6 @@ user_routers.use(session({
 
   user_routers.get("/userDashboard",userauth.isLogin,userauth.isActive,userController.userDashboard);
   user_routers.get("/userlogout",userauth.isLogin,userController.userLogout);
-  // user_routers.use('*',(req,res)=>{res.render('error',{message:''})})
-
-//   user_routers.get("/postman",(req,res)=>{
-//     const id='651ec5873ec49e4550745496';
-// const userPromise = User.findById(id);
-// const userDataPromise = User.findById(id);
-// const userCartPromise = User.findOne({_id: id}).populate('cart.productId');
-// const categoriesPromise = Category.find();
-
-// Promise.all([userPromise, userDataPromise, userCartPromise, categoriesPromise])
-//   .then(([user, userData, userCart, categories]) => {
-//    res.send({user:user});
-//   })
-//   .catch(error => {
-//     // Handle any errors that might occur during the Promise.all
-//   });
-
-//   }
-//   );
 
 
   module.exports = user_routers;

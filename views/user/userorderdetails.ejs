@@ -699,6 +699,14 @@
                                 </div>
                                 <tr>    
 
+
+                                    <div class="cart-action text-end mt-55">
+
+
+                                        <% if (order.orderStatus === "DELIVERED") { %>
+                                            <a onclick="invoicePrint('<%= order._id %>')"class="btn "><i class="fi-rs-shopping-bag mr-10"></i>INVOICE</a>
+                                        <% } %>
+                                    </div>
                                     <div class="cart-action text-end mt-55">
 
 
@@ -724,6 +732,30 @@
         </section>
         
 </main>
+
+
+<script>
+    function invoicePrint(orderId) {
+        $.ajax({
+            url: '/invoicedownload',
+            method: 'post',
+            data: { orderId },
+            success: function (res) {
+                alert('success')
+                console.log(res);
+                // Pass 'res' directly to easyinvoice.createInvoice
+                easyinvoice.createInvoice(res, function (result) {
+                easyinvoice.download('myInvoice.pdf', result.pdf);
+                    // alert('finished')
+    //	you can download like this as well:
+    //	easyinvoice.download();
+    //	easyinvoice.download('myInvoice.pdf');   
+});
+            }
+        });
+    }
+</script>
+
     <!-- Vendor JS-->
     <script src="/assets/js/vendor/modernizr-3.6.0.min.js"></script>
     <script src="/assets/js/vendor/jquery-3.6.0.min.js"></script>

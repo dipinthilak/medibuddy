@@ -246,6 +246,7 @@ const orderstatus = async (req, res) => {
     console.log(req.body);
     console.log(req.query.ordrid);
     const order = await Order.findById(req.query.ordrid);
+    console.log(order);
 
     if (req.body.status == "DELIVERED") {
       if (order.paymentDetails == "COD") {
@@ -265,6 +266,12 @@ const orderstatus = async (req, res) => {
           { orderStatus: "DELIVERED" }
         );
       }
+            else if (order.paymentDetails == "WALLET" && order.paymentStatus == 'RECEIVED') {
+        const orderdata = await Order.findByIdAndUpdate(
+          { _id: req.query.ordrid },
+          { orderStatus: "DELIVERED" }
+        );
+      }
     } else if (req.body.status == "PLACED") {
       if (order.paymentDetails == "COD") {
         const orderdata = await Order.findByIdAndUpdate(
@@ -277,8 +284,15 @@ const orderstatus = async (req, res) => {
           { orderStatus: "PLACED" }
         );
       }
+    else if (order.paymentDetails == "WALLET") {
+      const orderdata = await Order.findByIdAndUpdate(
+        { _id: req.query.ordrid },
+        { orderStatus: "PLACED" }
+      );
     }
+  }
     res.redirect("/admin/ordermanagement");
+
   } catch (error) {
     console.log(error);
   }
