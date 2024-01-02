@@ -10,15 +10,18 @@
     <meta property="og:type" content="" />
     <meta property="og:url" content="" />
     <meta property="og:image" content="" />
-    
-    <link rel="icon" type="image/x-icon" href="assets/imgs/theme/logo.svg">
+
+    <link rel="icon" type="image/x-icon" href="assets/imgs/theme/logo.svg" />
     <link rel="stylesheet" href="assets/css/main.css?v=3.4" />
     <!-- Include Toastr CSS -->
-    <link rel="stylesheet" href="assets/css/toastr.min.css">
+    <link rel="stylesheet" href="assets/css/toastr.min.css" />
   </head>
   <body>
     <!-- header -->
-    <header style="background-color:rgb(208, 249, 235)" class="header-area header-style-1 pt-1 header-height-1">
+    <header
+      style="background-color: rgb(208, 249, 235)"
+      class="header-area header-style-1 pt-1 header-height-1"
+    >
       <div class="header-top d-none d-lg-block mt-20">
         <div>
           <div class="row">
@@ -67,25 +70,28 @@
                           src="assets/imgs/theme/icons/icon-heart.svg"
                         />
                         <%if(user){%>
-                        <span id="wlicon" class="pro-count blue"><%=user.wishlist.length%></span>
+                        <span id="wlicon" class="pro-count blue"
+                          ><%=user.wishlist.length%></span
+                        >
                         <%} else { %>
                         <span id="wlicon"></span>
                         <%}%>
                       </a>
                     </div>
 
-
                     <div class="header-action-icon-2" onclick="userCart()">
                       <!-- <a onclick="userCart('<%=user%>')" id="user" class="mini-cart-icon" > -->
-                        <a  id="user" class="mini-cart-icon">
+                      <a id="user" class="mini-cart-icon">
                         <img
                           alt="Evara"
                           src="assets/imgs/theme/icons/icon-cart.svg"
                         />
                         <%if(user){%>
-                        <span id="clength" class="pro-count blue"><%=user.cart.length%></span>
+                        <span id="clength" class="pro-count blue"
+                          ><%=user.cart.length%></span
+                        >
                         <%}else{%>
-                          <span id="clength"></span>
+                        <span id="clength"></span>
                         <%}%>
                       </a>
                     </div>
@@ -120,8 +126,10 @@
                         </li>
                         <% for (let i = 0; i < category.length; i++) { %>
                         <li>
-                          <a href="/userCategoryproduct?cid=<%=category[i]._id%>"
-                            ><i class="evara-font-kite"></i><%= category[i].name%></a
+                          <a
+                            href="/userCategoryproduct?cid=<%=category[i]._id%>"
+                            ><i class="evara-font-kite"></i><%=
+                            category[i].name%></a
                           >
                         </li>
                         <%}%>
@@ -130,15 +138,21 @@
                   </div>
                 </div>
               </div>
-              <div style="border-style: solid; border-color: black; border-radius: 10px;" class="col-6">
-                <div class="search-style-2" >
+              <div
+                style="
+                  border-style: solid;
+                  border-color: black;
+                  border-radius: 10px;
+                "
+                class="col-6"
+              >
+                <div class="search-style-2">
                   <form action="/searchproduct">
                     <input
                       type="text"
                       name="searchquery"
                       placeholder="Search for medicines , supplements"
                     />
-
                   </form>
                 </div>
               </div>
@@ -373,9 +387,10 @@
       </div>
     </div>
 
-
     <main class="main">
-      <section class="product-tabs section-padding position-relative mt-10 wow fadeIn animated">
+      <section
+        class="product-tabs section-padding position-relative mt-10 wow fadeIn animated"
+      >
         <div class="container">
           <div class="tab-header">
             <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -458,7 +473,7 @@
                         <a
                           aria-label="Quick view"
                           class="action-btn hover-up"
-                          href="/userShopproduct?pid=<%= product[i]._id%>"  
+                          href="/userShopproduct?pid=<%= product[i]._id%>"
                           ><i class="fi-rs-eye"></i
                         ></a>
                         <a
@@ -486,7 +501,8 @@
                       </div>
                       <h2>
                         <a href="/userShopproduct?pid=<%= product[i]._id%>">
-                        <%= product[i].productName%></a>
+                          <%= product[i].productName%></a
+                        >
                       </h2>
                       <div class="rating-result" title="90%">
                         <span>
@@ -494,20 +510,23 @@
                         </span>
                       </div>
                       <div class="product-price">
-                        <span>&#8377;
-                          <%if(!product[i]?.offerPrice){%>
-                          <%= product[i]?.salePrice%>                           
-                            <%} else {%>
-                            <%= product[i].offerPrice%>
-                        <%}%></span>
+                        <span
+                          >&#8377; <%if(!product[i]?.offerPrice){%> <%=
+                          product[i]?.salePrice%> <%} else {%> <%=
+                          product[i].offerPrice%> <%}%></span
+                        >
                         <span class="old-price"
-                          >&#8377;
-                          <%= product[i].regularPrice%></span
+                          >&#8377; <%= product[i].regularPrice%></span
                         >
                       </div>
                       <div class="product-action-1 show">
-                        <a onclick="addtoCart('<%=product[i]._id%>')" aria-label="Add To Cart" class="action-btn hover-up" id="addtocartButton" 
-                        ><i class="fi-rs-shopping-bag-add"></i></a>
+                        <a
+                          onclick="addtoCart('<%=product[i]._id%>')"
+                          aria-label="Add To Cart"
+                          class="action-btn hover-up"
+                          id="addtocartButton"
+                          ><i class="fi-rs-shopping-bag-add"></i
+                        ></a>
                       </div>
                     </div>
                   </div>
@@ -523,81 +542,87 @@
               role="tabpanel"
               aria-labelledby="tab-two"
             >
-            <div class="row product-grid-4">
-              <% for (let i = 0; i < product.length; i++) { %>
-              <div class="col-lg-3 col-md-4 col-12 col-sm-6">
-                <!-- ********************************************************************************** -->
-                <div class="product-cart-wrap mb-30">
-                  <div class="product-img-action-wrap">
-                    <div class="product-img product-img-zoom">
-                      <a href="/userShopproduct?pid=<%= product[i]._id%>">
-                        <img
-                          class="default-img"
-                          src="/admin-assets/product/<%= product[i].image[0]%>"
-                          alt=""
-                        />
-                        <img
-                          class="hover-img"
-                          src="/admin-assets/product/<%= product[i].image[0]%>"
-                          alt=""
-                        />
-                      </a>
-                    </div>
-                    <div class="product-action-1">
-                      <a
-                        aria-label="Quick view"
-                        class="action-btn hover-up"
-                        data-bs-toggle="modal"
-                        data-bs-target="#quickViewModal"
-                        ><i class="fi-rs-eye"></i
-                      ></a>
-                      <a
-                        aria-label="Add To Wishlist"
-                        class="action-btn hover-up"
-                        href="shop-wishlist.html"
-                        ><i class="fi-rs-heart"></i
-                      ></a>
-                      <a
-                        aria-label="Compare"
-                        class="action-btn hover-up"
-                        href="shop-compare.html"
-                        ><i class="fi-rs-shuffle"></i
-                      ></a>
-                    </div>
-                    <div
-                      class="product-badges product-badges-position product-badges-mrg"
-                    >
-                      <span class="hot">Hot</span>
-                    </div>
-                  </div>
-                  <div class="product-content-wrap">
-                    <div class="product-category">
-                      <a href="#"><%= product[i].category%></a>
-                    </div>
-                    <h2>
-                      <a href="/userShopproduct?pid=<%= product[i]._id%>">
-                      <%= product[i].productName%></a>
-                    </h2>
-                    <div class="rating-result" title="90%">
-                      <span>
-                        <span>90%</span>
-                      </span>
-                    </div>
-                    <div class="product-price">
-                      <span>&#8377;<%= product[i].salePrice%> </span>
-                      <span class="old-price"
-                        >&#8377;<%= product[i].regularPrice%></span
+              <div class="row product-grid-4">
+                <% for (let i = 0; i < product.length; i++) { %>
+                <div class="col-lg-3 col-md-4 col-12 col-sm-6">
+                  <!-- ********************************************************************************** -->
+                  <div class="product-cart-wrap mb-30">
+                    <div class="product-img-action-wrap">
+                      <div class="product-img product-img-zoom">
+                        <a href="/userShopproduct?pid=<%= product[i]._id%>">
+                          <img
+                            class="default-img"
+                            src="/admin-assets/product/<%= product[i].image[0]%>"
+                            alt=""
+                          />
+                          <img
+                            class="hover-img"
+                            src="/admin-assets/product/<%= product[i].image[0]%>"
+                            alt=""
+                          />
+                        </a>
+                      </div>
+                      <div class="product-action-1">
+                        <a
+                          aria-label="Quick view"
+                          class="action-btn hover-up"
+                          data-bs-toggle="modal"
+                          data-bs-target="#quickViewModal"
+                          ><i class="fi-rs-eye"></i
+                        ></a>
+                        <a
+                          aria-label="Add To Wishlist"
+                          class="action-btn hover-up"
+                          href="shop-wishlist.html"
+                          ><i class="fi-rs-heart"></i
+                        ></a>
+                        <a
+                          aria-label="Compare"
+                          class="action-btn hover-up"
+                          href="shop-compare.html"
+                          ><i class="fi-rs-shuffle"></i
+                        ></a>
+                      </div>
+                      <div
+                        class="product-badges product-badges-position product-badges-mrg"
                       >
+                        <span class="hot">Hot</span>
+                      </div>
                     </div>
-                    <div class="product-action-1 show">
-                      <a onclick="addtoCart('<%=product[i]._id%>')" aria-label="Add To Cart" class="action-btn hover-up" id="addtocartButton" 
-                      ><i class="fi-rs-shopping-bag-add"></i></a>
+                    <div class="product-content-wrap">
+                      <div class="product-category">
+                        <a href="#"><%= product[i].category%></a>
+                      </div>
+                      <h2>
+                        <a href="/userShopproduct?pid=<%= product[i]._id%>">
+                          <%= product[i].productName%></a
+                        >
+                      </h2>
+                      <div class="rating-result" title="90%">
+                        <span>
+                          <span>90%</span>
+                        </span>
+                      </div>
+                      <div class="product-price">
+                        <span>&#8377;<%= product[i].salePrice%> </span>
+                        <span class="old-price"
+                          >&#8377;<%= product[i].regularPrice%></span
+                        >
+                      </div>
+                      <div class="product-action-1 show">
+                        <a
+                          onclick="addtoCart('<%=product[i]._id%>')"
+                          aria-label="Add To Cart"
+                          class="action-btn hover-up"
+                          id="addtocartButton"
+                          ><i class="fi-rs-shopping-bag-add"></i
+                        ></a>
+                      </div>
                     </div>
                   </div>
                 </div>
+                <%}%>
               </div>
-              <%}%>
-            </div>
               <!--End product-grid-4-->
             </div>
             <!--En tab two (Popular)-->
@@ -607,81 +632,87 @@
               role="tabpanel"
               aria-labelledby="tab-three"
             >
-            <div class="row product-grid-4">
-              <% for (let i = 0; i < product.length; i++) { %>
-              <div class="col-lg-3 col-md-4 col-12 col-sm-6">
-                <!-- ********************************************************************************** -->
-                <div class="product-cart-wrap mb-30">
-                  <div class="product-img-action-wrap">
-                    <div class="product-img product-img-zoom">
-                      <a href="/userShopproduct?pid=<%= product[i]._id%>">
-                        <img
-                          class="default-img"
-                          src="/admin-assets/product/<%= product[i].image[0]%>"
-                          alt=""
-                        />
-                        <img
-                          class="hover-img"
-                          src="/admin-assets/product/<%= product[i].image[0]%>"
-                          alt=""
-                        />
-                      </a>
-                    </div>
-                    <div class="product-action-1">
-                      <a
-                        aria-label="Quick view"
-                        class="action-btn hover-up"
-                        data-bs-toggle="modal"
-                        data-bs-target="#quickViewModal"
-                        ><i class="fi-rs-eye"></i
-                      ></a>
-                      <a
-                        aria-label="Add To Wishlist"
-                        class="action-btn hover-up"
-                        href="shop-wishlist.html"
-                        ><i class="fi-rs-heart"></i
-                      ></a>
-                      <a
-                        aria-label="Compare"
-                        class="action-btn hover-up"
-                        href="shop-compare.html"
-                        ><i class="fi-rs-shuffle"></i
-                      ></a>
-                    </div>
-                    <div
-                      class="product-badges product-badges-position product-badges-mrg"
-                    >
-                      <span class="hot">Hot</span>
-                    </div>
-                  </div>
-                  <div class="product-content-wrap">
-                    <div class="product-category">
-                      <a href="#"><%= product[i].category%></a>
-                    </div>
-                    <h2>
-                      <a href="/userShopproduct?pid=<%= product[i]._id%>">
-                      <%= product[i].productName%></a>
-                    </h2>
-                    <div class="rating-result" title="90%">
-                      <span>
-                        <span>90%</span>
-                      </span>
-                    </div>
-                    <div class="product-price">
-                      <span>&#8377;<%= product[i].salePrice%> </span>
-                      <span class="old-price"
-                        >&#8377;<%= product[i].regularPrice%></span
+              <div class="row product-grid-4">
+                <% for (let i = 0; i < product.length; i++) { %>
+                <div class="col-lg-3 col-md-4 col-12 col-sm-6">
+                  <!-- ********************************************************************************** -->
+                  <div class="product-cart-wrap mb-30">
+                    <div class="product-img-action-wrap">
+                      <div class="product-img product-img-zoom">
+                        <a href="/userShopproduct?pid=<%= product[i]._id%>">
+                          <img
+                            class="default-img"
+                            src="/admin-assets/product/<%= product[i].image[0]%>"
+                            alt=""
+                          />
+                          <img
+                            class="hover-img"
+                            src="/admin-assets/product/<%= product[i].image[0]%>"
+                            alt=""
+                          />
+                        </a>
+                      </div>
+                      <div class="product-action-1">
+                        <a
+                          aria-label="Quick view"
+                          class="action-btn hover-up"
+                          data-bs-toggle="modal"
+                          data-bs-target="#quickViewModal"
+                          ><i class="fi-rs-eye"></i
+                        ></a>
+                        <a
+                          aria-label="Add To Wishlist"
+                          class="action-btn hover-up"
+                          href="shop-wishlist.html"
+                          ><i class="fi-rs-heart"></i
+                        ></a>
+                        <a
+                          aria-label="Compare"
+                          class="action-btn hover-up"
+                          href="shop-compare.html"
+                          ><i class="fi-rs-shuffle"></i
+                        ></a>
+                      </div>
+                      <div
+                        class="product-badges product-badges-position product-badges-mrg"
                       >
+                        <span class="hot">Hot</span>
+                      </div>
                     </div>
-                    <div class="product-action-1 show">
-                      <a onclick="addtoCart('<%=product[i]._id%>')" aria-label="Add To Cart" class="action-btn hover-up" id="addtocartButton" 
-                      ><i class="fi-rs-shopping-bag-add"></i></a>
+                    <div class="product-content-wrap">
+                      <div class="product-category">
+                        <a href="#"><%= product[i].category%></a>
+                      </div>
+                      <h2>
+                        <a href="/userShopproduct?pid=<%= product[i]._id%>">
+                          <%= product[i].productName%></a
+                        >
+                      </h2>
+                      <div class="rating-result" title="90%">
+                        <span>
+                          <span>90%</span>
+                        </span>
+                      </div>
+                      <div class="product-price">
+                        <span>&#8377;<%= product[i].salePrice%> </span>
+                        <span class="old-price"
+                          >&#8377;<%= product[i].regularPrice%></span
+                        >
+                      </div>
+                      <div class="product-action-1 show">
+                        <a
+                          onclick="addtoCart('<%=product[i]._id%>')"
+                          aria-label="Add To Cart"
+                          class="action-btn hover-up"
+                          id="addtocartButton"
+                          ><i class="fi-rs-shopping-bag-add"></i
+                        ></a>
+                      </div>
                     </div>
                   </div>
                 </div>
+                <%}%>
               </div>
-              <%}%>
-            </div>
               <!--End product-grid-4-->
             </div>
             <!--En tab three (New added)-->
@@ -736,9 +767,10 @@
           <div class="banner-img banner-big wow fadeIn animated f-none">
             <img src="assets/imgs/banner/banner-4.png" alt="" />
             <div class="banner-text d-md-block d-none">
-              <h4 class="mb-15 mt-40 text-brand">Medical consultation </h4>
+              <h4 class="mb-15 mt-40 text-brand">Medical consultation</h4>
               <h1 class="fw-600 mb-20">
-                We've Medical Experts, <br /> Need consultation !
+                We've Medical Experts, <br />
+                Need consultation !
               </h1>
               <a href="shop-grid-right.html" class="btn"
                 >Online consultation <i class="fi-rs-arrow-right"></i
@@ -748,9 +780,7 @@
         </div>
       </section>
 
-
-
-<!---------------------- category carousel------------------->
+      <!---------------------- category carousel------------------->
       <section class="popular-categories section-padding mt-15 mb-25">
         <div class="container wow fadeIn animated">
           <h3 class="section-title mb-20"><span>Popular</span> Categories</h3>
@@ -758,8 +788,7 @@
             <div
               class="slider-arrow slider-arrow-2 carausel-6-columns-arrow"
               id="carausel-6-columns-arrows"
-            >
-          </div>
+            ></div>
             <div class="carausel-6-columns" id="carausel-6-columns">
               <% for (let i = 0; i < category.length; i++) { %>
               <div class="card-1">
@@ -771,7 +800,9 @@
                   /></a>
                 </figure>
                 <h5>
-                  <a href="/userCategoryproduct?cid=<%=category[i]._id%>"><%= category[i].name %></a>
+                  <a href="/userCategoryproduct?cid=<%=category[i]._id%>"
+                    ><%= category[i].name %></a
+                  >
                 </h5>
               </div>
               <%}%>
@@ -780,7 +811,6 @@
         </div>
       </section>
 
-      
       <section class="banners mb-15">
         <div class="container">
           <div class="row">
@@ -909,11 +939,10 @@
           </div>
         </div>
       </section>
-
     </main>
 
     <footer class="main">
-      <hr>
+      <hr />
       <section class="section-padding footer-mid mt-100">
         <div class="container pt-15 pb-20">
           <div class="row">
@@ -1026,16 +1055,11 @@
       <div class="container pb-20 wow fadeIn animated">
         <div class="row">
           <div class="col-12 mb-20">
-            <div class="footer-bottom">
-            </div>
-          </div>
+            <div class="footer-bottom"></div>
           </div>
         </div>
       </div>
     </footer>
-   
-
-
 
     <!-- Vendor JS-->
     <script src="assets/js/vendor/modernizr-3.6.0.min.js"></script>
@@ -1060,178 +1084,139 @@
     <script src="assets/js/plugins/jquery.elevatezoom.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  
-<!-- toastr -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <!-- toastr -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     <script>
-        function addtoWishlist(productid)
-        {
-          toastr.options = 
-                      {
-                        "closeButton": false,
-                        "newestOnTop": false,
-                        "progressBar": true,
-                        "positionClass": "toast-bottom-right",
-                        "preventDuplicates": false,
-                        "onclick": null,
-                        "showDuration": "300",
-                        "hideDuration": "1000",
-                        "timeOut": "5000",
-                        "extendedTimeOut": "1000",
-                        "showEasing": "swing",
-                        "hideEasing": "linear",
-                        "showMethod": "fadeIn",
-                        "hideMethod": "fadeOut"
-                      }
-          $.ajax({
-            method:'POST',
-            url:'/addtowishlist',
-            data:{productid},
-            success : function(res){
-                // Handle the response
-                if(res.notlogin){
-                  Swal.fire(
-                              'You should login first'
-                            ).then(function(){
-                              window.location.href="/userSignin";
-
-                            });
-                }
-                else if(res.exsting){
-                  $(document).ready(function onDocumentReady() 
-                      {  
-                        toastr.error('Item already in WISHLIST'); 
-                      });
-
-                }
-                else if(res.towishlist){
-                  if(typeof(res.wlsize)=="number")
-                  {
-                  const wlicon=document.getElementById("wlicon");
-                  wlicon.innerHTML=res.wlsize;
-                  }
-                  $(document).ready(function onDocumentReady() 
-                      {  
-                        toastr.success('Item added to WISHLIST'); 
-                      });
-                }
-                else{
-                  $(document).ready(function onDocumentReady() 
-                      {  
-                        toastr.error('Item not added to WISHLIST'); 
-                      });
-                }
-            }
-          });
-        }
-
-function userCart()
-{
-  console.log("userCart");
-  $.ajax({
-    method:'GET',
-    url:'/cartOpen',
-    success: function(res){
-      console.log("cart open check");
-      if(res.notlogin){
-        console.log("no login");
-        Swal.fire(
-          'you should login first'
-        ).then(function()
-        {
-          window.location.href="/userSignin";
-        })
-      }
-      else if(res.userlogin){
-        window.location.href="/userCart";
-      }
-
-    }
-  });
-};
-
-
-function userWlist()
-{
-  console.log("userWlist");
-  $.ajax({
-    method:'GET',
-    url:'/wsOpen',
-    success: function(res){
-      console.log("ws open check");
-      if(res.notlogin){
-        console.log("no login");
-        Swal.fire(
-          'you should login first'
-        ).then(function()
-        {
-          window.location.href="/userSignin";
-        })
-      }
-      else if(res.userlogin){
-        window.location.href="/userWishlist";
-      }
-
-    }
-  });
-};
-
-
-function addtoCart(productid)
-      {
+      function addtoWishlist(productid) {
+        toastr.options = {
+          closeButton: false,
+          newestOnTop: false,
+          progressBar: true,
+          positionClass: "toast-bottom-right",
+          preventDuplicates: false,
+          onclick: null,
+          showDuration: "300",
+          hideDuration: "1000",
+          timeOut: "5000",
+          extendedTimeOut: "1000",
+          showEasing: "swing",
+          hideEasing: "linear",
+          showMethod: "fadeIn",
+          hideMethod: "fadeOut",
+        };
         $.ajax({
-            method: 'POST',
-            url: '/addtoCart',
-            data: { productid }, 
-            success : function(res){
-              toastr.options = 
-                      {
-                        "closeButton": false,
-                        "newestOnTop": false,
-                        "progressBar": true,
-                        "positionClass": "toast-bottom-right",
-                        "preventDuplicates": false,
-                        "onclick": null,
-                        "showDuration": "300",
-                        "hideDuration": "1000",
-                        "timeOut": "5000",
-                        "extendedTimeOut": "1000",
-                        "showEasing": "swing",
-                        "hideEasing": "linear",
-                        "showMethod": "fadeIn",
-                        "hideMethod": "fadeOut"
-                      }
-                // Handle the response
-                if(res.notlogin){
-                  Swal.fire(
-                              'You should login first'
-                            ).then(function(){
-                              window.location.href="/userSignin";
+          method: "POST",
+          url: "/addtowishlist",
+          data: { productid },
+          success: function (res) {
+            // Handle the response
+            if (res.notlogin) {
+              Swal.fire("You should login first").then(function () {
+                window.location.href = "/userSignin";
+              });
+            } else if (res.exsting) {
+              $(document).ready(function onDocumentReady() {
+                toastr.error("Item already in WISHLIST");
+              });
+            } else if (res.towishlist) {
+              if (typeof res.wlsize == "number") {
+                const wlicon = document.getElementById("wlicon");
+                wlicon.innerHTML = res.wlsize;
+              }
+              $(document).ready(function onDocumentReady() {
+                toastr.success("Item added to WISHLIST");
+              });
+            } else {
+              $(document).ready(function onDocumentReady() {
+                toastr.error("Item not added to WISHLIST");
+              });
+            }
+          },
+        });
+      }
 
-                            });
-                }
-                else if(res.toCart){
-                  if(typeof(res.cartcount)=="number")
-                  {
-                    // alert(res.cartcount);
-                    const cartl=document.getElementById("clength");
-                    cartl.innerHTML=res.cartcount;
-                  }
+      function userCart() {
+        console.log("userCart");
+        $.ajax({
+          method: "GET",
+          url: "/cartOpen",
+          success: function (res) {
+            console.log("cart open check");
+            if (res.notlogin) {
+              console.log("no login");
+              Swal.fire("you should login first").then(function () {
+                window.location.href = "/userSignin";
+              });
+            } else if (res.userlogin) {
+              window.location.href = "/userCart";
+            }
+          },
+        });
+      }
 
-                    $(document).ready(function onDocumentReady() 
-                      {  
-                        toastr.success("'Item added to cart'"); 
-                      });
-                }
-                else{
-                    $(document).ready(function onDocumentReady() 
-                      {  
-                        toastr.error("'Item not added to cart'"); 
-                      });
+      function userWlist() {
+        console.log("userWlist");
+        $.ajax({
+          method: "GET",
+          url: "/wsOpen",
+          success: function (res) {
+            console.log("ws open check");
+            if (res.notlogin) {
+              console.log("no login");
+              Swal.fire("you should login first").then(function () {
+                window.location.href = "/userSignin";
+              });
+            } else if (res.userlogin) {
+              window.location.href = "/userWishlist";
+            }
+          },
+        });
+      }
 
-                }
-            } 
+      function addtoCart(productid) {
+        $.ajax({
+          method: "POST",
+          url: "/addtoCart",
+          data: { productid },
+          success: function (res) {
+            toastr.options = {
+              closeButton: false,
+              newestOnTop: false,
+              progressBar: true,
+              positionClass: "toast-bottom-right",
+              preventDuplicates: false,
+              onclick: null,
+              showDuration: "300",
+              hideDuration: "1000",
+              timeOut: "5000",
+              extendedTimeOut: "1000",
+              showEasing: "swing",
+              hideEasing: "linear",
+              showMethod: "fadeIn",
+              hideMethod: "fadeOut",
+            };
+            // Handle the response
+            if (res.notlogin) {
+              Swal.fire("You should login first").then(function () {
+                window.location.href = "/userSignin";
+              });
+            } else if (res.toCart) {
+              if (typeof res.cartcount == "number") {
+                // alert(res.cartcount);
+                const cartl = document.getElementById("clength");
+                cartl.innerHTML = res.cartcount;
+              }
+
+              $(document).ready(function onDocumentReady() {
+                toastr.success("'Item added to cart'");
+              });
+            } else {
+              $(document).ready(function onDocumentReady() {
+                toastr.error("'Item not added to cart'");
+              });
+            }
+          },
         });
       }
     </script>

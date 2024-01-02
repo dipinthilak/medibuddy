@@ -112,8 +112,25 @@ const userDashboard =async (req,res)=>{
     const user = await User.findById(req.session.user_id);
     console.log(user);
     const wallet=await User.findOne({_id:req.session.user_id},{wallet:1});
-    const order=await Order.find({customerId:req.session.user_id}).sort({ createdAt: -1 });
-    res.render('userDashboard',{user:user,order:order,wallet:wallet})
+``
+
+    const PAGE_SIZE = 10; // Adjust the page size as needed
+    const pageNumber = parseInt(req.query.pageNumber) ||1;
+    console.log(pageNumber);
+
+
+    const order = await Order.find({customerId:req.session.user_id})
+  .sort({ createdAt: -1 })
+  .populate('customerId')
+  .skip((pageNumber - 1) * PAGE_SIZE)
+  .limit(PAGE_SIZE);
+
+  const ordercount=await Order.countDocuments({customerId:req.session.user_id});
+  const pagecount =Math.ceil(ordercount/PAGE_SIZE);
+
+
+
+    res.render('userDashboard',{user:user,order:order,wallet:wallet,pagecount:pagecount})
     };
 
 const addaddressload=async(req,res)=>{
@@ -1199,18 +1216,19 @@ const orderdetails=async (req,res)=>{
 const downloadInvoice = async (req, res) => {
         try {
           let product;
-          const orderId = req.query.orderId;
+          const orderId = req.body.orderId;
+          console.log(orderId);
           console.log("hdsjkfhjksdhfjksdhfjhsdfhsdjkfjhsdf");
           const order = await Order.findById(orderId).populate("products.productId");
           console.log(order);
+          console.log(order.products.productId);
           if (order) {
              product = order.products.map((item, i) => {
               return {
                 quantity: parseInt(item.quantity),
                 discount: parseInt(order.discount),
-                total: parseInt(order.paidAmount),
-                description: item.productId.name,
-                price: parseInt(item.productId.price),
+                description: item.productId.productName,
+                price: parseInt(item.productId.salePrice),
                 "tax-rate": 0,
               };
             });
@@ -1247,9 +1265,9 @@ const downloadInvoice = async (req, res) => {
             // Your recipient
             
             client: {
-              company: order.shippingAddress.customerName,
+              company: order.shippingAddress.name,
               address: order.shippingAddress.addressLine1,
-              zip: order.shippingAddress.zipcode,
+              zip:order.shippingAddress.pinCode,
               city: order.shippingAddress.city,
               state: order.shippingAddress.state,
               country: "INDIA",
@@ -1257,7 +1275,7 @@ const downloadInvoice = async (req, res) => {
       
             information: {
               // Invoice number
-              number: order.orderId,
+              number: JSON.stringify(order._id),
               // Invoice data
               date: String(order.createdAt).slice(4, 16),
               // Invoice due date
@@ -1513,14 +1531,27 @@ const removeWishitem=async (req,res)=>{
 const allProduct = async (req, res) => {
     try {
       req.session.originalURL = '/allProducts';
+      const sortv=req.query.sort ||'';
+      
       console.log(req.query.page);  
       var page = 1;
       if (req.query.page) {
         page = req.query.page;
       }
+      let productsQuery;
   
       const limit = 3;
-      const productsQuery = Product.find();
+      if(sortv=='splh'){
+         productsQuery = Product.find().sort({salePrice:1});
+      }
+      else if(sortv=='sphl'){
+         productsQuery = Product.find().sort({salePrice:-1});
+      }
+      else {
+        productsQuery = Product.find();
+
+      }
+    
       console.log(productsQuery);
   
       const products = await paginateQuery(productsQuery, page, limit).exec();

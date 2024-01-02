@@ -112,6 +112,7 @@ admin_routers.post("/login", adminControllers.adminSignin);
 admin_routers.get("/logout",adminauth.isLogin, adminControllers.adminSignout);
 admin_routers.get("/adminDashboard",adminauth.isLogin,adminControllers.adminDashboard);
 admin_routers.get("/createreport",adminauth.isLogin,adminControllers.createreport);
+admin_routers.get("/report",adminauth.isLogin,adminControllers.reportview);
 
 
 //User management

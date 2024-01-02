@@ -3,9 +3,12 @@ const User = require("../models/userSchema");
 const bcrypt = require("bcrypt");
 const Order = require("../models/orderSchema");
 const path = require("path");
-const Product=require("../models/productSchema")
-const Category=require("../models/categorySchema")
+const Product = require("../models/productSchema");
+const Category = require("../models/categorySchema");
 const { render } = require("../routers/user_Routers");
+const { assert } = require("console");
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
 
 const loadLogin = (req, res) => {
   if (req.query.credential) {
@@ -16,7 +19,7 @@ const loadLogin = (req, res) => {
   res.render("adminLogin", { crerror });
 };
 
-const adminSignin = async (req, res) => { 
+const adminSignin = async (req, res) => {
   try {
     const email = req.body.email;
     if (req.body.email != null && req.body.password != null) {
@@ -62,8 +65,7 @@ const adminDashboard = async (req, res) => {
     const productCount = await Product.count();
     const categoryCount = await Category.count();
     const userCount = await User.count();
-  
-  
+
     const monthlyRevenue = await Order.aggregate([
       {
         $match: {
@@ -84,12 +86,9 @@ const adminDashboard = async (req, res) => {
         },
       },
     ]);
-  
-  
-    
-    const mRevenue = monthlyRevenue[0]?.total.toLocaleString("en-IN") || 0 ;
-  
-  
+
+    const mRevenue = monthlyRevenue[0]?.total.toLocaleString("en-IN") || 0;
+
     const monthlySales = await Order.aggregate([
       {
         $project: {
@@ -110,9 +109,9 @@ const adminDashboard = async (req, res) => {
         },
       },
     ]);
-  
+
     const graphDataSales = [];
-  
+
     // Loop through the 12 months (1 to 12)
     for (let month = 1; month <= 12; month++) {
       const resultForMonth = monthlySales.find(
@@ -124,8 +123,7 @@ const adminDashboard = async (req, res) => {
         graphDataSales.push(0);
       }
     }
-  
-  
+
     const productCountData = await Product.aggregate([
       {
         $group: {
@@ -134,32 +132,26 @@ const adminDashboard = async (req, res) => {
         },
       },
     ]);
-  
-    
-  
-      // console.log(productCountData);
-      const categoryNames = productCountData.map((item) => item._id);
-      const categoryCounts = productCountData.map((item) => item.count);
-  
-  
-  
-  
-  
-    res.render("adminDashboard",{  adminData: adminData,
-        totalRevenue: totalRevenue,
-        orderCount: orderCount,
-        productCount: productCount,
-        categoryCount: categoryCount,
-        monthlyRevenue: mRevenue,
-        graphDataSales: graphDataSales,
-        categoryNames: categoryNames,
-        categoryCounts: categoryCounts,
-        userCount: userCount,});
 
+    // console.log(productCountData);
+    const categoryNames = productCountData.map((item) => item._id);
+    const categoryCounts = productCountData.map((item) => item.count);
+
+    res.render("adminDashboard", {
+      adminData: adminData,
+      totalRevenue: totalRevenue,
+      orderCount: orderCount,
+      productCount: productCount,
+      categoryCount: categoryCount,
+      monthlyRevenue: mRevenue,
+      graphDataSales: graphDataSales,
+      categoryNames: categoryNames,
+      categoryCounts: categoryCounts,
+      userCount: userCount,
+    });
   } catch (error) {
     console.log(error);
   }
-
 };
 
 const loadUsermanagement = async (req, res) => {
@@ -175,10 +167,10 @@ const userstatusChange = async (req, res) => {
     const user = await User.findById({ _id: userid });
     if (user.isActive) {
       await User.findByIdAndUpdate(userid, { isActive: false });
-      res.status(200).json({blocked:true});
+      res.status(200).json({ blocked: true });
     } else {
       await User.findByIdAndUpdate(userid, { isActive: true });
-      res.status(200).json({unblocked:true});
+      res.status(200).json({ unblocked: true });
     }
   } catch (errordata) {
     console.log(errordata);
@@ -220,8 +212,20 @@ const adminSignout = async (req, res) => {
 
 const ordermanagement = async (req, res) => {
   try {
-    const order = await Order.find().sort({createdAt:1}).populate("customerId");
-    res.render("adminOrderview", { order: order });
+    const PAGE_SIZE = 10; // Adjust the page size as needed
+    const pageNumber = parseInt(req.query.pageNumber) ||1;
+    console.log(pageNumber);
+
+
+    const order = await Order.find()
+  .sort({ createdAt: -1 })
+  .populate('customerId')
+  .skip((pageNumber - 1) * PAGE_SIZE)
+  .limit(PAGE_SIZE);
+
+  const ordercount=await Order.countDocuments();
+  const pagecount =Math.ceil(ordercount/PAGE_SIZE);
+    res.render("adminOrderview", { order: order,pagecount:pagecount,pageNumber:pageNumber});
   } catch (error) {
     console.log(error);
   }
@@ -254,19 +258,30 @@ const orderstatus = async (req, res) => {
           { _id: req.query.ordrid },
           { paymentStatus: "RECEIVED", orderStatus: "DELIVERED" }
         );
-      } else if (order.paymentDetails == "razorpay" && order.paymentStatus == 'PENDING') {
+      } else if (
+        order.paymentDetails == "razorpay" &&
+        order.paymentStatus == "PENDING"
+      ) {
         const orderdata = await Order.findByIdAndUpdate(
           { _id: req.query.ordrid },
-          {paymentDetails:'COD', paymentStatus:'RECEIVED' ,orderStatus: "DELIVERED" }
+          {
+            paymentDetails: "COD",
+            paymentStatus: "RECEIVED",
+            orderStatus: "DELIVERED",
+          }
         );
-      }
-      else if (order.paymentDetails == "razorpay" && order.paymentStatus == 'RECEIVED') {
+      } else if (
+        order.paymentDetails == "razorpay" &&
+        order.paymentStatus == "RECEIVED"
+      ) {
         const orderdata = await Order.findByIdAndUpdate(
           { _id: req.query.ordrid },
           { orderStatus: "DELIVERED" }
         );
-      }
-            else if (order.paymentDetails == "WALLET" && order.paymentStatus == 'RECEIVED') {
+      } else if (
+        order.paymentDetails == "WALLET" &&
+        order.paymentStatus == "RECEIVED"
+      ) {
         const orderdata = await Order.findByIdAndUpdate(
           { _id: req.query.ordrid },
           { orderStatus: "DELIVERED" }
@@ -283,114 +298,290 @@ const orderstatus = async (req, res) => {
           { _id: req.query.ordrid },
           { orderStatus: "PLACED" }
         );
+      } else if (order.paymentDetails == "WALLET") {
+        const orderdata = await Order.findByIdAndUpdate(
+          { _id: req.query.ordrid },
+          { orderStatus: "PLACED" }
+        );
       }
-    else if (order.paymentDetails == "WALLET") {
-      const orderdata = await Order.findByIdAndUpdate(
-        { _id: req.query.ordrid },
-        { orderStatus: "PLACED" }
-      );
     }
-  }
     res.redirect("/admin/ordermanagement");
-
   } catch (error) {
     console.log(error);
   }
 };
 
 const createreport = async (req, res) => {
-  try {
-    console.log("report processing");
-    let orders = await Order.find().populate("products.productId");
+try {
+  console.log("print pdf");
+  let report;
+  let selectedPeriod=req.session.period;
+  console.log(selectedPeriod);
+  if (selectedPeriod === "") {
+    report = await Order.find().limit(15);
+  } else if (selectedPeriod === "day") {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(today);
+    endOfDay.setHours(23, 59, 59, 999);
+    const query = {
+      createdAt: {
+        $gte: today,
+        $lt: endOfDay,
+      },
+      paymentStatus: 'RECEIVED'
+    };
+    report = await Order.find(query);
+  
+    const numberOfDocuments = await Order.countDocuments(query);
+    console.log("      ------------->>>" + numberOfDocuments);
+  
+  } else if (selectedPeriod === "week") {
+    const today = new Date();
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setDate(today.getDate() - 7);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(today);
+    endOfDay.setHours(23, 59, 59, 999);
+    const query = {
+      createdAt: {
+        $gte: sevenDaysAgo,
+        $lt: endOfDay,
+      },
+    };
+  
+    report = await Order.find(query);
+    const numberOfDocuments = await Order.countDocuments(query);
+    console.log("      ------------->>>" + numberOfDocuments);
+  
+  } else if (selectedPeriod === "month") {
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today);
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+    
+    const query = {
+        createdAt: {
+            $gte: thirtyDaysAgo,
+            $lt: today,
+        },
+    };
+  
+    report = await Order.find(query);
+    const numberOfDocuments = await Order.countDocuments(query);
+    console.log("      ------------->>>" + numberOfDocuments);
+  
+  } else if (selectedPeriod === "3 month") {
+    const today = new Date();
+    const threeMonthsAgo = new Date(today);
+    threeMonthsAgo.setMonth(today.getMonth() - 3);
+    threeMonthsAgo.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(today);
+    endOfDay.setHours(23, 59, 59, 999);
+    const query = {
+      createdAt: {
+        $gte: threeMonthsAgo,
+        $lt: endOfDay,
+      },
+      paymentStatus: 'RECEIVED'
+    };
+  
+    report = await Order.find(query);
+    const numberOfDocuments = await Order.countDocuments(query);
+    console.log("      ------------->>>" + numberOfDocuments);
+  }
+  
+  console.log(`order created within the period: ${selectedPeriod}`);
 
-    const PDFDocument = require("pdfkit");
+  
+  // Generate PDF
+  const pdfDoc = new PDFDocument({ size: "letter", margin: 50 });
+  pdfDoc.pipe(res);
+  pdfDoc.fontSize(20).text("Sales Report", { align: "center" });
+  console.log("pdf creating");
+  if(selectedPeriod==''){
+    pdfDoc.text(`order created within the period: last 15 orders`);
+  }
+  else if(selectedPeriod=='today'){
+    pdfDoc.text(`order created within the period: today`);
+  }
+  else if(selectedPeriod=='week'){
+    pdfDoc.text(`order created within the period: one week`);
+  }
+  else if(selectedPeriod=='month'){
+    pdfDoc.text(`order created within the period:  months`);
+  }  
+  else if(selectedPeriod=='3 month'){
+    pdfDoc.text(`order created within the period: three months`);
+  }
+  pdfDoc.moveDown();
 
-    // Create a document with custom page size and margins
-    const doc = new PDFDocument({ size: "letter", margin: 50 });
-
-    // Pipe its output somewhere, like to a file or HTTP response
-    // See below for browser usage
-    doc.pipe(res);
-
-    // Title
-    doc.fontSize(20).text("Sales Report", { align: "center" });
-    doc.moveDown(); // Move down to create space below the title
-
-    // Define table headers
-    const headers = [
-      "Index",
-      "Date",
-      "Order Id",
-      "Qnty",
-      "Total",
-      "Discount",
-      "Final Price",
-    ];
-    // Calculate column widths
-    const colWidths = [35, 90, 140, 50, 70, 70, 70];
-
-    // Set initial position for drawing
-    let x = 50;
-    let y = doc.y;
-
-    // Draw table headers
+  const headers = [
+    "Index",
+    "Order Id",
+    "Payment_mode",
+    "Total",
+    "Discount",
+  ];
+  const colWidths = [35, 160, 90, 100, 100];
+  let x = 50;
+  let y = pdfDoc.y;
     headers.forEach((header, index) => {
-      doc
+      pdfDoc
         .font("Helvetica-Bold")
         .fontSize(12)
         .text(header, x, y, { width: colWidths[index], align: "center" });
       x += colWidths[index];
     });
-
-    // Draw table rows
     let currentPageY = y;
-    orders.forEach((order, index) => {
+    report.forEach((order, index) => {
       const total = order.totalAmount;
       const discount = order.discount;
-      const orderId = "Odr-" + String(order._id).slice(4, 12);
-      const date = String(order.createdAt).slice(4, 16);
+      const Payment_mode=order.paymentDetails;
+      const orderId = "#ord-" + String(order._id).slice(4, 12);
+      const rowData = [
+        index + 1,
+        orderId,
+        Payment_mode,
+        total, // Format total price
+        discount, // Format discount
+      ];
 
-      order.products.forEach((product) => {
-        const quantity = product.quantity;
-        const finalPrice = total - discount;
-      // Create an array of row data with the Indian Rupee symbol and formatted prices
-        const rowData = [
-          index + 1,
-          date,
-          orderId,
-          quantity,
-          total, // Format total price
-          discount, // Format discount
-          finalPrice, // Format final price
-        ];
+      x = 50;
+      currentPageY += 20;
 
-        x = 50;
-        currentPageY += 20;
+      if (currentPageY + 20 > pdfDoc.page.height - 50) {
+        pdfDoc.addPage(); // Create a new page
+        currentPageY = 50; // Reset the current Y position
+      }
 
-        // Check if the current row will fit on the current page, if not, create a new page
-        if (currentPageY + 20 > doc.page.height - 50) {
-          doc.addPage(); // Create a new page
-          currentPageY = 50; // Reset the current Y position
-        }
+      //draw row data
 
-        // Draw row data
-        rowData.forEach((value, index) => {
-          doc
-            .font("Helvetica")
-            .fontSize(12)
-            .text(value.toString(), x, currentPageY, {
-              width: colWidths[index],
-              align: "center",
-            });
+      rowData.forEach((value, index) => {
+        pdfDoc
+          .font("Helvetica")
+          .fontSize(12)
+          .text(value.toString(), x, currentPageY, {
+            width: colWidths[index],
+            align: "center",
+          });
           x += colWidths[index];
-        });
-      });
-    });
 
-    // Finalize PDF file
-    doc.end();
+    });
+  });
+
+
+  pdfDoc.end();
+  
+  // Assuming `client` refers to your MongoDB client, close the connection if needed.
+  // client.close();
+  
+
+} catch (error) {
+  
+}
+};
+
+const reportview = async (req, res) => {
+  try {
+    console.log("report");
+    const selectedPeriod = req.query.period || "";
+    console.log(selectedPeriod);
+    req.session.period=selectedPeriod;
+    let report = [];
+    if (selectedPeriod === "") {
+      report = await Order.find().limit(15);
+      console.log(report);
+
+    } else if (selectedPeriod === "day") {
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(today);
+      endOfDay.setHours(23, 59, 59, 999);
+      const query = {
+        createdAt: {
+          $gte: today,
+          $lt: endOfDay,
+        },
+        paymentStatus: 'RECEIVED'
+      };
+      report = await Order.find(query);
+      console.log(report);
+      
+      const numberOfDocuments = await Order.countDocuments(query);
+      console.log("      ------------->>>"  + numberOfDocuments);
+
+
+    } else if (selectedPeriod === "week") {
+
+      const today = new Date();
+      const sevenDaysAgo = new Date(today);
+      sevenDaysAgo.setDate(today.getDate() - 7);
+      sevenDaysAgo.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(today);
+      endOfDay.setHours(23, 59, 59, 999);
+      const query = {
+        createdAt: {
+          $gte: sevenDaysAgo,
+          $lt: endOfDay,
+        },
+      };
+
+
+      report = await Order.find(query);
+      console.log(report);
+      const numberOfDocuments = await Order.countDocuments(query);
+      console.log("      ------------->>>"  + numberOfDocuments);
+
+
+    } else if (selectedPeriod === "month") {
+
+
+      const today = new Date();
+      const thirtyDaysAgo = new Date(today);
+      thirtyDaysAgo.setDate(today.getDate() - 30);
+      
+      const query = {
+          createdAt: {
+              $gte: thirtyDaysAgo,
+              $lt: today,
+          },
+      };
+
+
+      report = await Order.find(query);
+      console.log(report);
+      const numberOfDocuments = await Order.countDocuments(query);
+      console.log("      ------------->>>"  + numberOfDocuments);
+
+
+    } else if (selectedPeriod === "3 month") {
+
+
+      const today = new Date();
+      const threeMonthsAgo = new Date(today);
+      threeMonthsAgo.setMonth(today.getMonth() - 3);
+      threeMonthsAgo.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(today);
+      endOfDay.setHours(23, 59, 59, 999);
+      const query = {
+        createdAt: {
+          $gte: threeMonthsAgo,
+          $lt: endOfDay,
+        },
+        paymentStatus: 'RECEIVED'
+      };
+      
+      report = await Order.find(query);
+      console.log(report);
+      const numberOfDocuments = await Order.countDocuments(query);
+      console.log("      ------------->>>"  + numberOfDocuments);
+
+    }
+
+    res.render("adminReport.ejs",{report});
   } catch (error) {
-    console.log(error.message);
+    console.log(error);
   }
 };
 module.exports = {
@@ -404,6 +595,7 @@ module.exports = {
   adminDashboard,
   ordermanagement,
   orderdetails,
-  createreport,
   orderstatus,
+  createreport,
+  reportview,
 };

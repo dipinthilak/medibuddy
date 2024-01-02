@@ -332,7 +332,7 @@
                                         </ul>
                                     </div> -->
                                 </div>
-                                <div class="sort-by-cover">
+                                <!-- <div class="sort-by-cover">
                                     <div class="sort-by-product-wrap">
                                         <div class="sort-by">
                                             <span><i class="fi-rs-apps-sort"></i>Sort by:</span>
@@ -350,7 +350,7 @@
                                             <li><a href="#">Avg. Rating</a></li>
                                         </ul>
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                         <!--  -->
@@ -418,14 +418,16 @@
                             <div class="col-lg-12 col-mg-6"></div>
                         </div>
                         <div class="widget-category mb-30">
-                            <h5 class="section-title style-1 mb-30 wow fadeIn animated">Category</h5>
+                            <h5 class="section-title style-1 mb-30 wow fadeIn animated">Sort</h5>
                             <ul class="categories">
-                                <% for (let i = 0; i < category.length; i++) { %>
-                                <li><a href="/userCategoryproduct?cid=<%=category[i]._id%>">
-                                    <%= category[i].name%> </a></li>
-                                <%}%>
+                              <li><a href="/allProducts?sort=splh">Price low -high </a></li>
+                              <li><a href="/allProducts?sort=sphl">Price high -low </a></li>
                             </ul>
                         </div>
+
+
+
+
                         <!-- Fillter By Price -->
                         <!-- <div class="sidebar-widget price_range range mb-30">
                             <div class="widget-header position-relative mb-20 pb-10">

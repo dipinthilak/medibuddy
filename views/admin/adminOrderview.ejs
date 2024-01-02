@@ -99,9 +99,10 @@
                         <div class="card-body">
                             <div class="row">   
                                 <div class="table-responsive">
-                                    <table class="table table-hover" id="dataTable">
+                                    <table class="table table-hover">
                                         <thead>
                                             <tr>
+                                                <th>SI no.</th>
                                                 <th>#ID</th>
                                                 <th scope="col">Name</th>
                                                 <th scope="col">Email</th>
@@ -114,6 +115,7 @@
                                         <tbody>
                                             <%for(let i=0;i<order.length;i++) {%>
                                             <tr>
+                                                <td><%=i+1%></td>
                                                 <td><%=String(order[i]._id).slice(-8)%></td>
                                                 <td><b><%= order[i].customerId.name %></b></td>
                                                 <td><%= order[i].customerId.email %></td>
@@ -143,9 +145,22 @@
                                             </tr>
             
                                             <% } %>
+
                                            
                                         </tbody>
                                     </table>
+                                    <div id="paginationButtons">
+                                        <% for (let j = 1; j <= pagecount; j++) { %>
+                                            <input type="button" value="<%= j %>" onclick="loadPage(<%= j %>)">
+                                        <% } %>
+                                    </div>
+                                
+                                    <script>
+                                        function loadPage(pageNumber) 
+                                        {
+                                            window.location.href = `/admin/ordermanagement?pageNumber=${pageNumber}`;
+                                        }
+                                    </script>
                                 </div>
                             </div>
                         </div>
