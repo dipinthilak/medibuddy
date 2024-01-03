@@ -401,6 +401,22 @@
                                                 <tr>
                                                     <td class="cart_total_label">Shipping</td>
                                                     <td class="cart_total_amount"> <i class="ti-gift mr-5"></i> Free Shipping</td>
+                                                </tr> 
+                                                <tr>
+                                                    <td class="cart_total_label">Coupon</td>
+                                                    <td class="cart_total_amount">
+                                                        <i class="ti-gift mr-5"></i>
+                                                        <% if (order.coupon == 'no coupon' || '') { %>
+                                                          no coupon
+                                                        <% } else { %>
+                                                          <%= order.coupon %>
+                                                        <% } %>
+                                                      </td>
+                                                      
+                                                </tr> 
+                                                <tr>
+                                                    <td class="cart_total_label">Discount</td>
+                                                    <td class="cart_total_amount"> <i class="ti-gift mr-5"></i>₹<%= order.discount%></td>
                                                 </tr>   
                                                 <tr>
                                                     <td class="cart_total_label">Total</td>
@@ -495,12 +511,10 @@
             method: 'post',
             data: { orderId },
             success: function (res) {
-                // alert('success')
                 console.log(res);
                 // Pass 'res' directly to easyinvoice.createInvoice
                 easyinvoice.createInvoice(res, function (result) {
                 easyinvoice.download('myInvoice.pdf', result.pdf);
-                    // alert('finished')
     //	you can download like this as well:
     //	easyinvoice.download();
     //	easyinvoice.download('myInvoice.pdf');   

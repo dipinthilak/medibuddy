@@ -761,12 +761,11 @@
  
  <script>
     function couponApply(){
-        alert('coupon apply')
         event.preventDefault();
         const coupon = document.getElementById('coupon').value
         const total = document.getElementById('total1').value
-        alert(coupon)
-        alert(total)
+        // alert(coupon)
+        // alert(total)
         $.ajax({
             url: '/applycoupon',
             method: 'post',
@@ -822,11 +821,11 @@
                         }
                         var razorpayObj = new Razorpay(options);
                         razorpayObj.on('payment.failed', function(response){
-                            alert("payment failed")
+                            // alert("payment failed")
                         })
                         razorpayObj.open();
                     }else{
-                        alert("--"+res.msg +"--1212--"+  res.orderId+"--")
+                        // alert("--"+res.msg +"--1212--"+  res.orderId+"--")
                     }
                     if (res.status) {
                         Swal.fire({
@@ -846,10 +845,10 @@
     })
 
     function verifyPayment(payment, order, orderId) {
-            alert("call comes")
-            alert(orderId +"data")
-            alert(payment+"data")
-            alert(order+"data")
+            // alert("call comes")
+            // alert(orderId +"data")
+            // alert(payment+"data")
+            // alert(order+"data")
             $.ajax({
                 url: '/verifypayment',
                 method: 'post',
@@ -866,8 +865,8 @@
                         showConfirmButton: true,
                         confirmButtonText: "View order"
                     }).then(function () {
-                    alert('success ---2')
-                    alert(orderId)
+                    // alert('success ---2')
+                    // alert(orderId)
                         window.open("/ordersuccess?ordid="+orderId, "_self");
 
                         // window.location.href = "/ordersuccess?ordid="+orderId;
